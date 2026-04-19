@@ -13,7 +13,7 @@ import { DataTablePagination } from '../data-table-pagination'
 import { TokoEditDialog } from './toko-edit-dialog'
 import { TokoDeleteDialog } from './toko-delete-dialog'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
-import type { TokoRecord } from '@/services/tokoService'
+import type { TokoRecord } from '@/services/deprecated/tokoService'
 import {
   Table,
   TableBody,
@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { deleteToko } from '@/services/tokoService'
+import { deleteToko } from '@/services/deprecated/tokoService'
 
 interface TokoTableProps {
   data: Array<TokoRecord>

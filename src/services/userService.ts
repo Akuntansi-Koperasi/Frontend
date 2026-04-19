@@ -42,12 +42,6 @@ export const getUserList = async (params: UserParams) => {
   return response.data.data
 }
 
-// GUESSING: Roles?
-export const getRoleList = async () => {
-  const roles = ["admin", "employee", "superAdmin", "manager", "staff"]
-  return roles
-}
-
 export const deleteUser = async (id: number) => {
   const response = await api.delete<{ status: string; message: string }>(
     `/admin/user/${id}`

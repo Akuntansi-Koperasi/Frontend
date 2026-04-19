@@ -1,5 +1,5 @@
 import { Clock } from "lucide-react"
-import type { AttendanceResponse } from "@/services/attendanceService"
+import type { AttendanceResponse } from "@/services/deprecated/attendanceService"
 import { Card, CardContent } from "@/components/ui/card"
 
 export function KehadiranStats({ summary }: { summary?: AttendanceResponse['summary'] }) {

@@ -14,7 +14,7 @@ import {
 import { useNavigate } from '@tanstack/react-router'
 import { DataTablePagination } from '../data-table-pagination'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
-import type { CashflowRecord } from '@/services/cashflowService'
+import type { CashflowRecord } from '@/services/deprecated/cashflowService'
 import {
   Table,
   TableBody,

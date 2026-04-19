@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { FileSpreadsheet, Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import type { CashflowParams} from "@/services/cashflowService";
+import type { CashflowParams} from "@/services/deprecated/cashflowService";
 import { Button } from "@/components/ui/button"
-import { exportCashflowExcel } from "@/services/cashflowService"
+import { exportCashflowExcel } from "@/services/deprecated/cashflowService"
 
 interface KeuanganHeaderProps {
   currentFilters: CashflowParams

@@ -11,7 +11,7 @@ import { ArrowUpDown, Calendar, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
 import { DataTablePagination } from '../data-table-pagination'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
-import type { DepositRecord } from '@/services/depositService'
+import type { DepositRecord } from '@/services/deprecated/depositService'
 import {
   Table,
   TableBody,
@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { verifyDeposit } from '@/services/depositService'
+import { verifyDeposit } from '@/services/deprecated/depositService'
 
 interface SetoranTableProps {
   data: Array<DepositRecord>

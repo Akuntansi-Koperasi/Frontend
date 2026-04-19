@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, Loader2, MapPin } from 'lucide-react'
 import { toast } from 'sonner'
 import { MapPicker } from './map-picker'
-import type { TokoRecord } from '@/services/tokoService'
+import type { TokoRecord } from '@/services/deprecated/tokoService'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { getAddressFromCoordinates, updateToko } from '@/services/tokoService'
+import { getAddressFromCoordinates, updateToko } from '@/services/deprecated/tokoService'
 
 interface TokoEditDialogProps {
   open: boolean

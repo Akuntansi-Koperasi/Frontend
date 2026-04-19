@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { FileSpreadsheet, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { DepositParams} from '@/services/depositService';
+import type { DepositParams} from '@/services/deprecated/depositService';
 import { Button } from '@/components/ui/button'
-import { exportDepositExcel } from '@/services/depositService'
+import { exportDepositExcel } from '@/services/deprecated/depositService'
 
 interface SetoranHeaderProps {
   currentFilters: DepositParams

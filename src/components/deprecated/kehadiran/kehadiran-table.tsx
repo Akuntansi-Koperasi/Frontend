@@ -9,7 +9,7 @@ import { ArrowUpDown, Calendar } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { DataTablePagination } from '../data-table-pagination'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
-import type { AttendanceRecord } from '@/services/attendanceService'
+import type { AttendanceRecord } from '@/services/deprecated/attendanceService'
 import {
   Table,
   TableBody,

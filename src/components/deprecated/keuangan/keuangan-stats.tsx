@@ -1,5 +1,5 @@
 import { ArrowDownRight, ArrowUpRight } from "lucide-react"
-import type { CashflowResponse } from "@/services/cashflowService"
+import type { CashflowResponse } from "@/services/deprecated/cashflowService"
 import { Card, CardContent } from "@/components/ui/card"
 
 export function KeuanganStats({ summary }: { summary?: CashflowResponse['summary'] }) {
