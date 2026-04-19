@@ -1,4 +1,15 @@
-import { Banknote, CalendarCheck, HandCoins, House, Store, Users } from "lucide-react";
+import {
+  Banknote,
+  Coins,
+  FileMinus,
+  FileText,
+  HandCoins,
+  House,
+  School,
+  Settings,
+  Store,
+  Wallet,
+} from 'lucide-react'
 
 export const navItems = [
   {
@@ -7,28 +18,61 @@ export const navItems = [
     icon: House,
   },
   {
-    title: 'Kehadiran',
-    url: '/kehadiran',
-    icon: CalendarCheck,
+    title: 'Simpan Pinjam',
+    url: '/simpan-pinjam',
+    icon: Coins,
   },
   {
-    title: 'Pemasukan dan Pengeluaran',
-    url: '/keuangan',
-    icon: Banknote,
+    title: 'Simpanan',
+    url: '/simpanan',
+    icon: Wallet,
   },
   {
-    title: 'Setoran',
-    url: '/setoran',
+    title: 'Pinjaman',
+    url: '/pinjaman',
     icon: HandCoins,
   },
   {
-    title: 'Toko',
-    url: '/toko',
+    title: 'Gerai / Retail',
+    url: '/gerai-retail',
+    icon: School,
+  },
+  {
+    title: 'Laporan Retail',
+    url: '/laporan-retail',
+    icon: FileText,
+  },
+  {
+    title: 'Akuntansi',
+    url: '/akuntansi',
+    icon: Banknote,
+  },
+  {
+    title: 'Laporan Akuntansi',
+    url: '/laporan-akuntansi',
+    icon: FileMinus,
+  },
+  {
+    title: 'Koperasi',
+    url: '/koperasi',
     icon: Store,
   },
   {
-    title: 'User',
-    url: '/users',
-    icon: Users,
+    title: 'Pengaturan',
+    icon: Settings,
+    items: [
+      {
+        title: 'Pengguna',
+        url: '/settings/users',
+      },
+      {
+        title: 'Peran',
+        url: '/settings/roles',
+      },
+      {
+        title: 'Migrasi',
+        url: '/settings/migration',
+      },
+    ],
   },
 ]

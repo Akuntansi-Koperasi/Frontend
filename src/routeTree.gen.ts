@@ -12,13 +12,19 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthUsersRouteImport } from './routes/_auth/users'
-import { Route as AuthTokoRouteImport } from './routes/_auth/toko'
-import { Route as AuthSetoranRouteImport } from './routes/_auth/setoran'
+import { Route as AuthSimpananRouteImport } from './routes/_auth/simpanan'
+import { Route as AuthSimpanPinjamRouteImport } from './routes/_auth/simpan-pinjam'
 import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
-import { Route as AuthKeuanganRouteImport } from './routes/_auth/keuangan'
-import { Route as AuthKehadiranRouteImport } from './routes/_auth/kehadiran'
+import { Route as AuthPinjamanRouteImport } from './routes/_auth/pinjaman'
+import { Route as AuthLaporanRetailRouteImport } from './routes/_auth/laporan-retail'
+import { Route as AuthLaporanAkuntansiRouteImport } from './routes/_auth/laporan-akuntansi'
+import { Route as AuthKoperasiRouteImport } from './routes/_auth/koperasi'
+import { Route as AuthGeraiRetailRouteImport } from './routes/_auth/gerai-retail'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
+import { Route as AuthAkuntansiRouteImport } from './routes/_auth/akuntansi'
+import { Route as AuthSettingsUsersRouteImport } from './routes/_auth/settings/users'
+import { Route as AuthSettingsRolesRouteImport } from './routes/_auth/settings/roles'
+import { Route as AuthSettingsMigrationRouteImport } from './routes/_auth/settings/migration'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -34,19 +40,14 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthUsersRoute = AuthUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
+const AuthSimpananRoute = AuthSimpananRouteImport.update({
+  id: '/simpanan',
+  path: '/simpanan',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthTokoRoute = AuthTokoRouteImport.update({
-  id: '/toko',
-  path: '/toko',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthSetoranRoute = AuthSetoranRouteImport.update({
-  id: '/setoran',
-  path: '/setoran',
+const AuthSimpanPinjamRoute = AuthSimpanPinjamRouteImport.update({
+  id: '/simpan-pinjam',
+  path: '/simpan-pinjam',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthProfileRoute = AuthProfileRouteImport.update({
@@ -54,14 +55,29 @@ const AuthProfileRoute = AuthProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthKeuanganRoute = AuthKeuanganRouteImport.update({
-  id: '/keuangan',
-  path: '/keuangan',
+const AuthPinjamanRoute = AuthPinjamanRouteImport.update({
+  id: '/pinjaman',
+  path: '/pinjaman',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthKehadiranRoute = AuthKehadiranRouteImport.update({
-  id: '/kehadiran',
-  path: '/kehadiran',
+const AuthLaporanRetailRoute = AuthLaporanRetailRouteImport.update({
+  id: '/laporan-retail',
+  path: '/laporan-retail',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLaporanAkuntansiRoute = AuthLaporanAkuntansiRouteImport.update({
+  id: '/laporan-akuntansi',
+  path: '/laporan-akuntansi',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthKoperasiRoute = AuthKoperasiRouteImport.update({
+  id: '/koperasi',
+  path: '/koperasi',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthGeraiRetailRoute = AuthGeraiRetailRouteImport.update({
+  id: '/gerai-retail',
+  path: '/gerai-retail',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthDashboardRoute = AuthDashboardRouteImport.update({
@@ -69,77 +85,133 @@ const AuthDashboardRoute = AuthDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthAkuntansiRoute = AuthAkuntansiRouteImport.update({
+  id: '/akuntansi',
+  path: '/akuntansi',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSettingsUsersRoute = AuthSettingsUsersRouteImport.update({
+  id: '/settings/users',
+  path: '/settings/users',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSettingsRolesRoute = AuthSettingsRolesRouteImport.update({
+  id: '/settings/roles',
+  path: '/settings/roles',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSettingsMigrationRoute = AuthSettingsMigrationRouteImport.update({
+  id: '/settings/migration',
+  path: '/settings/migration',
+  getParentRoute: () => AuthRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/akuntansi': typeof AuthAkuntansiRoute
   '/dashboard': typeof AuthDashboardRoute
-  '/kehadiran': typeof AuthKehadiranRoute
-  '/keuangan': typeof AuthKeuanganRoute
+  '/gerai-retail': typeof AuthGeraiRetailRoute
+  '/koperasi': typeof AuthKoperasiRoute
+  '/laporan-akuntansi': typeof AuthLaporanAkuntansiRoute
+  '/laporan-retail': typeof AuthLaporanRetailRoute
+  '/pinjaman': typeof AuthPinjamanRoute
   '/profile': typeof AuthProfileRoute
-  '/setoran': typeof AuthSetoranRoute
-  '/toko': typeof AuthTokoRoute
-  '/users': typeof AuthUsersRoute
+  '/simpan-pinjam': typeof AuthSimpanPinjamRoute
+  '/simpanan': typeof AuthSimpananRoute
+  '/settings/migration': typeof AuthSettingsMigrationRoute
+  '/settings/roles': typeof AuthSettingsRolesRoute
+  '/settings/users': typeof AuthSettingsUsersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/akuntansi': typeof AuthAkuntansiRoute
   '/dashboard': typeof AuthDashboardRoute
-  '/kehadiran': typeof AuthKehadiranRoute
-  '/keuangan': typeof AuthKeuanganRoute
+  '/gerai-retail': typeof AuthGeraiRetailRoute
+  '/koperasi': typeof AuthKoperasiRoute
+  '/laporan-akuntansi': typeof AuthLaporanAkuntansiRoute
+  '/laporan-retail': typeof AuthLaporanRetailRoute
+  '/pinjaman': typeof AuthPinjamanRoute
   '/profile': typeof AuthProfileRoute
-  '/setoran': typeof AuthSetoranRoute
-  '/toko': typeof AuthTokoRoute
-  '/users': typeof AuthUsersRoute
+  '/simpan-pinjam': typeof AuthSimpanPinjamRoute
+  '/simpanan': typeof AuthSimpananRoute
+  '/settings/migration': typeof AuthSettingsMigrationRoute
+  '/settings/roles': typeof AuthSettingsRolesRoute
+  '/settings/users': typeof AuthSettingsUsersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
+  '/_auth/akuntansi': typeof AuthAkuntansiRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
-  '/_auth/kehadiran': typeof AuthKehadiranRoute
-  '/_auth/keuangan': typeof AuthKeuanganRoute
+  '/_auth/gerai-retail': typeof AuthGeraiRetailRoute
+  '/_auth/koperasi': typeof AuthKoperasiRoute
+  '/_auth/laporan-akuntansi': typeof AuthLaporanAkuntansiRoute
+  '/_auth/laporan-retail': typeof AuthLaporanRetailRoute
+  '/_auth/pinjaman': typeof AuthPinjamanRoute
   '/_auth/profile': typeof AuthProfileRoute
-  '/_auth/setoran': typeof AuthSetoranRoute
-  '/_auth/toko': typeof AuthTokoRoute
-  '/_auth/users': typeof AuthUsersRoute
+  '/_auth/simpan-pinjam': typeof AuthSimpanPinjamRoute
+  '/_auth/simpanan': typeof AuthSimpananRoute
+  '/_auth/settings/migration': typeof AuthSettingsMigrationRoute
+  '/_auth/settings/roles': typeof AuthSettingsRolesRoute
+  '/_auth/settings/users': typeof AuthSettingsUsersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/login'
+    | '/akuntansi'
     | '/dashboard'
-    | '/kehadiran'
-    | '/keuangan'
+    | '/gerai-retail'
+    | '/koperasi'
+    | '/laporan-akuntansi'
+    | '/laporan-retail'
+    | '/pinjaman'
     | '/profile'
-    | '/setoran'
-    | '/toko'
-    | '/users'
+    | '/simpan-pinjam'
+    | '/simpanan'
+    | '/settings/migration'
+    | '/settings/roles'
+    | '/settings/users'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
+    | '/akuntansi'
     | '/dashboard'
-    | '/kehadiran'
-    | '/keuangan'
+    | '/gerai-retail'
+    | '/koperasi'
+    | '/laporan-akuntansi'
+    | '/laporan-retail'
+    | '/pinjaman'
     | '/profile'
-    | '/setoran'
-    | '/toko'
-    | '/users'
+    | '/simpan-pinjam'
+    | '/simpanan'
+    | '/settings/migration'
+    | '/settings/roles'
+    | '/settings/users'
   id:
     | '__root__'
     | '/'
     | '/_auth'
     | '/login'
+    | '/_auth/akuntansi'
     | '/_auth/dashboard'
-    | '/_auth/kehadiran'
-    | '/_auth/keuangan'
+    | '/_auth/gerai-retail'
+    | '/_auth/koperasi'
+    | '/_auth/laporan-akuntansi'
+    | '/_auth/laporan-retail'
+    | '/_auth/pinjaman'
     | '/_auth/profile'
-    | '/_auth/setoran'
-    | '/_auth/toko'
-    | '/_auth/users'
+    | '/_auth/simpan-pinjam'
+    | '/_auth/simpanan'
+    | '/_auth/settings/migration'
+    | '/_auth/settings/roles'
+    | '/_auth/settings/users'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,25 +243,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_auth/users': {
-      id: '/_auth/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof AuthUsersRouteImport
+    '/_auth/simpanan': {
+      id: '/_auth/simpanan'
+      path: '/simpanan'
+      fullPath: '/simpanan'
+      preLoaderRoute: typeof AuthSimpananRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/toko': {
-      id: '/_auth/toko'
-      path: '/toko'
-      fullPath: '/toko'
-      preLoaderRoute: typeof AuthTokoRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/setoran': {
-      id: '/_auth/setoran'
-      path: '/setoran'
-      fullPath: '/setoran'
-      preLoaderRoute: typeof AuthSetoranRouteImport
+    '/_auth/simpan-pinjam': {
+      id: '/_auth/simpan-pinjam'
+      path: '/simpan-pinjam'
+      fullPath: '/simpan-pinjam'
+      preLoaderRoute: typeof AuthSimpanPinjamRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/profile': {
@@ -199,18 +264,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthProfileRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/keuangan': {
-      id: '/_auth/keuangan'
-      path: '/keuangan'
-      fullPath: '/keuangan'
-      preLoaderRoute: typeof AuthKeuanganRouteImport
+    '/_auth/pinjaman': {
+      id: '/_auth/pinjaman'
+      path: '/pinjaman'
+      fullPath: '/pinjaman'
+      preLoaderRoute: typeof AuthPinjamanRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/kehadiran': {
-      id: '/_auth/kehadiran'
-      path: '/kehadiran'
-      fullPath: '/kehadiran'
-      preLoaderRoute: typeof AuthKehadiranRouteImport
+    '/_auth/laporan-retail': {
+      id: '/_auth/laporan-retail'
+      path: '/laporan-retail'
+      fullPath: '/laporan-retail'
+      preLoaderRoute: typeof AuthLaporanRetailRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/laporan-akuntansi': {
+      id: '/_auth/laporan-akuntansi'
+      path: '/laporan-akuntansi'
+      fullPath: '/laporan-akuntansi'
+      preLoaderRoute: typeof AuthLaporanAkuntansiRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/koperasi': {
+      id: '/_auth/koperasi'
+      path: '/koperasi'
+      fullPath: '/koperasi'
+      preLoaderRoute: typeof AuthKoperasiRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/gerai-retail': {
+      id: '/_auth/gerai-retail'
+      path: '/gerai-retail'
+      fullPath: '/gerai-retail'
+      preLoaderRoute: typeof AuthGeraiRetailRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/dashboard': {
@@ -220,27 +306,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/akuntansi': {
+      id: '/_auth/akuntansi'
+      path: '/akuntansi'
+      fullPath: '/akuntansi'
+      preLoaderRoute: typeof AuthAkuntansiRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/users': {
+      id: '/_auth/settings/users'
+      path: '/settings/users'
+      fullPath: '/settings/users'
+      preLoaderRoute: typeof AuthSettingsUsersRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/roles': {
+      id: '/_auth/settings/roles'
+      path: '/settings/roles'
+      fullPath: '/settings/roles'
+      preLoaderRoute: typeof AuthSettingsRolesRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/migration': {
+      id: '/_auth/settings/migration'
+      path: '/settings/migration'
+      fullPath: '/settings/migration'
+      preLoaderRoute: typeof AuthSettingsMigrationRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
 interface AuthRouteChildren {
+  AuthAkuntansiRoute: typeof AuthAkuntansiRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
-  AuthKehadiranRoute: typeof AuthKehadiranRoute
-  AuthKeuanganRoute: typeof AuthKeuanganRoute
+  AuthGeraiRetailRoute: typeof AuthGeraiRetailRoute
+  AuthKoperasiRoute: typeof AuthKoperasiRoute
+  AuthLaporanAkuntansiRoute: typeof AuthLaporanAkuntansiRoute
+  AuthLaporanRetailRoute: typeof AuthLaporanRetailRoute
+  AuthPinjamanRoute: typeof AuthPinjamanRoute
   AuthProfileRoute: typeof AuthProfileRoute
-  AuthSetoranRoute: typeof AuthSetoranRoute
-  AuthTokoRoute: typeof AuthTokoRoute
-  AuthUsersRoute: typeof AuthUsersRoute
+  AuthSimpanPinjamRoute: typeof AuthSimpanPinjamRoute
+  AuthSimpananRoute: typeof AuthSimpananRoute
+  AuthSettingsMigrationRoute: typeof AuthSettingsMigrationRoute
+  AuthSettingsRolesRoute: typeof AuthSettingsRolesRoute
+  AuthSettingsUsersRoute: typeof AuthSettingsUsersRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthAkuntansiRoute: AuthAkuntansiRoute,
   AuthDashboardRoute: AuthDashboardRoute,
-  AuthKehadiranRoute: AuthKehadiranRoute,
-  AuthKeuanganRoute: AuthKeuanganRoute,
+  AuthGeraiRetailRoute: AuthGeraiRetailRoute,
+  AuthKoperasiRoute: AuthKoperasiRoute,
+  AuthLaporanAkuntansiRoute: AuthLaporanAkuntansiRoute,
+  AuthLaporanRetailRoute: AuthLaporanRetailRoute,
+  AuthPinjamanRoute: AuthPinjamanRoute,
   AuthProfileRoute: AuthProfileRoute,
-  AuthSetoranRoute: AuthSetoranRoute,
-  AuthTokoRoute: AuthTokoRoute,
-  AuthUsersRoute: AuthUsersRoute,
+  AuthSimpanPinjamRoute: AuthSimpanPinjamRoute,
+  AuthSimpananRoute: AuthSimpananRoute,
+  AuthSettingsMigrationRoute: AuthSettingsMigrationRoute,
+  AuthSettingsRolesRoute: AuthSettingsRolesRoute,
+  AuthSettingsUsersRoute: AuthSettingsUsersRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

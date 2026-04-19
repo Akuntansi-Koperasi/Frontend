@@ -33,25 +33,25 @@ export const Route = createFileRoute('/_auth')({
 })
 
 function AuthLayout() {
-  const router = useRouter()
+  // const router = useRouter()
   const pathname = useLocation({
     select: (location) => location.pathname,
   })
 
-  // Autentikasi dan authorisasi dengan client-side
-  const [isAuthorized, setIsAuthorized] = useState(false)
+  // // Autentikasi dan authorisasi dengan client-side
+  // const [isAuthorized, setIsAuthorized] = useState(false)
 
-  useEffect(() => {
-    if (isAuthenticated()) {
-      setIsAuthorized(true)
-    } else {
-      router.navigate({ to: '/login', replace: true })
-    }
-  }, [router])
+  // useEffect(() => {
+  //   if (isAuthenticated()) {
+  //     setIsAuthorized(true)
+  //   } else {
+  //     router.navigate({ to: '/login', replace: true })
+  //   }
+  // }, [router])
 
-  if (!isAuthorized) {
-    return null
-  }
+  // if (!isAuthorized) {
+  //   return null
+  // }
 
   return (
     <SidebarProvider

@@ -64,7 +64,7 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
 
   const handlePageChange = (newPageIndex: number) => {
     navigate({
-      to: '/users',
+      to: '/settings/users',
       search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
       replace: true,
     })
@@ -72,7 +72,7 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
 
   const handlePageSizeChange = (newPageSize: number) => {
     navigate({
-      to: '/users',
+      to: '/settings/users',
       search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
       replace: true,
     })
@@ -109,39 +109,15 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
           </Avatar>
           <div className="flex flex-col text-left">
             <span className="font-semibold text-slate-900 text-sm">{row.original.name}</span>
-            <span className="text-xs text-muted-foreground">@{row.original.username}</span>
+            <span className="text-xs text-muted-foreground">@{row.original.email}</span>
           </div>
         </div>
       ),
     },
     {
-      accessorKey: "email",
-      header: "Email",
-      cell: ({ row }) => <span className="font-medium text-slate-700">{row.original.email}</span>,
-    },
-    {
-      accessorKey: "presence_location_name",
-      header: "Toko",
-      cell: ({ row }) => <span className="font-medium text-slate-700">{row.original.presence_location_name || "-"}</span>,
-    },
-    {
-      accessorKey: "role",
-      header: "Role",
-      cell: ({ row }) => {
-        const isAdmin = row.original.role === "admin"
-        return (
-          <Badge 
-            variant="outline" 
-            className={`px-3 py-0.5 rounded-full border ${
-              isAdmin 
-                ? "bg-rose-50 text-rose-600 border-rose-200" 
-                : "bg-amber-50 text-amber-600 border-amber-200"
-            }`}
-          >
-            {capitalize(row.original.role)}
-          </Badge>
-        )
-      },
+      accessorKey: "peran",
+      header: "Peran",
+      cell: () => <Badge variant="outline" className="cursor-default bg-amber-50 text-amber-600 border-amber-200 rounded-full h-8 gap-1.5 px-3 has-[>svg]:px-2.5 font-bold">Peran</Badge>,
     },
     {
       id: "actions",

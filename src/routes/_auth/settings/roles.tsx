@@ -15,7 +15,7 @@ const usersSearchSchema = z.object({
   role: z.enum(['admin', 'employee']).optional(),
 })
 
-export const Route = createFileRoute('/_auth/users')({
+export const Route = createFileRoute('/_auth/settings/roles')({
   validateSearch: (search) => usersSearchSchema.parse(search),
   component: UsersPage,
 })

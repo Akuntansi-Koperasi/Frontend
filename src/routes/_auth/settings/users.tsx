@@ -1,30 +1,31 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
-import { getTokoList } from '@/services/tokoService'
-import { TokoHeader } from '@/components/toko/toko-header'
-import { TokoSearch } from '@/components/toko/toko-search'
-import { TokoTable } from '@/components/toko/toko-table'
+import { getUserList } from '@/services/userService'
+import { UsersHeader } from '@/components/users/users-header'
+import { UsersFilters } from '@/components/users/users-filters'
+import { UsersTable } from '@/components/users/users-table'
 import LoadingPage from '@/components/loading-page'
 import ErrorPage from '@/components/error-page'
 
-const tokoSearchSchema = z.object({
+const usersSearchSchema = z.object({
   page: z.number().catch(1),
   per_page: z.number().catch(10),
   search: z.string().optional(),
+  role: z.enum(['admin', 'employee']).optional(),
 })
 
-export const Route = createFileRoute('/_auth/toko')({
-  validateSearch: (search) => tokoSearchSchema.parse(search),
-  component: TokoPage,
+export const Route = createFileRoute('/_auth/settings/users')({
+  validateSearch: (search) => usersSearchSchema.parse(search),
+  component: UsersPage,
 })
 
-function TokoPage() {
+function UsersPage() {
   const search = Route.useSearch()
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['toko', search],
-    queryFn: () => getTokoList(search),
+    queryKey: ['users', search],
+    queryFn: () => getUserList(search),
     placeholderData: (previousData) => previousData,
   })
 
@@ -35,7 +36,7 @@ function TokoPage() {
   if (error) {
     return (
       <ErrorPage 
-        title="Gagal Memuat Data Toko" 
+        title="Gagal Memuat Data Users" 
         error={error} 
         reset={refetch} 
       />
@@ -44,10 +45,10 @@ function TokoPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <TokoHeader />
-      <TokoSearch currentSearch={search.search} />
-      <TokoTable 
-        data={data?.presence_locations || []} 
+      <UsersHeader />
+      <UsersFilters currentFilters={search} />
+      <UsersTable 
+        data={data?.users || []} 
         pagination={{
           pageIndex: (data?.current_page || 1) - 1,
           pageSize: data?.per_page || 10,
