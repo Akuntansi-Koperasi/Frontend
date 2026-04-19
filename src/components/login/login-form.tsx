@@ -4,7 +4,7 @@ import { useRouter } from '@tanstack/react-router'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { GoogleLogin } from '@react-oauth/google'
 import { toast } from 'sonner'
-import { login, loginWithGoogle } from '@/services/authService'
+import { login, loginWithGoogle, mockLogin } from '@/services/authService'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -36,7 +36,7 @@ export function LoginForm({
   const handleAuthSuccess = (response: any) => {
     localStorage.setItem('token', response.data.token)
     localStorage.setItem('user', JSON.stringify(response.data.user))
-    router.navigate({ to: '/dashboard' })
+    router.navigate({ to: '/koperasi' })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,7 +45,8 @@ export function LoginForm({
     setError('')
 
     try {
-      const response = await login(email, password)
+      // const response = await login(email, password)
+      const response = await mockLogin()
       handleAuthSuccess(response)
     } catch (err: any) {
       const msg =

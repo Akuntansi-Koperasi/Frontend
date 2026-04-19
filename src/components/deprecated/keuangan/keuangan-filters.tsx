@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Calendar, Filter, Search } from 'lucide-react'
-import type { CashflowParams } from '@/services/cashflowService'
+import type { CashflowParams } from '@/services/deprecated/cashflowService'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {

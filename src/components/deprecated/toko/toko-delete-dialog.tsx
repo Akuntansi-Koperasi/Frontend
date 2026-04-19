@@ -1,5 +1,5 @@
 import { AlertTriangle, Loader2 } from 'lucide-react'
-import type { TokoRecord } from '@/services/tokoService'
+import type { TokoRecord } from '@/services/deprecated/tokoService'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

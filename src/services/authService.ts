@@ -40,6 +40,21 @@ export const login = async (email: string, password: string) => {
   return response.data
 }
 
+export const mockLogin = async () => {
+      const mockUser = {"id":69,"name":"Afif","username":"afif","email":"juwhater@mail.com","role":"admin","profile_image":"https://lh3.googleusercontent.com/a/ACg8ocLlT6wjyml6pl-yYNjdQA7zg_Yqo_wYrdAGGgh5zh15AA2OrMk=s96-c","has_password":true}
+      localStorage.setItem('token', 'mock-token')
+      localStorage.setItem('user', JSON.stringify(mockUser))
+      return {
+        status: 'success',
+        message: 'Mock login successful',
+        data: {
+          token_type: 'Bearer',
+          token: 'mock-token',
+          user: mockUser,
+        },
+      }
+}
+
 export const loginWithGoogle = async (idToken: string) => {
   const formData = new FormData()
   formData.append('id_token', idToken)

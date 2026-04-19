@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { createToko, getAddressFromCoordinates } from '@/services/tokoService'
+import { createToko, getAddressFromCoordinates } from '@/services/deprecated/tokoService'
 
 export function TokoAddDialog() {
   const [open, setOpen] = useState(false)

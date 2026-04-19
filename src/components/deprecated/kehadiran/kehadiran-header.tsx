@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { FileSpreadsheet, Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import type { AttendanceParams} from "@/services/attendanceService";
+import type { AttendanceParams} from "@/services/deprecated/attendanceService";
 import { Button } from "@/components/ui/button"
-import { exportAttendanceExcel } from "@/services/attendanceService"
+import { exportAttendanceExcel } from "@/services/deprecated/attendanceService"
 
 interface KehadiranHeaderProps {
   currentFilters: AttendanceParams
