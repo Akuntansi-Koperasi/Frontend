@@ -114,7 +114,7 @@ export function AppSidebar({
                       <div className="flex items-center gap-1">
                         <SidebarMenuButton
                           tooltip={item.title}
-                          className="h-12 flex-1 font-medium hover:bg-slate-100 data-[active=true]:bg-slate-900 data-[active=true]:text-white data-[active=true]:hover:bg-slate-800 data-[active=true]:hover:text-white"
+                          className="h-12 flex-1 font-medium cursor-pointer hover:bg-slate-100 data-[active=true]:bg-slate-900 data-[active=true]:text-white data-[active=true]:hover:bg-slate-800 data-[active=true]:hover:text-white"
                           onClick={() => toggleSection(item.title)}
                         >
                           {item.icon ? <item.icon /> : null}

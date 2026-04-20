@@ -36,7 +36,7 @@ export function LoginForm({
   const handleAuthSuccess = (response: any) => {
     localStorage.setItem('token', response.data.token)
     localStorage.setItem('user', JSON.stringify(response.data.user))
-    router.navigate({ to: '/koperasi' })
+    router.navigate({ to: '/dashboard' })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,6 +45,7 @@ export function LoginForm({
     setError('')
 
     try {
+      // MOCK
       // const response = await login(email, password)
       const response = await mockLogin()
       handleAuthSuccess(response)
@@ -102,7 +103,7 @@ export function LoginForm({
             </div>
           </div>
           <CardTitle className="text-2xl">
-            Presensi KPRI Bina Sejahtera
+            Akuntansi KPRI Bina Sejahtera.<br/>Langsung klik "Masuk" untuk masuk.
           </CardTitle>
           <CardDescription className="text-sm">
             Silakan masukkan kredensial Anda untuk mengakses dashboard
@@ -128,7 +129,7 @@ export function LoginForm({
                   id="email"
                   type="email"
                   placeholder="Masukkan Email"
-                  required
+                  // required
                   className="p-5"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -148,7 +149,7 @@ export function LoginForm({
                   id="password"
                   type="password"
                   placeholder="Masukkan Password"
-                  required
+                  // required
                   className="p-5"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
