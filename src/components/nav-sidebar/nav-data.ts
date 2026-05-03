@@ -19,13 +19,35 @@ export const navItems = [
   },
   {
     title: 'Simpan Pinjam',
-    url: '/simpan-pinjam',
     icon: Coins,
+    items: [
+      {
+        title: 'Laporan Transaksi',
+        url: '/simpan-pinjam/laporan-transaksi',
+      },
+      {
+        title: 'Transaksi Anggota',
+        url: '/simpan-pinjam/transaksi-anggota',
+      },
+    ],
   },
   {
     title: 'Simpanan',
-    url: '/simpanan',
     icon: Wallet,
+    items: [
+      {
+        title: 'Produk Simpanan',
+        url: '/simpanan/produk-simpanan',
+      },
+      {
+        title: 'Rekening Simpanan',
+        url: '/simpanan/rekening-simpanan',
+      },
+      {
+        title: 'Tagihan',
+        url: '/simpanan/tagihan',
+      },
+    ],
   },
   {
     title: 'Pinjaman',
@@ -44,8 +66,25 @@ export const navItems = [
   },
   {
     title: 'Akuntansi',
-    url: '/akuntansi',
     icon: Banknote,
+    items: [
+      {
+        title: 'Buku Besar',
+        url: '/akuntansi/buku-besar',
+      },
+      {
+        title: 'Tutup Buku',
+        url: '/akuntansi/tutup-buku',
+      },
+      {
+        title: 'Transaksi Umum',
+        url: '/akuntansi/transaksi-umum',
+      },
+      {
+        title: 'COA',
+        url: '/akuntansi/coa',
+      },
+    ],
   },
   {
     title: 'Laporan Akuntansi',
@@ -54,8 +93,21 @@ export const navItems = [
   },
   {
     title: 'Koperasi',
-    url: '/koperasi',
     icon: Store,
+    items: [
+      {
+        title: 'Anggota',
+        url: '/koperasi/anggota',
+      },
+      {
+        title: 'Pengurus Koperasi',
+        url: '/koperasi/pengurus',
+      },
+      {
+        title: 'Pengaturan Jabatan',
+        url: '/koperasi/jabatan',
+      },
+    ]
   },
   {
     title: 'Pengaturan',
