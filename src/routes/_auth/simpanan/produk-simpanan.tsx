@@ -1,19 +1,19 @@
 import HeaderComp from '@/components/shared/header-comp'
-import { Plus } from 'lucide-react'
 import { createFileRoute } from '@tanstack/react-router'
+import { Plus } from 'lucide-react'
 
-export const Route = createFileRoute('/_auth/settings/users')({
+export const Route = createFileRoute('/_auth/simpanan/produk-simpanan')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  return (
+    return (
     <>
       <HeaderComp
-        title="Manajemen Pengguna"
-        description="Kelola akun akses anggota"
+        title="Manajemen Produk Simpanan"
+        description="Kelola produk simpanan"
         icon={<Plus />}
-        actionLabel='Aktifkan Pengguna'
+        actionLabel="Tambah Simpanan"
       />
     </>
   )
