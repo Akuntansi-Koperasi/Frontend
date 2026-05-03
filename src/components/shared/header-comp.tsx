@@ -27,7 +27,7 @@ const HeaderComp = ({
   const hasActionButton = Boolean(actionLabel || icon || onAction)
 
   return (
-    <div className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 className="text-2xl font-bold">{title}</h1>
         <p className="text-sm text-gray-500">{description}</p>

@@ -1,4 +1,5 @@
 import HeaderComp from '@/components/shared/header-comp'
+import { SearchBar } from '@/components/shared/search-bar'
 import { createFileRoute } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 
@@ -7,7 +8,7 @@ export const Route = createFileRoute('/_auth/koperasi/pengurus')({
 })
 
 function RouteComponent() {
-    return (
+  return (
     <>
       <HeaderComp
         title="Manajemen Pengurus Koperasi"
@@ -15,6 +16,7 @@ function RouteComponent() {
         icon={<Plus />}
         actionLabel="Tambah Struktur"
       />
+      <SearchBar placeholder="Cari nama pengurus..." className="mb-4" />
     </>
   )
 }
