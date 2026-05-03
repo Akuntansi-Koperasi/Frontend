@@ -13,7 +13,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
-import { Route as AuthPinjamanRouteImport } from './routes/_auth/pinjaman'
 import { Route as AuthLaporanRetailRouteImport } from './routes/_auth/laporan-retail'
 import { Route as AuthLaporanAkuntansiRouteImport } from './routes/_auth/laporan-akuntansi'
 import { Route as AuthGeraiRetailRouteImport } from './routes/_auth/gerai-retail'
@@ -26,6 +25,9 @@ import { Route as AuthSimpanPinjamLaporanTransaksiRouteImport } from './routes/_
 import { Route as AuthSettingsUsersRouteImport } from './routes/_auth/settings/users'
 import { Route as AuthSettingsRolesRouteImport } from './routes/_auth/settings/roles'
 import { Route as AuthSettingsMigrationRouteImport } from './routes/_auth/settings/migration'
+import { Route as AuthPinjamanTagihanRouteImport } from './routes/_auth/pinjaman/tagihan'
+import { Route as AuthPinjamanProdukPinjamanRouteImport } from './routes/_auth/pinjaman/produk-pinjaman'
+import { Route as AuthPinjamanPengajuanPinjamanRouteImport } from './routes/_auth/pinjaman/pengajuan-pinjaman'
 import { Route as AuthKoperasiPengurusRouteImport } from './routes/_auth/koperasi/pengurus'
 import { Route as AuthKoperasiJabatanRouteImport } from './routes/_auth/koperasi/jabatan'
 import { Route as AuthKoperasiAnggotaRouteImport } from './routes/_auth/koperasi/anggota'
@@ -51,11 +53,6 @@ const IndexRoute = IndexRouteImport.update({
 const AuthProfileRoute = AuthProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthPinjamanRoute = AuthPinjamanRouteImport.update({
-  id: '/pinjaman',
-  path: '/pinjaman',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthLaporanRetailRoute = AuthLaporanRetailRouteImport.update({
@@ -122,6 +119,23 @@ const AuthSettingsMigrationRoute = AuthSettingsMigrationRouteImport.update({
   path: '/settings/migration',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthPinjamanTagihanRoute = AuthPinjamanTagihanRouteImport.update({
+  id: '/pinjaman/tagihan',
+  path: '/pinjaman/tagihan',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthPinjamanProdukPinjamanRoute =
+  AuthPinjamanProdukPinjamanRouteImport.update({
+    id: '/pinjaman/produk-pinjaman',
+    path: '/pinjaman/produk-pinjaman',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthPinjamanPengajuanPinjamanRoute =
+  AuthPinjamanPengajuanPinjamanRouteImport.update({
+    id: '/pinjaman/pengajuan-pinjaman',
+    path: '/pinjaman/pengajuan-pinjaman',
+    getParentRoute: () => AuthRoute,
+  } as any)
 const AuthKoperasiPengurusRoute = AuthKoperasiPengurusRouteImport.update({
   id: '/koperasi/pengurus',
   path: '/koperasi/pengurus',
@@ -166,7 +180,6 @@ export interface FileRoutesByFullPath {
   '/gerai-retail': typeof AuthGeraiRetailRoute
   '/laporan-akuntansi': typeof AuthLaporanAkuntansiRoute
   '/laporan-retail': typeof AuthLaporanRetailRoute
-  '/pinjaman': typeof AuthPinjamanRoute
   '/profile': typeof AuthProfileRoute
   '/akuntansi/buku-besar': typeof AuthAkuntansiBukuBesarRoute
   '/akuntansi/coa': typeof AuthAkuntansiCoaRoute
@@ -175,6 +188,9 @@ export interface FileRoutesByFullPath {
   '/koperasi/anggota': typeof AuthKoperasiAnggotaRoute
   '/koperasi/jabatan': typeof AuthKoperasiJabatanRoute
   '/koperasi/pengurus': typeof AuthKoperasiPengurusRoute
+  '/pinjaman/pengajuan-pinjaman': typeof AuthPinjamanPengajuanPinjamanRoute
+  '/pinjaman/produk-pinjaman': typeof AuthPinjamanProdukPinjamanRoute
+  '/pinjaman/tagihan': typeof AuthPinjamanTagihanRoute
   '/settings/migration': typeof AuthSettingsMigrationRoute
   '/settings/roles': typeof AuthSettingsRolesRoute
   '/settings/users': typeof AuthSettingsUsersRoute
@@ -191,7 +207,6 @@ export interface FileRoutesByTo {
   '/gerai-retail': typeof AuthGeraiRetailRoute
   '/laporan-akuntansi': typeof AuthLaporanAkuntansiRoute
   '/laporan-retail': typeof AuthLaporanRetailRoute
-  '/pinjaman': typeof AuthPinjamanRoute
   '/profile': typeof AuthProfileRoute
   '/akuntansi/buku-besar': typeof AuthAkuntansiBukuBesarRoute
   '/akuntansi/coa': typeof AuthAkuntansiCoaRoute
@@ -200,6 +215,9 @@ export interface FileRoutesByTo {
   '/koperasi/anggota': typeof AuthKoperasiAnggotaRoute
   '/koperasi/jabatan': typeof AuthKoperasiJabatanRoute
   '/koperasi/pengurus': typeof AuthKoperasiPengurusRoute
+  '/pinjaman/pengajuan-pinjaman': typeof AuthPinjamanPengajuanPinjamanRoute
+  '/pinjaman/produk-pinjaman': typeof AuthPinjamanProdukPinjamanRoute
+  '/pinjaman/tagihan': typeof AuthPinjamanTagihanRoute
   '/settings/migration': typeof AuthSettingsMigrationRoute
   '/settings/roles': typeof AuthSettingsRolesRoute
   '/settings/users': typeof AuthSettingsUsersRoute
@@ -218,7 +236,6 @@ export interface FileRoutesById {
   '/_auth/gerai-retail': typeof AuthGeraiRetailRoute
   '/_auth/laporan-akuntansi': typeof AuthLaporanAkuntansiRoute
   '/_auth/laporan-retail': typeof AuthLaporanRetailRoute
-  '/_auth/pinjaman': typeof AuthPinjamanRoute
   '/_auth/profile': typeof AuthProfileRoute
   '/_auth/akuntansi/buku-besar': typeof AuthAkuntansiBukuBesarRoute
   '/_auth/akuntansi/coa': typeof AuthAkuntansiCoaRoute
@@ -227,6 +244,9 @@ export interface FileRoutesById {
   '/_auth/koperasi/anggota': typeof AuthKoperasiAnggotaRoute
   '/_auth/koperasi/jabatan': typeof AuthKoperasiJabatanRoute
   '/_auth/koperasi/pengurus': typeof AuthKoperasiPengurusRoute
+  '/_auth/pinjaman/pengajuan-pinjaman': typeof AuthPinjamanPengajuanPinjamanRoute
+  '/_auth/pinjaman/produk-pinjaman': typeof AuthPinjamanProdukPinjamanRoute
+  '/_auth/pinjaman/tagihan': typeof AuthPinjamanTagihanRoute
   '/_auth/settings/migration': typeof AuthSettingsMigrationRoute
   '/_auth/settings/roles': typeof AuthSettingsRolesRoute
   '/_auth/settings/users': typeof AuthSettingsUsersRoute
@@ -245,7 +265,6 @@ export interface FileRouteTypes {
     | '/gerai-retail'
     | '/laporan-akuntansi'
     | '/laporan-retail'
-    | '/pinjaman'
     | '/profile'
     | '/akuntansi/buku-besar'
     | '/akuntansi/coa'
@@ -254,6 +273,9 @@ export interface FileRouteTypes {
     | '/koperasi/anggota'
     | '/koperasi/jabatan'
     | '/koperasi/pengurus'
+    | '/pinjaman/pengajuan-pinjaman'
+    | '/pinjaman/produk-pinjaman'
+    | '/pinjaman/tagihan'
     | '/settings/migration'
     | '/settings/roles'
     | '/settings/users'
@@ -270,7 +292,6 @@ export interface FileRouteTypes {
     | '/gerai-retail'
     | '/laporan-akuntansi'
     | '/laporan-retail'
-    | '/pinjaman'
     | '/profile'
     | '/akuntansi/buku-besar'
     | '/akuntansi/coa'
@@ -279,6 +300,9 @@ export interface FileRouteTypes {
     | '/koperasi/anggota'
     | '/koperasi/jabatan'
     | '/koperasi/pengurus'
+    | '/pinjaman/pengajuan-pinjaman'
+    | '/pinjaman/produk-pinjaman'
+    | '/pinjaman/tagihan'
     | '/settings/migration'
     | '/settings/roles'
     | '/settings/users'
@@ -296,7 +320,6 @@ export interface FileRouteTypes {
     | '/_auth/gerai-retail'
     | '/_auth/laporan-akuntansi'
     | '/_auth/laporan-retail'
-    | '/_auth/pinjaman'
     | '/_auth/profile'
     | '/_auth/akuntansi/buku-besar'
     | '/_auth/akuntansi/coa'
@@ -305,6 +328,9 @@ export interface FileRouteTypes {
     | '/_auth/koperasi/anggota'
     | '/_auth/koperasi/jabatan'
     | '/_auth/koperasi/pengurus'
+    | '/_auth/pinjaman/pengajuan-pinjaman'
+    | '/_auth/pinjaman/produk-pinjaman'
+    | '/_auth/pinjaman/tagihan'
     | '/_auth/settings/migration'
     | '/_auth/settings/roles'
     | '/_auth/settings/users'
@@ -349,13 +375,6 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthProfileRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/pinjaman': {
-      id: '/_auth/pinjaman'
-      path: '/pinjaman'
-      fullPath: '/pinjaman'
-      preLoaderRoute: typeof AuthPinjamanRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/laporan-retail': {
@@ -442,6 +461,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSettingsMigrationRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/pinjaman/tagihan': {
+      id: '/_auth/pinjaman/tagihan'
+      path: '/pinjaman/tagihan'
+      fullPath: '/pinjaman/tagihan'
+      preLoaderRoute: typeof AuthPinjamanTagihanRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/pinjaman/produk-pinjaman': {
+      id: '/_auth/pinjaman/produk-pinjaman'
+      path: '/pinjaman/produk-pinjaman'
+      fullPath: '/pinjaman/produk-pinjaman'
+      preLoaderRoute: typeof AuthPinjamanProdukPinjamanRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/pinjaman/pengajuan-pinjaman': {
+      id: '/_auth/pinjaman/pengajuan-pinjaman'
+      path: '/pinjaman/pengajuan-pinjaman'
+      fullPath: '/pinjaman/pengajuan-pinjaman'
+      preLoaderRoute: typeof AuthPinjamanPengajuanPinjamanRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/koperasi/pengurus': {
       id: '/_auth/koperasi/pengurus'
       path: '/koperasi/pengurus'
@@ -499,7 +539,6 @@ interface AuthRouteChildren {
   AuthGeraiRetailRoute: typeof AuthGeraiRetailRoute
   AuthLaporanAkuntansiRoute: typeof AuthLaporanAkuntansiRoute
   AuthLaporanRetailRoute: typeof AuthLaporanRetailRoute
-  AuthPinjamanRoute: typeof AuthPinjamanRoute
   AuthProfileRoute: typeof AuthProfileRoute
   AuthAkuntansiBukuBesarRoute: typeof AuthAkuntansiBukuBesarRoute
   AuthAkuntansiCoaRoute: typeof AuthAkuntansiCoaRoute
@@ -508,6 +547,9 @@ interface AuthRouteChildren {
   AuthKoperasiAnggotaRoute: typeof AuthKoperasiAnggotaRoute
   AuthKoperasiJabatanRoute: typeof AuthKoperasiJabatanRoute
   AuthKoperasiPengurusRoute: typeof AuthKoperasiPengurusRoute
+  AuthPinjamanPengajuanPinjamanRoute: typeof AuthPinjamanPengajuanPinjamanRoute
+  AuthPinjamanProdukPinjamanRoute: typeof AuthPinjamanProdukPinjamanRoute
+  AuthPinjamanTagihanRoute: typeof AuthPinjamanTagihanRoute
   AuthSettingsMigrationRoute: typeof AuthSettingsMigrationRoute
   AuthSettingsRolesRoute: typeof AuthSettingsRolesRoute
   AuthSettingsUsersRoute: typeof AuthSettingsUsersRoute
@@ -523,7 +565,6 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthGeraiRetailRoute: AuthGeraiRetailRoute,
   AuthLaporanAkuntansiRoute: AuthLaporanAkuntansiRoute,
   AuthLaporanRetailRoute: AuthLaporanRetailRoute,
-  AuthPinjamanRoute: AuthPinjamanRoute,
   AuthProfileRoute: AuthProfileRoute,
   AuthAkuntansiBukuBesarRoute: AuthAkuntansiBukuBesarRoute,
   AuthAkuntansiCoaRoute: AuthAkuntansiCoaRoute,
@@ -532,6 +573,9 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthKoperasiAnggotaRoute: AuthKoperasiAnggotaRoute,
   AuthKoperasiJabatanRoute: AuthKoperasiJabatanRoute,
   AuthKoperasiPengurusRoute: AuthKoperasiPengurusRoute,
+  AuthPinjamanPengajuanPinjamanRoute: AuthPinjamanPengajuanPinjamanRoute,
+  AuthPinjamanProdukPinjamanRoute: AuthPinjamanProdukPinjamanRoute,
+  AuthPinjamanTagihanRoute: AuthPinjamanTagihanRoute,
   AuthSettingsMigrationRoute: AuthSettingsMigrationRoute,
   AuthSettingsRolesRoute: AuthSettingsRolesRoute,
   AuthSettingsUsersRoute: AuthSettingsUsersRoute,

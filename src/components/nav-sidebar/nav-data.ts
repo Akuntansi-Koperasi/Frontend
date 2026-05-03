@@ -22,12 +22,12 @@ export const navItems = [
     icon: Coins,
     items: [
       {
-        title: 'Laporan Transaksi',
-        url: '/simpan-pinjam/laporan-transaksi',
-      },
-      {
         title: 'Transaksi Anggota',
         url: '/simpan-pinjam/transaksi-anggota',
+      },
+      {
+        title: 'Laporan Transaksi',
+        url: '/simpan-pinjam/laporan-transaksi',
       },
     ],
   },
@@ -51,8 +51,21 @@ export const navItems = [
   },
   {
     title: 'Pinjaman',
-    url: '/pinjaman',
     icon: HandCoins,
+    items: [
+      {
+        title: 'Produk Pinjaman',
+        url: '/pinjaman/produk-pinjaman',
+      },
+      {
+        title: 'Pengajuan Pinjaman',
+        url: '/pinjaman/pengajuan-pinjaman',
+      },
+      {
+        title: 'Tagihan',
+        url: '/pinjaman/tagihan',
+      },
+    ],
   },
   {
     title: 'Gerai / Retail',
