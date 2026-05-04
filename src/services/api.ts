@@ -12,6 +12,11 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+  const koperasi_id = typeof window !== 'undefined' ? localStorage.getItem('koperasiActive') : null
+
+  if (koperasi_id) {
+    config.headers['X-Koperasi-ID'] = koperasi_id
+  }
   
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
@@ -26,6 +31,10 @@ api.interceptors.response.use(
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
+        localStorage.removeItem('koperasiList')
+        localStorage.removeItem('koperasiActive')
+        localStorage.removeItem('anggota')
+        localStorage.removeItem('permissions')
 
         if (window.location.pathname !== '/login') {
           window.location.href = '/login'

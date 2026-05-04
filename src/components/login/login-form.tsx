@@ -4,7 +4,7 @@ import { useRouter } from '@tanstack/react-router'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { GoogleLogin } from '@react-oauth/google'
 import { toast } from 'sonner'
-import { login, loginWithGoogle, mockLogin } from '@/services/authService'
+import { login, loginWithGoogle, } from '@/services/authService'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,9 +33,7 @@ export function LoginForm({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleAuthSuccess = (response: any) => {
-    localStorage.setItem('token', response.data.token)
-    localStorage.setItem('user', JSON.stringify(response.data.user))
+  const handleAuthSuccess = () => {
     router.navigate({ to: '/dashboard' })
   }
 
@@ -45,10 +43,8 @@ export function LoginForm({
     setError('')
 
     try {
-      // MOCK
-      // const response = await login(email, password)
-      const response = await mockLogin()
-      handleAuthSuccess(response)
+      await login(email, password)
+      handleAuthSuccess()
     } catch (err: any) {
       const msg =
         err.response?.data?.message || 'Login gagal. Cek email/password.'
@@ -70,8 +66,8 @@ export function LoginForm({
     setError('')
 
     try {
-      const response = await loginWithGoogle(idToken)
-      handleAuthSuccess(response)
+      await loginWithGoogle(idToken)
+      handleAuthSuccess()
     } catch (err: any) {
       if (err.response) {
         const msg = err.response.data?.message || 'Login Google gagal.'
@@ -103,7 +99,7 @@ export function LoginForm({
             </div>
           </div>
           <CardTitle className="text-2xl">
-            Akuntansi KPRI Bina Sejahtera.<br/>Langsung klik "Masuk" untuk masuk.
+            Akuntansi Koperasi.
           </CardTitle>
           <CardDescription className="text-sm">
             Silakan masukkan kredensial Anda untuk mengakses dashboard

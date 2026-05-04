@@ -2,13 +2,25 @@ import { api } from './api'
 
 export type User = {
   id: number
-  name: string
-  username: string
   email: string
-  role: string
-  profile_image: string | null
-  has_password?: boolean
-  google_id?: string | null
+}
+
+export type koperasiDetail = {
+  id: number
+  name: string
+}
+
+export type anggota = {
+  id: number
+  name: string
+  email: string
+  photo_profile: string | null
+}
+
+export type Koperasi = {
+  koperasi: koperasiDetail
+  anggota: anggota
+  permissions: Array<string>
 }
 
 export type LoginResponse = {
@@ -18,6 +30,7 @@ export type LoginResponse = {
     token_type: string
     token: string
     user: User
+    koperasi: Array<Koperasi>
   }
 }
 
@@ -35,24 +48,13 @@ export const login = async (email: string, password: string) => {
   if (typeof window !== 'undefined') {
     localStorage.setItem('token', response.data.data.token)
     localStorage.setItem('user', JSON.stringify(response.data.data.user))
+    localStorage.setItem('koperasiList', JSON.stringify(response.data.data.koperasi))
+    localStorage.setItem('koperasiActive', response.data.data.koperasi[0].koperasi.id.toString())
+    localStorage.setItem('anggota', JSON.stringify(response.data.data.koperasi[0].anggota))
+    localStorage.setItem('permissions', JSON.stringify(response.data.data.koperasi[0].permissions))
   }
 
   return response.data
-}
-
-export const mockLogin = async () => {
-      const mockUser = {"id":69,"name":"Afif","username":"afif","email":"juwhater@mail.com","role":"admin","profile_image":"https://lh3.googleusercontent.com/a/ACg8ocLlT6wjyml6pl-yYNjdQA7zg_Yqo_wYrdAGGgh5zh15AA2OrMk=s96-c","has_password":true}
-      localStorage.setItem('token', 'mock-token')
-      localStorage.setItem('user', JSON.stringify(mockUser))
-      return {
-        status: 'success',
-        message: 'Mock login successful',
-        data: {
-          token_type: 'Bearer',
-          token: 'mock-token',
-          user: mockUser,
-        },
-      }
 }
 
 export const loginWithGoogle = async (idToken: string) => {
@@ -107,6 +109,10 @@ export const logout = async () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
+      localStorage.removeItem('koperasiList')
+      localStorage.removeItem('koperasiActive')
+      localStorage.removeItem('anggota')
+      localStorage.removeItem('permissions')
       window.location.href = '/login'
     }
   }

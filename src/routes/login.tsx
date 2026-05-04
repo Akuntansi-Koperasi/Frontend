@@ -8,13 +8,13 @@ export const Route = createFileRoute('/login')({
 })
 
 function RouteComponent() {
-  // const router = useRouter()
+  const router = useRouter()
 
-  // useEffect(() => {
-  //   if (isAuthenticated()) {
-  //     router.navigate({ to: '/dashboard', replace: true })
-  //   }
-  // }, [router])
+  useEffect(() => {
+    if (isAuthenticated()) {
+      router.navigate({ to: '/dashboard', replace: true })
+    }
+  }, [router])
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">

@@ -1,30 +1,28 @@
 import { useQuery } from '@tanstack/react-query'
 import { getProfile } from '@/services/profileService'
 
-export interface User {
+export type Anggota = {
   id: number
-  name: string
+  nama: string
   email: string
-  username: string
-  role: 'admin' | 'employee'
-  profile_image: string | null
-  presence_location_id?: number | null
+  photo_profile: string | null
 }
 
 export function useUserProfile() {
-  return useQuery<User>({
+  return useQuery<Anggota>({
     queryKey: ['profile'],
     queryFn: async () => {
-      const data = await getProfile()
+      const data = localStorage.getItem("anggota")
+      // const data = await getProfile()
       if (typeof window !== 'undefined') {
-        localStorage.setItem("user", JSON.stringify(data))
+        localStorage.setItem("anggota", JSON.stringify(data))
       }
-      return data as unknown as User
+      return data as unknown as Anggota
     },
     initialData: () => {
       try {
         if (typeof window === 'undefined') return undefined
-        const stored = localStorage.getItem("user")
+        const stored = localStorage.getItem("anggota")
         return stored ? JSON.parse(stored) : undefined
       } catch {
         return undefined

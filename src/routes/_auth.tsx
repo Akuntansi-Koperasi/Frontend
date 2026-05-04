@@ -20,16 +20,16 @@ import { isAuthenticated } from '@/services/authService'
 
 export const Route = createFileRoute('/_auth')({
   // Tidak dipakai karena menyebabkan flicker
-  beforeLoad: ({ location }) => {
-    if (!isAuthenticated()) {
-      throw redirect({
-        to: '/login',
-        search: {
-          redirect: location.href,
-        },
-      })
-    }
-  },
+  // beforeLoad: ({ location }) => {
+  //   if (!isAuthenticated()) {
+  //     throw redirect({
+  //       to: '/login',
+  //       search: {
+  //         redirect: location.href,
+  //       },
+  //     })
+  //   }
+  // },
   component: AuthLayout,
 })
 
