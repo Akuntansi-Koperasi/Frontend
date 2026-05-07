@@ -11,16 +11,50 @@ export type Anggota = {
 
 function syncProfileStorage(data: ProfileData) {
   if (typeof window === 'undefined') return
+  const incomingList = data.koperasi ?? []
+  const incomingActive = incomingList[0] ?? null
 
-  const activeKoperasi = data.koperasi[0] ?? null
+  // merge koperasiList: update existing entries with same koperasi.id, keep others
+  const existingRaw = localStorage.getItem('koperasiList')
+  let existingList: Array<any> = []
+  try {
+    existingList = existingRaw ? JSON.parse(existingRaw) : []
+  } catch {
+    existingList = []
+  }
+
+  const merged = [...existingList]
+  for (const item of incomingList) {
+    const id = item?.koperasi?.id
+    const idx = merged.findIndex((m) => m?.koperasi?.id === id)
+    if (idx >= 0) merged[idx] = item
+    else merged.push(item)
+  }
 
   localStorage.setItem('user', JSON.stringify(data.user))
-  localStorage.setItem('koperasiList', JSON.stringify(data.koperasi))
+  localStorage.setItem('koperasiList', JSON.stringify(merged))
 
-  if (activeKoperasi) {
-    localStorage.setItem('koperasiActive', JSON.stringify(activeKoperasi))
-    localStorage.setItem('anggota', JSON.stringify(activeKoperasi.anggota))
-    localStorage.setItem('permissions', JSON.stringify(activeKoperasi.permissions))
+  const existingActiveRaw = localStorage.getItem('koperasiActive')
+  let existingActive = null
+  try {
+    existingActive = existingActiveRaw ? JSON.parse(existingActiveRaw) : null
+  } catch {
+    existingActive = null
+  }
+
+  if (incomingActive) {
+    // set/update active koperasi from incoming
+    const activeIdx = merged.findIndex((m) => m?.koperasi?.id === incomingActive.koperasi.id)
+    const activeItem = activeIdx >= 0 ? merged[activeIdx] : incomingActive
+    localStorage.setItem('koperasiActive', JSON.stringify(activeItem))
+    localStorage.setItem('anggota', JSON.stringify(activeItem.anggota))
+    localStorage.setItem('permissions', JSON.stringify(activeItem.permissions))
+  } else if (existingActive) {
+    // keep existing active as-is
+    // ensure anggota & permissions kept in sync with existingActive
+    localStorage.setItem('koperasiActive', JSON.stringify(existingActive))
+    if (existingActive.anggota) localStorage.setItem('anggota', JSON.stringify(existingActive.anggota))
+    if (existingActive.permissions) localStorage.setItem('permissions', JSON.stringify(existingActive.permissions))
   } else {
     localStorage.removeItem('koperasiActive')
     localStorage.removeItem('anggota')
