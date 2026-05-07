@@ -19,7 +19,7 @@ export function useUserProfile() {
     //   }
     //   return data as unknown as Anggota
     // },
-    initialData: () => {
+    queryFn: async () => {
       try {
         if (typeof window === 'undefined') return undefined
         const stored = localStorage.getItem("anggota")

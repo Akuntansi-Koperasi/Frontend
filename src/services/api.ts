@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { env } from '@/env' 
+import { env } from '@/env'
 
 export const api = axios.create({
   baseURL: env.VITE_API_URL,
@@ -12,12 +12,12 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
-  const koperasi_id = typeof window !== 'undefined' ? localStorage.getItem('koperasiActive') : null
+  const koperasi = typeof window !== 'undefined' ? localStorage.getItem('koperasiActive') : null
 
-  if (koperasi_id) {
-    config.headers['X-Koperasi-ID'] = koperasi_id
+  if (koperasi) {
+    config.headers['X-Koperasi-ID'] = JSON.parse(koperasi).koperasi.id.toString()
   }
-  
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }

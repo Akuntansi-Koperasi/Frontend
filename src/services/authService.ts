@@ -7,7 +7,7 @@ export type User = {
 
 export type koperasiDetail = {
   id: number
-  name: string
+  nama: string
 }
 
 export type anggota = {
@@ -49,7 +49,7 @@ export const login = async (email: string, password: string) => {
     localStorage.setItem('token', response.data.data.token)
     localStorage.setItem('user', JSON.stringify(response.data.data.user))
     localStorage.setItem('koperasiList', JSON.stringify(response.data.data.koperasi))
-    localStorage.setItem('koperasiActive', response.data.data.koperasi[0].koperasi.id.toString())
+    localStorage.setItem('koperasiActive', JSON.stringify(response.data.data.koperasi[0]))
     localStorage.setItem('anggota', JSON.stringify(response.data.data.koperasi[0].anggota))
     localStorage.setItem('permissions', JSON.stringify(response.data.data.koperasi[0].permissions))
   }
