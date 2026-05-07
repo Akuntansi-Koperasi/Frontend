@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getProfile } from '@/services/profileService'
+// import { getProfile } from '@/services/profileService'
 
 export type Anggota = {
   id: number
@@ -11,14 +11,14 @@ export type Anggota = {
 export function useUserProfile() {
   return useQuery<Anggota>({
     queryKey: ['profile'],
-    queryFn: async () => {
-      const data = localStorage.getItem("anggota")
-      // const data = await getProfile()
-      if (typeof window !== 'undefined') {
-        localStorage.setItem("anggota", JSON.stringify(data))
-      }
-      return data as unknown as Anggota
-    },
+    // queryFn: async () => {
+    //   const data = localStorage.getItem("anggota")
+    //   // const data = await getProfile()
+    //   if (typeof window !== 'undefined') {
+    //     localStorage.setItem("anggota", JSON.stringify(data))
+    //   }
+    //   return data as unknown as Anggota
+    // },
     initialData: () => {
       try {
         if (typeof window === 'undefined') return undefined
