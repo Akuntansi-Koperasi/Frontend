@@ -3,6 +3,7 @@ import { api } from './api'
 export type User = {
   id: number
   email: string
+  photo_profile: string | null
 }
 
 export type koperasiDetail = {
@@ -12,7 +13,7 @@ export type koperasiDetail = {
 
 export type anggota = {
   id: number
-  name: string
+  nama: string
   email: string
   photo_profile: string | null
 }

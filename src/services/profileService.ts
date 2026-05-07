@@ -1,13 +1,9 @@
 import { api } from './api'
+import { User, Koperasi } from './authService'
 
 export type ProfileData = {
-  id: number
-  name: string
-  username: string
-  email: string
-  role: string
-  profile_image: string | null
-  has_password: boolean
+  user: User
+  koperasi: Array<Koperasi>
 }
 
 export type UpdateProfilePayload = {
