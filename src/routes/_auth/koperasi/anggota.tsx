@@ -1,3 +1,4 @@
+import { SearchBar } from '@/components/nav-sidebar/search-bar';
 import HeaderComp from '@/components/shared/header-comp'
 import { createFileRoute } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
@@ -15,6 +16,7 @@ function RouteComponent() {
         icon={<Plus />}
         actionLabel="Tambah Anggota"
       />
+      <SearchBar placeholder="Cari anggota..." className="mb-4" />
     </>
   )
 }

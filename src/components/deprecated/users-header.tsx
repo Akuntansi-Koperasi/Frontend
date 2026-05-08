@@ -1,4 +1,4 @@
-import { UserAddDialog } from "./user-add-dialog"
+import { UserAddDialog } from "../settings/users/user-add-dialog"
 
 export function UsersHeader() {
   return (

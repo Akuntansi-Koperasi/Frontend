@@ -12,11 +12,8 @@ export type UserRecord = {
   name: string
   username: string
   email: string
-  role: string
+  peran: string
   profile_image: string | null
-  
-  presence_location_id: number | null
-  presence_location_name: string | null 
 }
 
 export type UserResponse = {

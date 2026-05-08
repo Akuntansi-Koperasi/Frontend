@@ -95,7 +95,7 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
           className="p-0 hover:bg-transparent font-bold text-slate-900 justify-start cursor-pointer"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Karyawan
+          Anggota
           <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground" />
         </Button>
       ),
@@ -117,7 +117,15 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
     {
       accessorKey: "peran",
       header: "Peran",
-      cell: () => <Badge variant="outline" className="cursor-default bg-amber-50 text-amber-600 border-amber-200 rounded-full h-8 gap-1.5 px-3 has-[>svg]:px-2.5 font-bold">Peran</Badge>,
+      cell: ({ row }) => {
+        const peran = row.original.peran || "-"
+
+        return (
+          <Badge variant="outline" className="cursor-default bg-amber-50 text-amber-600 border-amber-200 rounded-full h-8 gap-1.5 px-3 has-[>svg]:px-2.5 font-bold">
+            {capitalize(peran)}
+          </Badge>
+        )
+      },
     },
     {
       id: "actions",
