@@ -1,12 +1,16 @@
 import * as React from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import {
+  Building2,
   Check,
   ChevronDown,
-  Building2,
   LogOut,
   User as UserIcon,
 } from "lucide-react"
+import type { Koperasi } from "@/services/authService"
+import { logout } from "@/services/authService"
+import { useUserProfile } from "@/hooks/use-user-profile"
 import {
   Avatar,
   AvatarFallback,
@@ -22,12 +26,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { logout } from "@/services/authService"
-import { useUserProfile } from "@/hooks/use-user-profile"
-import type { Koperasi } from "@/services/authService"
-import { useQueryClient } from "@tanstack/react-query"
 
-function getKoperasiList(): Koperasi[] {
+function getKoperasiList(): Array<Koperasi> {
   try {
     if (typeof window === "undefined") return []
     const stored = localStorage.getItem("koperasiList")
@@ -41,7 +41,20 @@ function getActiveKoperasiId(): number | null {
   try {
     if (typeof window === "undefined") return null
     const stored = localStorage.getItem("koperasiActive")
-    return stored ? Number(stored) : null
+    if (!stored) return null
+    const parsed = JSON.parse(stored)
+    const id = parsed?.koperasi?.id
+    return typeof id === "number" ? id : null
+  } catch {
+    return null
+  }
+}
+
+function getActiveKoperasi(): Koperasi | null {
+  try {
+    if (typeof window === "undefined") return null
+    const stored = localStorage.getItem("koperasiActive")
+    return stored ? (JSON.parse(stored) as Koperasi) : null
   } catch {
     return null
   }
@@ -51,12 +64,12 @@ export function UserNav() {
   const { data: user } = useUserProfile()
   const qc = useQueryClient()
 
-  const [koperasiList] = React.useState<Koperasi[]>(() => getKoperasiList())
+  const [koperasiList] = React.useState<Array<Koperasi>>(() => getKoperasiList())
   const [activeId, setActiveId] = React.useState<number | null>(() => getActiveKoperasiId())
 
-  const activeKoperasi = localStorage.getItem("koperasiActive") ? JSON.parse(localStorage.getItem("koperasiActive")!) : null
+  const activeKoperasi = getActiveKoperasi()
 
-  const switchKoperasi = (item: Koperasi) => {
+  const switchKoperasi = async (item: Koperasi) => {
     if (item.koperasi.id === activeId) return
 
     localStorage.setItem("koperasiActive", JSON.stringify(item))
@@ -65,10 +78,14 @@ export function UserNav() {
 
     setActiveId(item.koperasi.id)
 
-    qc.invalidateQueries({ queryKey: ["profile"] })
-
-    // Reload page to apply new permissions everywhere
-    window.location.reload()
+    // Panggil ulang profile segera (akan memanggil API /profile/me)
+    // supaya storage (anggota/permissions/koperasiActive) tersinkron sebelum reload.
+    try {
+      await qc.refetchQueries({ queryKey: ["profile"], exact: true })
+    } finally {
+      // Reload page to apply new permissions everywhere
+      window.location.reload()
+    }
   }
 
   const getInitials = (name: string) => {

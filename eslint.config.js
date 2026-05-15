@@ -4,7 +4,16 @@ import { tanstackConfig } from '@tanstack/eslint-config'
 
 export default [
   {
-    ignores: ['src/components/deprecated/**', 'src/components/ui/**', 'src/services/deprecated/**'],
+    ignores: [
+      '.output/**',
+      'dist/**',
+      'node_modules/**',
+      'eslint.config.js',
+      'prettier.config.js',
+      'src/components/deprecated/**',
+      'src/components/ui/**',
+      'src/services/deprecated/**',
+    ],
   },
   ...tanstackConfig,
 ]

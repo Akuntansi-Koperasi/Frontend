@@ -87,7 +87,7 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
           <div className="space-y-2">
             <Label 
               htmlFor="name" 
-              className={fieldErrors.name ? "text-red-500" : ""}
+              className={fieldErrors["name"] ? "text-red-500" : ""}
             >
               Nama
             </Label>
@@ -96,33 +96,33 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
               value={name}
               onChange={(e) => handleInputChange(setName, "name", e.target.value)}
               disabled={mutation.isPending}
-              className={fieldErrors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
+              className={fieldErrors["name"] ? "border-red-500 focus-visible:ring-red-500" : ""}
             />
-            {fieldErrors.name && (
-              <p className="text-sm text-red-500">{fieldErrors.name[0]}</p>
+            {fieldErrors["name"] && (
+              <p className="text-sm text-red-500">{fieldErrors["name"][0]}</p>
             )}
           </div>
 
           <div className="space-y-2">
             <Label 
               htmlFor="email"
-              className={fieldErrors.email ? "text-red-500" : ""}
+              className={fieldErrors["email"] ? "text-red-500" : ""}
             >
               Alamat Email
             </Label>
             <div className="relative">
-              <Mail className={`absolute left-3 top-2.5 h-4 w-4 ${fieldErrors.email ? "text-red-500" : "text-muted-foreground"}`} />
+              <Mail className={`absolute left-3 top-2.5 h-4 w-4 ${fieldErrors["email"] ? "text-red-500" : "text-muted-foreground"}`} />
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => handleInputChange(setEmail, "email", e.target.value)}
                 disabled={mutation.isPending || !canEditEmail}
-                className={`${!canEditEmail ? 'pl-9 bg-slate-50 text-muted-foreground cursor-not-allowed' : 'pl-9'} ${fieldErrors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                className={`${!canEditEmail ? 'pl-9 bg-slate-50 text-muted-foreground cursor-not-allowed' : 'pl-9'} ${fieldErrors["email"] ? "border-red-500 focus-visible:ring-red-500" : ""}`}
               />
             </div>
-            {fieldErrors.email && (
-              <p className="text-sm text-red-500">{fieldErrors.email[0]}</p>
+            {fieldErrors["email"] && (
+              <p className="text-sm text-red-500">{fieldErrors["email"][0]}</p>
             )}
             {!canEditEmail && (
               <Alert variant="destructive" className="py-2 h-auto bg-amber-50 text-amber-900 border-amber-200">

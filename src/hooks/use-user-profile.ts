@@ -11,8 +11,7 @@ export type Anggota = {
 
 function syncProfileStorage(data: ProfileData) {
   if (typeof window === 'undefined') return
-  const incomingList = data.koperasi ?? []
-  const incomingActive = incomingList[0] ?? null
+  const incomingList = data.koperasi
 
   // merge koperasiList: update existing entries with same koperasi.id, keep others
   const existingRaw = localStorage.getItem('koperasiList')
@@ -25,7 +24,7 @@ function syncProfileStorage(data: ProfileData) {
 
   const merged = [...existingList]
   for (const item of incomingList) {
-    const id = item?.koperasi?.id
+    const id = item.koperasi.id
     const idx = merged.findIndex((m) => m?.koperasi?.id === id)
     if (idx >= 0) merged[idx] = item
     else merged.push(item)
@@ -42,13 +41,26 @@ function syncProfileStorage(data: ProfileData) {
     existingActive = null
   }
 
-  if (incomingActive) {
-    // set/update active koperasi from incoming
-    const activeIdx = merged.findIndex((m) => m?.koperasi?.id === incomingActive.koperasi.id)
-    const activeItem = activeIdx >= 0 ? merged[activeIdx] : incomingActive
-    localStorage.setItem('koperasiActive', JSON.stringify(activeItem))
-    localStorage.setItem('anggota', JSON.stringify(activeItem.anggota))
-    localStorage.setItem('permissions', JSON.stringify(activeItem.permissions))
+  // Prefer keeping currently-selected active koperasi (if it exists in the new list).
+  // If none is selected yet, fall back to the first koperasi from the API.
+  const preferredActiveId: number | null =
+    typeof existingActive?.koperasi?.id === 'number' ? existingActive.koperasi.id : null
+
+  let nextActive: any = null
+  if (preferredActiveId != null) {
+    const idx = merged.findIndex((m) => m?.koperasi?.id === preferredActiveId)
+    if (idx >= 0) nextActive = merged[idx]
+  }
+  if (!nextActive && incomingList.length > 0) {
+    const fallbackId = incomingList[0]?.koperasi?.id
+    const idx = merged.findIndex((m) => m?.koperasi?.id === fallbackId)
+    nextActive = idx >= 0 ? merged[idx] : incomingList[0]
+  }
+
+  if (nextActive) {
+    localStorage.setItem('koperasiActive', JSON.stringify(nextActive))
+    localStorage.setItem('anggota', JSON.stringify(nextActive.anggota))
+    localStorage.setItem('permissions', JSON.stringify(nextActive.permissions))
   } else if (existingActive) {
     // keep existing active as-is
     // ensure anggota & permissions kept in sync with existingActive
@@ -70,7 +82,7 @@ function readStoredAnggota(): Anggota | undefined {
     if (!stored) return undefined
 
     const parsed = JSON.parse(stored)
-    return parsed?.user ?? parsed ?? undefined
+    return parsed?.user ?? parsed
   } catch {
     return undefined
   }
@@ -82,13 +94,7 @@ export function useUserProfile() {
     queryFn: async () => {
       const data = await getProfile()
       syncProfileStorage(data)
-      const activeAnggota = data.koperasi[0]?.anggota
-
-      if (!activeAnggota) {
-        throw new Error('Data anggota aktif tidak ditemukan')
-      }
-
-      return activeAnggota
+      return data.koperasi[0].anggota
     },
     initialData: () => {
       return readStoredAnggota()
