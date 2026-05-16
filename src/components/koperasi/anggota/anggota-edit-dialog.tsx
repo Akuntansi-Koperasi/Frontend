@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import {
   Dialog,
   DialogBody,
-  DialogContentScrollable,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogForm,
@@ -82,7 +82,7 @@ export function AnggotaEditDialog({ open, onOpenChange, anggota, onSave }: Anggo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContentScrollable className="sm:max-w-[640px]">
+      <DialogContent className="sm:max-w-[480px]">
         <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Edit Anggota</DialogTitle>
@@ -200,7 +200,7 @@ export function AnggotaEditDialog({ open, onOpenChange, anggota, onSave }: Anggo
             </Button>
           </DialogFooter>
         </DialogForm>
-      </DialogContentScrollable>
+      </DialogContent>
     </Dialog>
   )
 }

@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
+  DialogForm,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
@@ -75,7 +77,7 @@ export function AnggotaActivateAccessDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[480px]">
-        <form onSubmit={handleSubmit}>
+        <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Aktifkan Akun Akses Anggota</DialogTitle>
             <DialogDescription>
@@ -83,7 +85,7 @@ export function AnggotaActivateAccessDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <DialogBody className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label className="text-slate-600 font-medium">Peran*</Label>
               <Select value={role} onValueChange={(v) => setRole(v as any)}>
@@ -99,7 +101,7 @@ export function AnggotaActivateAccessDialog({
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          </DialogBody>
 
           <DialogFooter>
             <Button
@@ -120,7 +122,7 @@ export function AnggotaActivateAccessDialog({
               Simpan
             </Button>
           </DialogFooter>
-        </form>
+        </DialogForm>
       </DialogContent>
     </Dialog>
   )

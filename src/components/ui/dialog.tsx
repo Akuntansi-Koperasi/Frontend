@@ -45,7 +45,7 @@ function DialogOverlay({
   )
 }
 
-const DialogContent = React.forwardRef<
+const DialogContentBase = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentProps<typeof DialogPrimitive.Content> & {
     showCloseButton?: boolean
@@ -75,15 +75,15 @@ const DialogContent = React.forwardRef<
     </DialogPrimitive.Content>
   </DialogPortal>
 ))
-DialogContent.displayName = "DialogContent"
+  DialogContentBase.displayName = "DialogContentBase"
 
-const DialogContentScrollable = React.forwardRef<
+const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentProps<typeof DialogPrimitive.Content> & {
     showCloseButton?: boolean
   }
 >(({ className, ...props }, ref) => (
-  <DialogContent
+  <DialogContentBase
     ref={ref}
     className={cn(
       "flex max-h-[90vh] min-h-0 flex-col overflow-hidden",
@@ -92,7 +92,7 @@ const DialogContentScrollable = React.forwardRef<
     {...props}
   />
 ))
-DialogContentScrollable.displayName = "DialogContentScrollable"
+DialogContent.displayName = "DialogContent"
 
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -183,8 +183,8 @@ function DialogDescription({
 export {
   Dialog,
   DialogClose,
+  DialogContentBase,
   DialogContent,
-  DialogContentScrollable,
   DialogDescription,
   DialogBody,
   DialogFooter,

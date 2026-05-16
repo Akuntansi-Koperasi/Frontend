@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import {
   Dialog,
   DialogBody,
-  DialogContentScrollable,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogForm,
@@ -96,7 +96,7 @@ export function AnggotaAddDialog({ open, onOpenChange, onCreate }: AnggotaAddDia
 
   return (
     <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
-      <DialogContentScrollable className="sm:max-w-[640px]">
+      <DialogContent className="sm:max-w-[480px]">
         <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Tambah Anggota Baru</DialogTitle>
@@ -213,7 +213,7 @@ export function AnggotaAddDialog({ open, onOpenChange, onCreate }: AnggotaAddDia
             </Button>
           </DialogFooter>
         </DialogForm>
-      </DialogContentScrollable>
+      </DialogContent>
     </Dialog>
   )
 }

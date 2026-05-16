@@ -8,9 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
+  DialogForm,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -91,14 +93,14 @@ export function PengurusAddDialog({ open, onOpenChange, onAdd }: PengurusAddDial
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[520px]">
-        <form onSubmit={handleSubmit}>
+      <DialogContent className="sm:max-w-[480px]">
+        <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Tambah Pengurus Koperasi Baru</DialogTitle>
             <DialogDescription>Silakan masukkan data pengurus koperasi</DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <DialogBody className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="pengurus-anggota" className="text-slate-600 font-medium">
                 Anggota *
@@ -182,7 +184,7 @@ export function PengurusAddDialog({ open, onOpenChange, onAdd }: PengurusAddDial
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          </DialogBody>
 
           <DialogFooter>
             <Button
@@ -203,7 +205,7 @@ export function PengurusAddDialog({ open, onOpenChange, onAdd }: PengurusAddDial
               Simpan
             </Button>
           </DialogFooter>
-        </form>
+        </DialogForm>
       </DialogContent>
     </Dialog>
   )

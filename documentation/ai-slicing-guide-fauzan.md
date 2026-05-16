@@ -2,7 +2,7 @@
 
 ## Instruksi singkat (untuk AI)
 
-Tujuan: jalankan perubahan UI/pagination seragam di kode Frontend lalu laporkan hasilnya dalam format JSON.
+Tujuan: jalankan perubahan UI seragam di kode Frontend lalu laporkan hasilnya dalam format JSON.
 
 Input: project root `Frontend`.
 
@@ -14,6 +14,7 @@ Langkah (eksekusi otomatis):
 	- slice: `data.slice(pageIndex * per_page, pageIndex * per_page + per_page)`
 4. Dialog yang berhubungan dengan tabel ditempatkan di dalam komponen tabel.
 5. buat data mock yang sesuai
+6. stuktur kode konsisten dengan yang sudah ada cek path orutes dan component dari yaang sebelum2 nyaa
 
 Verifikasi (perintah yang harus dijalankan setelah perubahan):
 ```bash
@@ -44,9 +45,10 @@ Notes:
 - Catatan tambahan dan hal yang perlu dilanjutkan.
 
 Kriteria keberhasilan:
+- halaman harus konsisten semuanya dengan yang sudah diterapkan sebelumnya
 - Semua route pagination default `per_page` = 10
 - Dialog/table menggunakan `Badge`/`Switch`/`Select`/lainnnya sesuai spesifikasi yang diminta
-- `eslint --fix` mengurangi error; `tsc --noEmit` tidak menampilkan error baru pada file yang diubah
+- `eslint --fix` mengurangi error; `tsc --noEmit` tidak menampilkan error sama sekali
 
 Catatan: fokuskan perbaikan lint pada file yang diubah terlebih dahulu.
 

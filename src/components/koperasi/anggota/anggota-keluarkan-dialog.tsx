@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
+  DialogForm,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
@@ -66,8 +68,8 @@ export function AnggotaKeluarkanDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[520px]">
-        <form onSubmit={handleSubmit}>
+      <DialogContent className="sm:max-w-[480px]">
+        <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Keluarkan Anggota Ini</DialogTitle>
             <DialogDescription>
@@ -81,7 +83,7 @@ export function AnggotaKeluarkanDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <DialogBody className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label className="text-slate-600 font-medium">Tanggal Keluar*</Label>
               <Input
@@ -91,7 +93,7 @@ export function AnggotaKeluarkanDialog({
                 className="h-auto min-h-12 cursor-pointer w-full px-4 py-3"
               />
             </div>
-          </div>
+          </DialogBody>
 
           <DialogFooter>
             <Button
@@ -112,7 +114,7 @@ export function AnggotaKeluarkanDialog({
               Ya, Keluarkan
             </Button>
           </DialogFooter>
-        </form>
+        </DialogForm>
       </DialogContent>
     </Dialog>
   )

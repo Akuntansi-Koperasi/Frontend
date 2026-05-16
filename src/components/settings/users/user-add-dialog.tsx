@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
+  DialogForm,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
@@ -102,7 +104,7 @@ export function UserAddDialog({ open, onOpenChange }: UserAddDialogProps) {
   return (
     <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[480px]">
-        <form onSubmit={handleSubmit}>
+        <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
               Aktifkan Akun Akses Anggota
@@ -110,7 +112,7 @@ export function UserAddDialog({ open, onOpenChange }: UserAddDialogProps) {
             <DialogDescription>Silahkan pilih anggota dan peran</DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <DialogBody className="grid gap-4 py-4">
             {/* Anggota */}
             <div className="grid gap-2">
               <Label htmlFor="anggota-select" className="text-slate-600 font-medium">
@@ -148,7 +150,7 @@ export function UserAddDialog({ open, onOpenChange }: UserAddDialogProps) {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          </DialogBody>
 
           <DialogFooter>
             <Button
@@ -169,7 +171,7 @@ export function UserAddDialog({ open, onOpenChange }: UserAddDialogProps) {
               Simpan
             </Button>
           </DialogFooter>
-        </form>
+        </DialogForm>
       </DialogContent>
     </Dialog>
   )

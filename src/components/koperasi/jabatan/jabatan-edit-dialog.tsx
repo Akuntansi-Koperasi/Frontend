@@ -11,9 +11,11 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
+  DialogForm,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -69,14 +71,14 @@ export function JabatanEditDialog({ open, onOpenChange, jabatan, onEdit }: Jabat
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[520px]">
-        <form onSubmit={handleSubmit}>
+      <DialogContent className="sm:max-w-[480px]">
+        <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Edit Jabatan</DialogTitle>
             <DialogDescription>Silakan ubah data jabatan</DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <DialogBody className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="edit-jabatan-nama" className="text-slate-600 font-medium">
                 Nama Jabatan*
@@ -113,7 +115,7 @@ export function JabatanEditDialog({ open, onOpenChange, jabatan, onEdit }: Jabat
                 Multiple
               </Label>
             </div>
-          </div>
+          </DialogBody>
 
           <DialogFooter>
             <Button
@@ -134,7 +136,7 @@ export function JabatanEditDialog({ open, onOpenChange, jabatan, onEdit }: Jabat
               Simpan
             </Button>
           </DialogFooter>
-        </form>
+        </DialogForm>
       </DialogContent>
     </Dialog>
   )

@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
+  DialogForm,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
@@ -96,8 +98,8 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <form onSubmit={handleSubmit}>
+      <DialogContent className="sm:max-w-[480px]">
+        <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Edit User</DialogTitle>
             <DialogDescription>
@@ -105,7 +107,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
             </DialogDescription>
           </DialogHeader>
           
-          <div className="grid gap-4 py-4">
+          <DialogBody className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label className="text-slate-500">
                 Peran* {isSelf && <span className="text-xs text-amber-600 font-normal ml-2">(Tidak dapat mengubah role sendiri)</span>}
@@ -125,7 +127,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
                 </Select>
               </div>
             </div>
-          </div>
+          </DialogBody>
 
           <DialogFooter>
             <Button 
@@ -145,7 +147,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
               Simpan
             </Button>
           </DialogFooter>
-        </form>
+        </DialogForm>
       </DialogContent>
     </Dialog>
   )

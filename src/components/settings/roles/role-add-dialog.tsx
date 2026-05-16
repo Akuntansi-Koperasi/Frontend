@@ -7,9 +7,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
+  DialogForm,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -54,13 +56,13 @@ export function RoleAddDialog({ open, onOpenChange, onAdd }: RoleAddDialogProps)
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[480px]">
-        <form onSubmit={handleSubmit}>
+        <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Tambah Peran</DialogTitle>
             <DialogDescription>Silakan masukkan nama peran baru</DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <DialogBody className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="role-name" className="text-slate-600 font-medium">
                 Nama Peran*
@@ -73,7 +75,7 @@ export function RoleAddDialog({ open, onOpenChange, onAdd }: RoleAddDialogProps)
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
             </div>
-          </div>
+          </DialogBody>
 
           <DialogFooter>
             <Button
@@ -94,7 +96,7 @@ export function RoleAddDialog({ open, onOpenChange, onAdd }: RoleAddDialogProps)
               Simpan
             </Button>
           </DialogFooter>
-        </form>
+        </DialogForm>
       </DialogContent>
     </Dialog>
   )
