@@ -35,6 +35,7 @@ import { Route as AuthAkuntansiTutupBukuRouteImport } from './routes/_auth/akunt
 import { Route as AuthAkuntansiTransaksiUmumRouteImport } from './routes/_auth/akuntansi/transaksi-umum'
 import { Route as AuthAkuntansiCoaRouteImport } from './routes/_auth/akuntansi/coa'
 import { Route as AuthAkuntansiBukuBesarRouteImport } from './routes/_auth/akuntansi/buku-besar'
+import { Route as AuthSettingsPermissionsRoleIdRouteImport } from './routes/_auth/settings/permissions.$roleId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -172,6 +173,12 @@ const AuthAkuntansiBukuBesarRoute = AuthAkuntansiBukuBesarRouteImport.update({
   path: '/akuntansi/buku-besar',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthSettingsPermissionsRoleIdRoute =
+  AuthSettingsPermissionsRoleIdRouteImport.update({
+    id: '/settings/permissions/$roleId',
+    path: '/settings/permissions/$roleId',
+    getParentRoute: () => AuthRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -199,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/simpanan/produk-simpanan': typeof AuthSimpananProdukSimpananRoute
   '/simpanan/rekening-simpanan': typeof AuthSimpananRekeningSimpananRoute
   '/simpanan/tagihan': typeof AuthSimpananTagihanRoute
+  '/settings/permissions/$roleId': typeof AuthSettingsPermissionsRoleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -226,6 +234,7 @@ export interface FileRoutesByTo {
   '/simpanan/produk-simpanan': typeof AuthSimpananProdukSimpananRoute
   '/simpanan/rekening-simpanan': typeof AuthSimpananRekeningSimpananRoute
   '/simpanan/tagihan': typeof AuthSimpananTagihanRoute
+  '/settings/permissions/$roleId': typeof AuthSettingsPermissionsRoleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -255,6 +264,7 @@ export interface FileRoutesById {
   '/_auth/simpanan/produk-simpanan': typeof AuthSimpananProdukSimpananRoute
   '/_auth/simpanan/rekening-simpanan': typeof AuthSimpananRekeningSimpananRoute
   '/_auth/simpanan/tagihan': typeof AuthSimpananTagihanRoute
+  '/_auth/settings/permissions/$roleId': typeof AuthSettingsPermissionsRoleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -284,6 +294,7 @@ export interface FileRouteTypes {
     | '/simpanan/produk-simpanan'
     | '/simpanan/rekening-simpanan'
     | '/simpanan/tagihan'
+    | '/settings/permissions/$roleId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -311,6 +322,7 @@ export interface FileRouteTypes {
     | '/simpanan/produk-simpanan'
     | '/simpanan/rekening-simpanan'
     | '/simpanan/tagihan'
+    | '/settings/permissions/$roleId'
   id:
     | '__root__'
     | '/'
@@ -339,6 +351,7 @@ export interface FileRouteTypes {
     | '/_auth/simpanan/produk-simpanan'
     | '/_auth/simpanan/rekening-simpanan'
     | '/_auth/simpanan/tagihan'
+    | '/_auth/settings/permissions/$roleId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -531,6 +544,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAkuntansiBukuBesarRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/settings/permissions/$roleId': {
+      id: '/_auth/settings/permissions/$roleId'
+      path: '/settings/permissions/$roleId'
+      fullPath: '/settings/permissions/$roleId'
+      preLoaderRoute: typeof AuthSettingsPermissionsRoleIdRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
@@ -558,6 +578,7 @@ interface AuthRouteChildren {
   AuthSimpananProdukSimpananRoute: typeof AuthSimpananProdukSimpananRoute
   AuthSimpananRekeningSimpananRoute: typeof AuthSimpananRekeningSimpananRoute
   AuthSimpananTagihanRoute: typeof AuthSimpananTagihanRoute
+  AuthSettingsPermissionsRoleIdRoute: typeof AuthSettingsPermissionsRoleIdRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
@@ -584,6 +605,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthSimpananProdukSimpananRoute: AuthSimpananProdukSimpananRoute,
   AuthSimpananRekeningSimpananRoute: AuthSimpananRekeningSimpananRoute,
   AuthSimpananTagihanRoute: AuthSimpananTagihanRoute,
+  AuthSettingsPermissionsRoleIdRoute: AuthSettingsPermissionsRoleIdRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
