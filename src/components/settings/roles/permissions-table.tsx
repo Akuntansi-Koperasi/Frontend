@@ -1,7 +1,6 @@
 import type { PermissionLevel, PermissionMenuItem } from '@/components/settings/roles/types'
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { DataTablePagination } from '@/components/data-table-pagination'
 import {
   Select,
@@ -42,9 +41,7 @@ interface PermissionsTableProps {
 }
 
 export function PermissionsTable({
-  roleName,
   menus,
-  totalMenus,
   levels,
   onChangeLevel,
   levelOptions = DEFAULT_LEVEL_OPTIONS,

@@ -44,7 +44,7 @@ const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 export function UsersTable({ data, pagination }: UsersTableProps) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting] = React.useState<SortingState>([])
 
   const [userToDelete, setUserToDelete] = React.useState<UserRecord | null>(null)
   const [userToEdit, setUserToEdit] = React.useState<UserRecord | null>(null)

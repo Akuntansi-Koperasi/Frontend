@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, Loader2, Mail, Save, User } from 'lucide-react'
 import { toast } from 'sonner'
-import type { ProfileData } from '@/services/profileService'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -10,11 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { updateProfile } from '@/services/profileService'
 
-interface ProfileInfoProps {
-  user: ProfileData & { has_password?: boolean }
-}
-
-export function ProfileInfo({ user }: ProfileInfoProps) {
+export function ProfileInfo({ user }: { user: { name: string; email: string } & Record<string, any> & { has_password?: boolean } }) {
   const queryClient = useQueryClient()
   const [name, setName] = useState(user.name)
   const [email, setEmail] = useState(user.email)

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import type { UserRecord } from "@/services/userService"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+
 import { Label } from "@/components/ui/label"
 import {
   Dialog,
@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { getTokoDropdown, updateUser } from "@/services/userService"
+import { updateUser } from "@/services/userService"
 import { useUserProfile } from "@/hooks/use-user-profile"
 
 const MOCK_PERAN = [
@@ -45,14 +45,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
   const [name, setName] = useState("")
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
-  const [tokoId, setTokoId] = useState("")
   const [role, setRole] = useState<string>("employee")
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<string, Array<string>>>>({})
-
-  const { data: tokoList } = useQuery({
-    queryKey: ['toko-dropdown'],
-    queryFn: getTokoDropdown
-  })
 
   useEffect(() => {
     if (user) {
@@ -61,7 +54,6 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
       setEmail(user.email)
       const safeRole = (user.peran || "employee").toLowerCase() as "admin" | "employee"
       setRole(safeRole)
-      setFieldErrors({})
     }
   }, [user])
 
@@ -77,30 +69,11 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
       }
 
       onOpenChange(false)
-      setFieldErrors({})
     },
     onError: (error: any) => {
-      if (error.response?.data?.errors) {
-        setFieldErrors(error.response.data.errors)
-      }
       toast.error(error.response?.data?.message || "Gagal memperbarui user")
     }
   })
-
-  const handleInputChange = (
-    setter: (value: string) => void, 
-    field: string, 
-    value: string
-  ) => {
-    setter(value)
-    if (fieldErrors[field]?.length) {
-      setFieldErrors(prev => {
-        const newErrors = { ...prev }
-        delete newErrors[field]
-        return newErrors
-      })
-    }
-  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -119,8 +92,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
   const isFormValid = 
     name.trim() !== "" && 
     username.trim() !== "" && 
-    email.trim() !== "" && 
-    (role === "admin" || (role === "employee" && tokoId !== ""))
+    email.trim() !== ""
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

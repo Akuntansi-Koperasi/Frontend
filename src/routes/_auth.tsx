@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import {
   Outlet,
   createFileRoute,
-  redirect,
   useLocation,
   useRouter,
 } from '@tanstack/react-router'

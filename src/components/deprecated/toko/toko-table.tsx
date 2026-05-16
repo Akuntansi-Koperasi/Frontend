@@ -9,7 +9,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowUpDown, MapPin, Pencil, Store, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { DataTablePagination } from '../data-table-pagination'
+import { DataTablePagination } from '../../data-table-pagination'
 import { TokoEditDialog } from './toko-edit-dialog'
 import { TokoDeleteDialog } from './toko-delete-dialog'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
@@ -55,20 +55,20 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
       const errorMessage = error?.response?.data?.message || 'Gagal menghapus toko'
       toast.error(errorMessage)
     },
-      import { DataTablePagination } from '../../data-table-pagination'
+  })
 
   const handlePageChange = (newPageIndex: number) => {
     navigate({
-      to: '/toko',
-      search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
+      to: '/toko' as any,
+      search: ((prev: any) => ({ ...prev, page: newPageIndex + 1 })) as any,
       replace: true,
     })
   }
 
   const handlePageSizeChange = (newPageSize: number) => {
     navigate({
-      to: '/toko',
-      search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
+      to: '/toko' as any,
+      search: ((prev: any) => ({ ...prev, per_page: newPageSize, page: 1 })) as any,
       replace: true,
     })
   }
@@ -108,7 +108,7 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
           <span className="font-semibold text-slate-900 text-sm">
             {row.original.name}
           </span>
-            to: '/toko' as any,
+        </div>
       ),
     },
     {
@@ -116,7 +116,7 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
       header: 'Alamat',
       cell: ({ row }) => (
         <span
-            to: '/toko' as any,
+          className="text-sm font-medium text-slate-700 block max-w-[250px] truncate"
           title={row.original.address}
         >
           {row.original.address || '-'}
