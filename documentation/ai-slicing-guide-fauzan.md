@@ -13,6 +13,7 @@ Langkah (eksekusi otomatis):
 	- `pageIndex = page - 1`
 	- slice: `data.slice(pageIndex * per_page, pageIndex * per_page + per_page)`
 4. Dialog yang berhubungan dengan tabel ditempatkan di dalam komponen tabel.
+5. buat data mock yang sesuai
 
 Verifikasi (perintah yang harus dijalankan setelah perubahan):
 ```bash
