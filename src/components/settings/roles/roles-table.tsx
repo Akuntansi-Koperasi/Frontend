@@ -5,7 +5,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, Link } from '@tanstack/react-router'
 import { ArrowUpDown, Eye, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -99,17 +99,17 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
           <Button
             variant="ghost"
             size="icon"
+            asChild
             className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
             title="Lihat / Atur Hak Akses"
-            onClick={() => {
-              navigate({
-                to: '/settings/permissions/$roleId',
-                params: { roleId: String(row.original.id) },
-                search: {},
-              })
-            }}
           >
-            <Eye className="h-4 w-4" />
+            <Link
+              to="/settings/permissions/$roleId"
+              params={{ roleId: String(row.original.id) }}
+              search={{ page: 1, per_page: 10 }}
+            >
+              <Eye className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
       ),

@@ -103,7 +103,7 @@ function RouteComponent() {
 
   const handleSave = () => {
     console.log('Saved permissions for role', roleId, levels)
-    navigate({ to: '/settings/roles' })
+    navigate({ to: '/settings/roles' } as any)
   }
 
   return (
