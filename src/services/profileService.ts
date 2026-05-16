@@ -1,5 +1,5 @@
 import { api } from './api'
-import { User, Koperasi } from './authService'
+import type { Koperasi, User } from './authService'
 
 export type ProfileData = {
   user: User

@@ -5,15 +5,13 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { ArrowUpDown, Eye, Pencil, Trash2 } from 'lucide-react'
-import { toast } from 'sonner'
-
-import { RoleDeleteDialog } from './role-delete-dialog'
-import { RoleEditDialog } from './role-edit-dialog'
+import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react'
+import { JabatanAddDialog } from './jabatan-add-dialog'
+import { JabatanEditDialog } from './jabatan-edit-dialog'
+import { JabatanDeleteDialog } from './jabatan-delete-dialog'
 
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
-import type { RoleRecord } from './types'
+import type { JabatanRecord } from './types'
 
 import { DataTablePagination } from '@/components/data-table-pagination'
 import {
@@ -25,45 +23,36 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 
-interface RolesTableProps {
-  data: Array<RoleRecord>
+interface JabatanTableProps {
+  data: Array<JabatanRecord>
   pagination: {
     pageIndex: number
     pageSize: number
     pageCount: number
     total: number
   }
-  onEdit: (payload: { id: number; name: string }) => void
+  onEdit: (payload: { id: number; nama: string; kategori: string; multiple: boolean }) => void
   onDelete: (id: number) => void
+  onPageChange: (newPageIndex: number) => void
+  onPageSizeChange: (newPageSize: number) => void
+  addOpen: boolean
+  onAddOpenChange: (open: boolean) => void
+  onAdd: (payload: { nama: string; kategori: string; multiple: boolean }) => void
 }
 
-export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTableProps) {
-  const navigate = useNavigate()
+export function JabatanTable({ data, pagination, onEdit, onDelete, onPageChange, onPageSizeChange, addOpen, onAddOpenChange, onAdd }: JabatanTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
+  const [editOpen, setEditOpen] = React.useState(false)
+  const [deleteOpen, setDeleteOpen] = React.useState(false)
+  const [editing, setEditing] = React.useState<JabatanRecord | null>(null)
+  const [deleting, setDeleting] = React.useState<JabatanRecord | null>(null)
 
-  const [roleToDelete, setRoleToDelete] = React.useState<RoleRecord | null>(null)
-  const [roleToEdit, setRoleToEdit] = React.useState<RoleRecord | null>(null)
-  const [isDeleting, setIsDeleting] = React.useState(false)
+  // handlers are provided by parent
 
-  const handlePageChange = (newPageIndex: number) => {
-    navigate({
-      to: '/settings/roles',
-      search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
-      replace: true,
-    })
-  }
-
-  const handlePageSizeChange = (newPageSize: number) => {
-    navigate({
-      to: '/settings/roles',
-      search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
-      replace: true,
-    })
-  }
-
-  const columns: Array<ColumnDef<RoleRecord>> = [
+  const columns: Array<ColumnDef<JabatanRecord>> = [
     {
       id: 'index',
       header: 'No.',
@@ -76,42 +65,33 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
       },
     },
     {
-      accessorKey: 'name',
+      accessorKey: 'nama',
       header: ({ column }) => (
         <Button
           variant="ghost"
           className="p-0 hover:bg-transparent font-bold text-slate-900 justify-start cursor-pointer"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Nama Peran
+          Nama Jabatan
           <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground" />
         </Button>
       ),
-      cell: ({ row }) => (
-        <span className="font-semibold text-slate-900 text-sm">{row.original.name}</span>
-      ),
+      cell: ({ row }) => <span className="font-semibold text-slate-900 text-sm">{row.original.nama}</span>,
     },
     {
-      id: 'permission',
-      header: 'Permission',
+      accessorKey: 'kategori',
+      header: 'Kategori',
+      cell: ({ row }) => <span className="text-sm">{row.original.kategori}</span>,
+    },
+    {
+      id: 'multiple',
+      header: 'Multiple',
       cell: ({ row }) => (
-        <div className="flex items-center justify-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            asChild
-            className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
-            title="Lihat / Atur Hak Akses"
-          >
-            <Link
-              to="/settings/permissions/$roleId"
-              params={{ roleId: String(row.original.id) }}
-              search={{ page: 1, per_page: 10 }}
-            >
-              <Eye className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
+        row.original.multiple ? (
+          <Badge variant={'green'}>Ya</Badge>
+        ) : (
+          <Badge variant={'destructive'}>Tidak</Badge>
+        )
       ),
     },
     {
@@ -123,7 +103,10 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
-            onClick={() => setRoleToEdit(row.original)}
+            onClick={() => {
+              setEditing(row.original)
+              setEditOpen(true)
+            }}
             title="Edit"
           >
             <Pencil className="h-4 w-4" />
@@ -133,7 +116,10 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
-            onClick={() => setRoleToDelete(row.original)}
+            onClick={() => {
+              setDeleting(row.original)
+              setDeleteOpen(true)
+            }}
             title="Hapus"
           >
             <Trash2 className="h-4 w-4" />
@@ -154,19 +140,7 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
     pageCount: pagination.pageCount,
   })
 
-  const handleDelete = async (id: number) => {
-    setIsDeleting(true)
-    try {
-      await new Promise((r) => setTimeout(r, 350))
-      onDelete(id)
-      toast.success('Peran berhasil dihapus')
-      setRoleToDelete(null)
-    } catch {
-      toast.error('Gagal menghapus peran')
-    } finally {
-      setIsDeleting(false)
-    }
-  }
+  // deletion handled by parent via onDelete
 
   return (
     <>
@@ -209,7 +183,7 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
-                    Tidak ada peran ditemukan.
+                    Tidak ada jabatan ditemukan.
                   </TableCell>
                 </TableRow>
               )}
@@ -220,28 +194,48 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
             pageIndex={pagination.pageIndex}
             pageCount={pagination.pageCount}
             pageSize={pagination.pageSize}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
           />
         </CardContent>
       </Card>
-
-      <RoleEditDialog
-        open={!!roleToEdit}
-        onOpenChange={(isOpen) => !isOpen && setRoleToEdit(null)}
-        role={roleToEdit}
-        onEdit={(payload) => {
-          onEdit(payload)
-          setRoleToEdit(null)
+      {/* Dialogs moved into table (add/edit/delete) */}
+      <JabatanAddDialog
+        open={addOpen}
+        onOpenChange={(isOpen) => onAddOpenChange(isOpen)}
+        onAdd={(payload) => {
+          onAdd(payload)
+          onAddOpenChange(false)
         }}
       />
 
-      <RoleDeleteDialog
-        open={!!roleToDelete}
-        onOpenChange={(isOpen) => !isOpen && setRoleToDelete(null)}
-        role={roleToDelete}
-        onConfirm={handleDelete}
-        isDeleting={isDeleting}
+      <JabatanEditDialog
+        open={editOpen}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) setEditing(null)
+          setEditOpen(isOpen)
+        }}
+        jabatan={editing}
+        onEdit={(payload) => {
+          onEdit(payload)
+          setEditOpen(false)
+          setEditing(null)
+        }}
+      />
+
+      <JabatanDeleteDialog
+        open={deleteOpen}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) setDeleting(null)
+          setDeleteOpen(isOpen)
+        }}
+        jabatan={deleting}
+        onConfirm={(id) => {
+          onDelete(id)
+          setDeleteOpen(false)
+          setDeleting(null)
+        }}
+        isDeleting={false}
       />
     </>
   )

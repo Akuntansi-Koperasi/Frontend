@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useMemo, useState } from 'react'
+import { Plus } from 'lucide-react'
+import type { UserRecord } from '@/services/userService'
 import { UserAddDialog } from '@/components/settings/users/user-add-dialog'
 import { UsersTable } from '@/components/settings/users/users-table'
-import type { UserRecord } from '@/services/userService'
 import HeaderComp from '@/components/shared/header-comp'
-import { Plus } from 'lucide-react'
 import { SearchBar } from '@/components/shared/search-bar'
 
 // ─── Search Params Schema ─────────────────────────────────────────────────────
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/_auth/settings/users')({
 })
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
-const MOCK_USERS: UserRecord[] = [
+const MOCK_USERS: Array<UserRecord> = [
   {
     id: 1,
     name: 'Budi Santoso',

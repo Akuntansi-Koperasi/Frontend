@@ -54,7 +54,7 @@ type UserAddDialogProps = {
 export function UserAddDialog({ open, onOpenChange }: UserAddDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false)
   const isControlled = typeof open === "boolean" && typeof onOpenChange === "function"
-  const dialogOpen = isControlled ? (open as boolean) : internalOpen
+  const dialogOpen = isControlled ? (open) : internalOpen
   const setDialogOpen = isControlled
     ? (onOpenChange as (o: boolean) => void)
     : setInternalOpen

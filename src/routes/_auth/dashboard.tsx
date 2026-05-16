@@ -1,10 +1,10 @@
+import { createFileRoute } from '@tanstack/react-router'
 import { SearchBar } from '@/components/nav-sidebar/search-bar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Switch } from '@/components/ui/switch'
-import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth/dashboard')({
   component: RouteComponent,
