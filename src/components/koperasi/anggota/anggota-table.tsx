@@ -70,7 +70,7 @@ export function AnggotaTable({
   onActivateAccess,
   onKeluarkan,
 }: AnggotaTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting] = React.useState<SortingState>([])
 
   const [anggotaToEdit, setAnggotaToEdit] = React.useState<AnggotaRecord | null>(null)
   const [anggotaToDelete, setAnggotaToDelete] = React.useState<AnggotaRecord | null>(null)

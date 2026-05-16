@@ -15,12 +15,8 @@ export function SetoranSearch({ currentSearch }: { currentSearch?: string }) {
 
   const handleSearch = (term: string) => {
     navigate({
-      to: '/setoran',
-      search: (prev: any) => ({
-        ...prev,
-        search: term || undefined,
-        page: 1,
-      }),
+      to: '/setoran' as any,
+      search: ((prev: any) => ({ ...prev, search: term || undefined, page: 1 })) as any,
       replace: true,
     })
   }

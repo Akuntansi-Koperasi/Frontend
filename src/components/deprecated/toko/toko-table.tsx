@@ -55,7 +55,7 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
       const errorMessage = error?.response?.data?.message || 'Gagal menghapus toko'
       toast.error(errorMessage)
     },
-  })
+      import { DataTablePagination } from '../../data-table-pagination'
 
   const handlePageChange = (newPageIndex: number) => {
     navigate({
@@ -108,7 +108,7 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
           <span className="font-semibold text-slate-900 text-sm">
             {row.original.name}
           </span>
-        </div>
+            to: '/toko' as any,
       ),
     },
     {
@@ -116,7 +116,7 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
       header: 'Alamat',
       cell: ({ row }) => (
         <span
-          className="text-sm font-medium text-slate-700 block max-w-[250px] truncate"
+            to: '/toko' as any,
           title={row.original.address}
         >
           {row.original.address || '-'}

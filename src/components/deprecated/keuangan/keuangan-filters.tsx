@@ -50,12 +50,12 @@ export function KeuanganFilters({
 
     if (!hasStart || !hasEnd) {
       navigate({
-        to: '/keuangan',
-        search: (prev: any) => ({
+        to: '/keuangan' as any,
+        search: ((prev: any) => ({
           ...prev,
           start_date: hasStart ? currentFilters.start_date : defaultStart,
           end_date: hasEnd ? currentFilters.end_date : defaultEnd,
-        }),
+        })) as any,
         replace: true,
       })
     } else {
@@ -68,12 +68,8 @@ export function KeuanganFilters({
     setFilters(newFilters)
 
     navigate({
-      to: '/keuangan',
-      search: {
-        ...newFilters,
-        page: 1,
-        per_page: newFilters.per_page ?? 10,
-      },
+      to: '/keuangan' as any,
+      search: ({ ...newFilters, page: 1, per_page: newFilters.per_page ?? 10 } as any) as any,
       replace: true,
     })
   }

@@ -23,12 +23,8 @@ export function UsersFilters({
     setFilters(newFilters)
 
     navigate({
-      to: '/settings/users',
-      search: {
-        ...newFilters,
-        page: 1,
-        per_page: newFilters.per_page ?? 10,
-      },
+      to: '/settings/users' as any,
+      search: ({ ...newFilters, page: 1, per_page: newFilters.per_page ?? 10 } as any) as any,
       replace: true,
     })
   }

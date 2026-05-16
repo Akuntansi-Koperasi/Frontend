@@ -47,12 +47,12 @@ export function SetoranFilters({
 
     if (!hasStart || !hasEnd) {
       navigate({
-        to: '/setoran',
-        search: (prev: any) => ({
+        to: '/setoran' as any,
+        search: ((prev: any) => ({
           ...prev,
           start_date: hasStart ? currentFilters.start_date : defaultStart,
           end_date: hasEnd ? currentFilters.end_date : defaultEnd,
-        }),
+        })) as any,
         replace: true,
       })
     } else {
@@ -74,12 +74,8 @@ export function SetoranFilters({
     setFilters(newFilters)
 
     navigate({
-      to: '/setoran',
-      search: {
-        ...newFilters,
-        page: 1,
-        per_page: newFilters.per_page ?? 10,
-      },
+      to: '/setoran' as any,
+      search: ({ ...newFilters, page: 1, per_page: newFilters.per_page ?? 10 } as any) as any,
       replace: true,
     })
   }

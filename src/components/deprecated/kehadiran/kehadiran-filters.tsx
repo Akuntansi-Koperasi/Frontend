@@ -58,12 +58,12 @@ export function KehadiranFilters({
 
     if (!hasStart || !hasEnd) {
       navigate({
-        to: '/kehadiran',
-        search: (prev: any) => ({
-          ...prev,
+        to: '/kehadiran' as any,
+        search: ({
+          ...((prev: any) => prev) as any,
           start_date: hasStart ? currentFilters.start_date : defaultStart,
           end_date: hasEnd ? currentFilters.end_date : defaultEnd,
-        }),
+        } as any) as any,
         replace: true,
       })
     } else {
@@ -76,12 +76,8 @@ export function KehadiranFilters({
     setFilters(newFilters)
 
     navigate({
-      to: '/kehadiran',
-      search: {
-        ...newFilters,
-        page: 1,
-        per_page: newFilters.per_page ?? 10,
-      },
+      to: '/kehadiran' as any,
+      search: ({ ...newFilters, page: 1, per_page: newFilters.per_page ?? 10 } as any) as any,
       replace: true,
     })
   }

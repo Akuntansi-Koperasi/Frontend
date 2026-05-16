@@ -59,11 +59,11 @@ export function DashboardBarChart({
           Pemasukan & Pengeluaran Seminggu
         </CardTitle>
         <Link
-          to="/keuangan"
+          to={'/keuangan' as any}
           search={{
             page: 1,
             per_page: 10,
-          }}
+          } as any}
           className="text-sm font-medium text-blue-600 hover:underline"
         >
           Lihat Detail

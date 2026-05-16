@@ -9,7 +9,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { updatePhoto } from '@/services/profileService'
 
 interface ProfileAvatarProps {
-  user: ProfileData
+  user: {
+    profile_image?: string | null
+    name: string
+    username: string
+  }
 }
 
 export function ProfileAvatar({ user }: ProfileAvatarProps) {

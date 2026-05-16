@@ -9,7 +9,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowUpDown, Calendar, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
-import { DataTablePagination } from '../data-table-pagination'
+import { DataTablePagination } from '../../data-table-pagination'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import type { DepositRecord } from '@/services/deprecated/depositService'
 import {
@@ -245,16 +245,16 @@ export function SetoranTable({ data, pagination }: SetoranTableProps) {
 
   const handlePageChange = (newPageIndex: number) => {
     navigate({
-      to: '/setoran',
-      search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
+      to: '/setoran' as any,
+      search: ((prev: any) => ({ ...prev, page: newPageIndex + 1 })) as any,
       replace: true,
     })
   }
 
   const handlePageSizeChange = (newPageSize: number) => {
     navigate({
-      to: '/setoran',
-      search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
+      to: '/setoran' as any,
+      search: ((prev: any) => ({ ...prev, per_page: newPageSize, page: 1 })) as any,
       replace: true,
     })
   }

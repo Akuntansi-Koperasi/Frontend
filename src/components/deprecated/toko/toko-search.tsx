@@ -15,12 +15,12 @@ export function TokoSearch({ currentSearch }: { currentSearch?: string }) {
 
   const handleSearch = (term: string) => {
     navigate({
-      to: '/toko',
-      search: (prev: any) => ({
+      to: '/toko' as any,
+      search: ((prev: any) => ({
         ...prev,
         search: term || undefined,
         page: 1,
-      }),
+      })) as any,
       replace: true,
     })
   }

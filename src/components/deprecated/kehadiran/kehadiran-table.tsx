@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-table'
 import { ArrowUpDown, Calendar } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
-import { DataTablePagination } from '../data-table-pagination'
+import { DataTablePagination } from '../../data-table-pagination'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import type { AttendanceRecord } from '@/services/deprecated/attendanceService'
 import {
@@ -128,16 +128,16 @@ export function KehadiranTable({ data, pagination }: KehadiranTableProps) {
 
   const handlePageChange = (newPageIndex: number) => {
     navigate({
-      to: '/kehadiran',
-      search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
+      to: '/kehadiran' as any,
+      search: ((prev: any) => ({ ...prev, page: newPageIndex + 1 })) as any,
       replace: true,
     })
   }
 
   const handlePageSizeChange = (newPageSize: number) => {
     navigate({
-      to: '/kehadiran',
-      search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
+      to: '/kehadiran' as any,
+      search: ((prev: any) => ({ ...prev, per_page: newPageSize, page: 1 })) as any,
       replace: true,
     })
   }

@@ -12,7 +12,7 @@ Langkah (eksekusi otomatis):
 3. Ganti logika paging menjadi:
 	- `pageIndex = page - 1`
 	- slice: `data.slice(pageIndex * per_page, pageIndex * per_page + per_page)`
-4. Di tabel/dialogs: gunakan `Badge` untuk kolom boolean `multiple`, `Switch` untuk input boolean, `Select` untuk `kategori` (Ketua, Sekretaris, Bendahara, Lain-lain). Dialog yang berhubungan dengan tabel ditempatkan di dalam komponen tabel.
+4. Dialog yang berhubungan dengan tabel ditempatkan di dalam komponen tabel.
 
 Verifikasi (perintah yang harus dijalankan setelah perubahan):
 ```bash

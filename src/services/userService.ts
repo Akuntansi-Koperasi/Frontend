@@ -25,9 +25,12 @@ export type UserResponse = {
 }
 
 export const getUserList = async (params: UserParams) => {
-  const cleanParams = Object.fromEntries(
-    Object.entries(params).filter(([_, v]) => v != null && v !== '')
-  )
+  const cleanParams: Record<string, any> = {}
+  Object.entries(params as Record<string, any>).forEach(([k, v]) => {
+    if (v == null) return
+    if (typeof v === 'string' && v === '') return
+    cleanParams[k] = v
+  })
 
   const response = await api.get<{ status: string; message: string; data: UserResponse }>(
     '/admin/user', 

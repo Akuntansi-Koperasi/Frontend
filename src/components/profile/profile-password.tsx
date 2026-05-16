@@ -21,7 +21,7 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [fieldErrors, setFieldErrors] = useState<Record<string, Array<string>>>({})
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<string, Array<string>>>>({})
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -53,7 +53,7 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
     value: string
   ) => {
     setter(value)
-    if (fieldErrors[field]) {
+    if (fieldErrors[field]?.length) {
       setFieldErrors((prev) => {
         const newErrors = { ...prev }
         delete newErrors[field]
@@ -104,7 +104,7 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
         <form onSubmit={handleSubmit} className="space-y-5">
           {hasPassword && (
             <div className="space-y-2">
-              <Label htmlFor="current-password" className={fieldErrors.current_password ? "text-red-600" : ""}>
+              <Label htmlFor="current-password" className={fieldErrors.current_password?.length ? "text-red-600" : ""}>
                 Kata Sandi Saat Ini
               </Label>
               <div className="relative">
@@ -114,7 +114,7 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
                   value={currentPassword}
                   onChange={(e) => handleInputChange(setCurrentPassword, 'current_password', e.target.value)}
                   placeholder="Masukkan kata sandi lama"
-                  className={`pr-10 ${fieldErrors.current_password ? "border-red-500 focus-visible:ring-red-200" : ""}`}
+                  className={`pr-10 ${fieldErrors.current_password?.length ? "border-red-500 focus-visible:ring-red-200" : ""}`}
                 />
                 <Button
                   type="button"
@@ -126,16 +126,16 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
                   {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              {fieldErrors.current_password && (
+              {fieldErrors.current_password?.length ? (
                 <p className="text-xs text-red-600 flex items-center gap-1 mt-1 animate-in slide-in-from-top-1">
                   <AlertCircle className="w-3 h-3" /> {fieldErrors.current_password[0]}
                 </p>
-              )}
+              ) : null}
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="new-password" className={fieldErrors.password ? "text-red-600" : ""}>
+            <Label htmlFor="new-password" className={fieldErrors.password?.length ? "text-red-600" : ""}>
               Kata Sandi Baru
             </Label>
             <div className="relative">
@@ -145,7 +145,7 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
                 value={newPassword}
                 onChange={(e) => handleInputChange(setNewPassword, 'password', e.target.value)}
                 placeholder="Minimal 6 karakter"
-                className={`pr-10 ${fieldErrors.password ? "border-red-500 focus-visible:ring-red-200" : ""}`}
+                className={`pr-10 ${fieldErrors.password?.length ? "border-red-500 focus-visible:ring-red-200" : ""}`}
               />
               <Button
                 type="button"
@@ -157,15 +157,15 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
                 {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
-            {fieldErrors.password && (
+            {fieldErrors.password?.length ? (
               <p className="text-xs text-red-600 flex items-center gap-1 mt-1 animate-in slide-in-from-top-1">
                  <AlertCircle className="w-3 h-3" /> {fieldErrors.password[0]}
               </p>
-            )}
+            ) : null}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirm-password" className={fieldErrors.password_confirmation ? "text-red-600" : ""}>
+            <Label htmlFor="confirm-password" className={fieldErrors.password_confirmation?.length ? "text-red-600" : ""}>
               Konfirmasi Kata Sandi Baru
             </Label>
             <div className="relative">
@@ -175,7 +175,7 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
                 value={confirmPassword}
                 onChange={(e) => handleInputChange(setConfirmPassword, 'password_confirmation', e.target.value)}
                 placeholder="Ulangi kata sandi baru"
-                className={`pr-10 ${fieldErrors.password_confirmation ? "border-red-500 focus-visible:ring-red-200" : ""}`}
+                className={`pr-10 ${fieldErrors.password_confirmation?.length ? "border-red-500 focus-visible:ring-red-200" : ""}`}
               />
               <Button
                 type="button"
@@ -187,11 +187,11 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
-            {fieldErrors.password_confirmation && (
+            {fieldErrors.password_confirmation?.length ? (
               <p className="text-xs text-red-600 flex items-center gap-1 mt-1 animate-in slide-in-from-top-1">
                  <AlertCircle className="w-3 h-3" /> {fieldErrors.password_confirmation[0]}
               </p>
-            )}
+            ) : null}
           </div>
 
           <div className="pt-2">

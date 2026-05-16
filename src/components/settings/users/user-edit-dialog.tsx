@@ -47,7 +47,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
   const [email, setEmail] = useState("")
   const [tokoId, setTokoId] = useState("")
   const [role, setRole] = useState<string>("employee")
-  const [fieldErrors, setFieldErrors] = useState<Record<string, Array<string>>>({})
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<string, Array<string>>>>({})
 
   const { data: tokoList } = useQuery({
     queryKey: ['toko-dropdown'],
@@ -93,7 +93,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
     value: string
   ) => {
     setter(value)
-    if (fieldErrors[field]) {
+    if (fieldErrors[field]?.length) {
       setFieldErrors(prev => {
         const newErrors = { ...prev }
         delete newErrors[field]

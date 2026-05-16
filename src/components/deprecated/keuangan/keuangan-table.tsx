@@ -12,7 +12,7 @@ import {
   Calendar,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
-import { DataTablePagination } from '../data-table-pagination'
+import { DataTablePagination } from '../../data-table-pagination'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import type { CashflowRecord } from '@/services/deprecated/cashflowService'
 import {
@@ -153,16 +153,16 @@ export function KeuanganTable({ data, pagination }: KeuanganTableProps) {
 
   const handlePageChange = (newPageIndex: number) => {
     navigate({
-      to: '/keuangan',
-      search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
+      to: '/keuangan' as any,
+      search: ((prev: any) => ({ ...prev, page: newPageIndex + 1 })) as any,
       replace: true,
     })
   }
 
   const handlePageSizeChange = (newPageSize: number) => {
     navigate({
-      to: '/keuangan',
-      search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
+      to: '/keuangan' as any,
+      search: ((prev: any) => ({ ...prev, per_page: newPageSize, page: 1 })) as any,
       replace: true,
     })
   }
