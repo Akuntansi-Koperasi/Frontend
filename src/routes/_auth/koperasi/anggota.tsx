@@ -129,14 +129,11 @@ function RouteComponent() {
 
   const total = filtered.length
   const pageCount = Math.max(1, Math.ceil(total / per_page))
-  const safePageIndex = Math.min(page - 1, pageCount - 1)
-  const paginatedData = filtered.slice(
-    safePageIndex * per_page,
-    safePageIndex * per_page + per_page,
-  )
+  const pageIndex = page - 1
+  const paginatedData = filtered.slice(pageIndex * per_page, pageIndex * per_page + per_page)
 
   const pagination = {
-    pageIndex: safePageIndex,
+    pageIndex,
     pageSize: per_page,
     pageCount,
     total,

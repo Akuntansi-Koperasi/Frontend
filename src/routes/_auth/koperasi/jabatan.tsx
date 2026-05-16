@@ -10,7 +10,7 @@ import { JabatanTable } from '@/components/koperasi/jabatan/jabatan-table'
 
 const jabatanSearchSchema = z.object({
   page: z.number().int().positive().catch(1),
-  per_page: z.number().int().positive().catch(20),
+  per_page: z.number().int().positive().catch(10),
   search: z.string().optional(),
 })
 
@@ -37,11 +37,11 @@ function RouteComponent() {
 
   const total = data.length
   const pageCount = Math.max(1, Math.ceil(total / perPage))
-  const safePageIndex = Math.min(page - 1, pageCount - 1)
-  const paginated = data.slice(safePageIndex * perPage, safePageIndex * perPage + perPage)
+  const pageIndex = page - 1
+  const paginated = data.slice(pageIndex * perPage, pageIndex * perPage + perPage)
 
   const pagination = {
-    pageIndex: safePageIndex,
+    pageIndex,
     pageSize: perPage,
     pageCount,
     total,
