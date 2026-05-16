@@ -1,4 +1,10 @@
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
 import type { PermissionLevel, PermissionMenuItem } from '@/components/settings/roles/types'
+import type { ColumnDef } from '@tanstack/react-table'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { DataTablePagination } from '@/components/data-table-pagination'
@@ -49,51 +55,96 @@ export function PermissionsTable({
   onPageChange,
   onPageSizeChange,
 }: PermissionsTableProps) {
+  const columns: Array<ColumnDef<PermissionMenuItem>> = [
+    {
+      id: 'index',
+      header: 'No.',
+      cell: ({ row }) => (
+        <span className="text-muted-foreground font-medium">
+          {pagination.pageIndex * pagination.pageSize + row.index + 1}.
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'label',
+      header: 'Menu',
+      cell: ({ row }) => (
+        <span className="font-semibold text-slate-900 text-sm">{row.original.label}</span>
+      ),
+    },
+    {
+      id: 'level',
+      header: 'Izin',
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          <Select
+            value={levels[row.original.key] ?? 'lihat'}
+            onValueChange={(v) => onChangeLevel(row.original.key, v as PermissionLevel)}
+          >
+            <SelectTrigger className="h-9 w-auto min-w-fit bg-white cursor-pointer text-sm">
+              <SelectValue placeholder="Pilih level" />
+            </SelectTrigger>
+            <SelectContent>
+              {levelOptions.map((opt) => (
+                <SelectItem key={opt.id} value={opt.id} className="text-sm">
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ),
+    },
+  ]
+
+  const table = useReactTable({
+    data: menus,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  })
+
   return (
-    <Card className="shadow-lg border border-slate-200 p-0">
+    <Card className="shadow-lg border-3 border-slate-200 p-0">
       <CardContent className="p-0">
         <Table>
           <TableHeader className="bg-slate-50/50">
-            <TableRow className="hover:bg-transparent border-b border-slate-200">
-              <TableHead className="font-semibold text-slate-700 text-left px-4 py-3 text-sm">
-                Menu
-              </TableHead>
-              <TableHead className="font-semibold text-slate-700 text-center px-4 py-3 w-[200px] text-sm">
-                Izin
-              </TableHead>
-            </TableRow>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                {headerGroup.headers.map((header, index) => {
+                  let alignClass = 'text-center'
+                  if (index === 1) alignClass = 'text-left'
+
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={`font-semibold text-slate-900 ${alignClass}`}
+                    >
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  )
+                })}
+              </TableRow>
+            ))}
           </TableHeader>
           <TableBody>
-            {menus.length ? (
-              menus.map((m) => (
-                <TableRow key={m.key} className="hover:bg-slate-50 border-b border-slate-100">
-                  <TableCell className="px-4 py-3 text-left">
-                    <span className="text-slate-900 font-medium text-sm">{m.label}</span>
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-center w-[200px]">
-                    <div className="flex justify-center">
-                      <Select
-                        value={levels[m.key] ?? 'lihat'}
-                        onValueChange={(v) => onChangeLevel(m.key, v as PermissionLevel)}
-                      >
-                        <SelectTrigger className="h-9 w-[150px] bg-white cursor-pointer text-sm">
-                          <SelectValue placeholder="Pilih level" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {levelOptions.map((opt) => (
-                            <SelectItem key={opt.id} value={opt.id} className="text-sm">
-                              {opt.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </TableCell>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} className="hover:bg-slate-50">
+                  {row.getVisibleCells().map((cell, index) => {
+                    let alignClass = 'text-center'
+                    if (index === 1) alignClass = 'text-left'
+
+                    return (
+                      <TableCell key={cell.id} className={`py-3 ${alignClass}`}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    )
+                  })}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={2} className="h-24 text-center text-sm text-muted-foreground">
+                <TableCell colSpan={3} className="h-24 text-center">
                   Tidak ada menu ditemukan.
                 </TableCell>
               </TableRow>
