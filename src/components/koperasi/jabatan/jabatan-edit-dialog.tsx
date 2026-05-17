@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AlertCircle, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
 
 import type { JabatanRecord } from './types'
 
@@ -56,11 +55,8 @@ export function JabatanEditDialog({ open, onOpenChange, jabatan, onEdit, errors 
       await new Promise((r) => setTimeout(r, 350))
       const success = await onEdit({ id: jabatan.id, nama: nama.trim(), kategori: kategori.trim(), multiple })
       if (success) {
-        toast.success('Jabatan berhasil diperbarui')
         onOpenChange(false)
       }
-    } catch {
-      toast.error('Gagal memperbarui jabatan')
     } finally {
       setIsLoading(false)
     }

@@ -25,6 +25,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { Toaster } from 'src/components/ui/sonner';
 
 interface JabatanTableProps {
   data: Array<JabatanRecord>
@@ -237,6 +238,13 @@ export function JabatanTable({ data, pagination, onEdit, onDelete, onPageChange,
           setDeleting(null)
         }}
         isDeleting={false}
+      />
+
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        theme="light"
       />
     </>
   )

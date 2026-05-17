@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { AlertCircle, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -51,12 +50,9 @@ export function JabatanAddDialog({ open, onOpenChange, onAdd, errors }: JabatanA
       await new Promise((r) => setTimeout(r, 350))
       const success = await onAdd({ nama: nama.trim(), kategori: kategori.trim(), multiple })
       if (success) {
-        toast.success('Jabatan berhasil ditambahkan')
         onOpenChange(false)
         resetForm()
       }
-    } catch {
-      toast.error('Gagal menambahkan jabatan')
     } finally {
       setIsLoading(false)
     }

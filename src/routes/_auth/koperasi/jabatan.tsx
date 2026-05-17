@@ -101,6 +101,8 @@ function RouteComponent() {
     try {
       await createMutation.mutateAsync(payload)
       setAddErrors(null)
+      toast.success('Jabatan berhasil ditambahkan')
+      toast
       return true
     } catch (err: any) {
       setAddErrors(normalizeApiErrors(err, 'Gagal menambahkan jabatan'))
@@ -113,6 +115,7 @@ function RouteComponent() {
     try {
       await updateMutation.mutateAsync({ id: payload.id, payload: { nama: payload.nama, kategori: payload.kategori, multiple: payload.multiple } })
       setEditErrors(null)
+      toast.success('Jabatan berhasil diperbarui')
       return true
     } catch (err: any) {
       setEditErrors(normalizeApiErrors(err, 'Gagal memperbarui jabatan'))
@@ -124,6 +127,7 @@ function RouteComponent() {
   const handleDelete = async (id: number) => {
     try {
       await deleteMutation.mutateAsync(id)
+      toast.success('Jabatan berhasil dihapus')
     } catch (err: any) {
       toast.error(err?.message ?? 'Gagal menghapus jabatan')
     }
