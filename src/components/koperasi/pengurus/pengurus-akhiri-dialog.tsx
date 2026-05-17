@@ -17,7 +17,7 @@ interface PengurusAkhiriDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   pengurus: PengurusRecord | null
-  onConfirm: (id: number) => void
+  onConfirm: (id: number) => Promise<boolean>
   isLoading: boolean
 }
 
@@ -31,7 +31,7 @@ export function PengurusAkhiriDialog({ open, onOpenChange, pengurus, onConfirm, 
             <AlertDialogTitle>Akhiri jabatan pengurus ini</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghakhiri jabatan pengurus ini? Tindakan ini tidak dapat dibatalkan.
+            Apakah Anda yakin ingin mengakhiri jabatan pengurus ini? Tindakan ini tidak dapat dibatalkan.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -43,19 +43,19 @@ export function PengurusAkhiriDialog({ open, onOpenChange, pengurus, onConfirm, 
           </AlertDialogCancel>
           <AlertDialogAction
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault()
-              if (pengurus) onConfirm(pengurus.id)
+              if (pengurus) await onConfirm(pengurus.id)
             }}
             disabled={isLoading}
           >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Menghakhiri...
+                Mengakhiri...
               </>
             ) : (
-              'Ya, Hapus'
+              'Ya, Akhiri'
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

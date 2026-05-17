@@ -17,7 +17,7 @@ interface PengurusDeleteDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   pengurus: PengurusRecord | null
-  onConfirm: (id: number) => void
+  onConfirm: (id: number) => Promise<boolean>
   isDeleting: boolean
 }
 
@@ -43,9 +43,9 @@ export function PengurusDeleteDialog({ open, onOpenChange, pengurus, onConfirm, 
           </AlertDialogCancel>
           <AlertDialogAction
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault()
-              if (pengurus) onConfirm(pengurus.id)
+              if (pengurus) await onConfirm(pengurus.id)
             }}
             disabled={isDeleting}
           >

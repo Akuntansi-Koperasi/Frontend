@@ -1,12 +1,26 @@
 import * as React from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { z } from 'zod'
-import type { PengurusRecord } from '@/components/koperasi/pengurus/types'
-import { MOCK_ANGGOTA_KOPERASI } from '@/components/koperasi/pengurus/types'
+import { toast } from 'sonner'
+
+import type { PengurusFormErrors, PengurusUpsertPayload } from '@/components/koperasi/pengurus/types'
+import type { PengurusParams } from '@/services/pengurusService'
 import HeaderComp from '@/components/shared/header-comp'
 import { SearchBar } from '@/components/shared/search-bar'
 import { PengurusTable } from '@/components/koperasi/pengurus/pengurus-table'
+import { getPermissionAccess } from '@/services/permissionService'
+
+import {
+  akhiriPengurus,
+  createPengurus,
+  deletePengurus,
+  getAnggotaDropdown,
+  getJabatanDropdown,
+  getPengurusList,
+  updatePengurus,
+} from '@/services/pengurusService'
 
 const pengurusSearchSchema = z.object({
   page: z.number().int().positive().catch(1),
@@ -19,52 +33,104 @@ export const Route = createFileRoute('/_auth/koperasi/pengurus')({
   component: RouteComponent,
 })
 
-const MOCK_DATA: Array<PengurusRecord> = Array.from({ length: 12 }).map((_, i) => {
-  const anggota = MOCK_ANGGOTA_KOPERASI[i % MOCK_ANGGOTA_KOPERASI.length]
-  return {
-    id: i + 1,
-    anggotaId: anggota.id,
-    nama: anggota.nama,
-    email: anggota.email,
-    avatar: anggota.avatar,
-    jabatan: ['Sekretaris', 'Wakil Ketua', 'Ketua', 'Bendahara', 'Anggota'][i % 5],
-    mulaiMenjabat: 2025,
-    selesaiMenjabat: 2026,
-    status: i % 3 === 0 ? 'Tidak Aktif' : 'Aktif',
-  }
-})
-
 function RouteComponent() {
   const navigate = useNavigate()
-  const [data, setData] = React.useState<Array<PengurusRecord>>(MOCK_DATA)
+  const queryClient = useQueryClient()
   const search = Route.useSearch()
   const page = search.page
   const perPage = search.per_page
-  const searchQuery = (search.search ?? '').trim().toLowerCase()
+  const searchQuery = (search.search ?? '').trim()
 
   const [addOpen, setAddOpen] = React.useState(false)
+  const [addErrors, setAddErrors] = React.useState<PengurusFormErrors>(null)
+  const [editErrors, setEditErrors] = React.useState<PengurusFormErrors>(null)
 
-  const filteredData = React.useMemo(() => {
-    if (!searchQuery) return data
-    return data.filter((item) => {
-      return (
-        item.nama.toLowerCase().includes(searchQuery) ||
-        item.email.toLowerCase().includes(searchQuery) ||
-        item.jabatan.toLowerCase().includes(searchQuery)
-      )
-    })
-  }, [data, searchQuery])
+  const { canView, canManage, canDelete } = React.useMemo(
+    () => getPermissionAccess('pengurus'),
+    []
+  )
 
-  const total = filteredData.length
+  const params: PengurusParams = {
+    page,
+    per_page: perPage,
+    search: searchQuery || undefined,
+  }
+
+  const pengurusQuery = useQuery({
+    queryKey: ['pengurus', params],
+    queryFn: () => getPengurusList(params),
+    staleTime: 1000 * 60 * 2,
+    enabled: canView,
+  })
+
+  const anggotaDropdownQuery = useQuery({
+    queryKey: ['pengurus-anggota-dropdown'],
+    queryFn: () => getAnggotaDropdown(),
+    staleTime: 1000 * 60 * 5,
+    enabled: canManage,
+  })
+
+  const jabatanDropdownQuery = useQuery({
+    queryKey: ['pengurus-jabatan-dropdown'],
+    queryFn: () => getJabatanDropdown(),
+    staleTime: 1000 * 60 * 5,
+    enabled: canManage,
+  })
+
+  const invalidatePengurusQueries = React.useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['pengurus'] }),
+      queryClient.invalidateQueries({ queryKey: ['pengurus-anggota-dropdown'] }),
+      queryClient.invalidateQueries({ queryKey: ['pengurus-jabatan-dropdown'] }),
+    ])
+  }, [queryClient])
+
+  const createMutation = useMutation({
+    mutationFn: createPengurus,
+    onSuccess: async () => {
+      await invalidatePengurusQueries()
+    },
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: PengurusUpsertPayload }) => updatePengurus(id, payload),
+    onSuccess: async () => {
+      await invalidatePengurusQueries()
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deletePengurus,
+    onSuccess: async () => {
+      await invalidatePengurusQueries()
+    },
+  })
+
+  const finishMutation = useMutation({
+    mutationFn: akhiriPengurus,
+    onSuccess: async () => {
+      await invalidatePengurusQueries()
+    },
+  })
+
+  const normalizeApiErrors = (err: any, fallbackMessage: string): PengurusFormErrors => {
+    const apiErrors = err?.apiErrors ?? err?.errors ?? {}
+    const message = err?.message ?? fallbackMessage
+
+    return {
+      ...apiErrors,
+      general: apiErrors.general?.length ? apiErrors.general : [message],
+    }
+  }
+
+  const total = pengurusQuery.data?.total ?? 0
   const pageCount = Math.max(1, Math.ceil(total / perPage))
   const safePage = Math.min(Math.max(page, 1), pageCount)
-  const pageIndex = safePage - 1
-  const paginated = filteredData.slice(pageIndex * perPage, pageIndex * perPage + perPage)
 
   const pagination = {
-    pageIndex,
+    pageIndex: safePage - 1,
     pageSize: perPage,
-    pageCount,
+    pageCount: pengurusQuery.data ? Math.max(1, Math.ceil(pengurusQuery.data.total / pengurusQuery.data.per_page)) : 1,
     total,
   }
 
@@ -78,40 +144,52 @@ function RouteComponent() {
     }
   }, [navigate, page, safePage])
 
-  const handleAdd = (payload: {
-    anggotaId: string
-    nama: string
-    email: string
-    avatar?: string
-    jabatan: string
-    mulaiMenjabat: number
-    selesaiMenjabat: number
-    status: 'Aktif' | 'Tidak Aktif'
-  }) => {
-    const id = Math.max(0, ...data.map((d) => d.id)) + 1
-    setData((prev) => [{ id, ...payload }, ...prev])
+  const handleAdd = async (payload: PengurusUpsertPayload) => {
+    try {
+      await createMutation.mutateAsync(payload)
+      setAddErrors(null)
+      toast.success('Pengurus berhasil ditambahkan')
+      return true
+    } catch (err: any) {
+      setAddErrors(normalizeApiErrors(err, 'Gagal menambahkan pengurus'))
+      toast.error(err?.message ?? 'Gagal menambahkan pengurus')
+      return false
+    }
   }
 
-  const handleEdit = (payload: {
-    id: number
-    anggotaId: string
-    nama: string
-    email: string
-    avatar?: string
-    jabatan: string
-    mulaiMenjabat: number
-    selesaiMenjabat: number
-    status: 'Aktif' | 'Tidak Aktif'
-  }) => {
-    setData((prev) => prev.map((d) => (d.id === payload.id ? { ...d, ...payload } : d)))
+  const handleEdit = async (payload: PengurusUpsertPayload & { id: number }) => {
+    try {
+      await updateMutation.mutateAsync({ id: payload.id, payload })
+      setEditErrors(null)
+      toast.success('Pengurus berhasil diperbarui')
+      return true
+    } catch (err: any) {
+      setEditErrors(normalizeApiErrors(err, 'Gagal memperbarui pengurus'))
+      toast.error(err?.message ?? 'Gagal memperbarui pengurus')
+      return false
+    }
   }
 
-  const handleDelete = (id: number) => {
-    setData((prev) => prev.filter((d) => d.id !== id))
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteMutation.mutateAsync(id)
+      toast.success('Pengurus berhasil dihapus')
+      return true
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Gagal menghapus pengurus')
+      return false
+    }
   }
 
-  const handleStatusChange = (id: number, status: 'Aktif' | 'Tidak Aktif') => {
-    setData((prev) => prev.map((d) => (d.id === id ? { ...d, status } : d)))
+  const handleAkhiri = async (id: number) => {
+    try {
+      await finishMutation.mutateAsync(id)
+      toast.success('Jabatan pengurus berhasil diakhiri')
+      return true
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Gagal mengakhiri jabatan pengurus')
+      return false
+    }
   }
 
   const handlePageChange = (newPageIndex: number) => {
@@ -148,8 +226,8 @@ function RouteComponent() {
         title="Manajemen Pengurus Koperasi"
         description="Kelola anggota pengurus koperasi"
         icon={<Plus />}
-        actionLabel="Tambah Struktur"
-        onAction={() => setAddOpen(true)}
+        actionLabel={canManage ? 'Tambah Struktur' : undefined}
+        onAction={canManage ? () => setAddOpen(true) : undefined}
       />
 
       <SearchBar
@@ -160,20 +238,27 @@ function RouteComponent() {
       />
 
       <PengurusTable
-        data={paginated}
+        data={pengurusQuery.data?.data ?? []}
+        isLoading={pengurusQuery.isLoading}
         pagination={pagination}
+        canManage={canManage}
+        canDelete={canDelete}
+        anggotaOptions={anggotaDropdownQuery.data ?? []}
+        jabatanOptions={jabatanDropdownQuery.data ?? []}
         addOpen={addOpen}
-        onAddOpenChange={setAddOpen}
+        onAddOpenChange={(isOpen: boolean) => {
+          setAddOpen(isOpen)
+          if (!isOpen) setAddErrors(null)
+        }}
         onAdd={handleAdd}
-        onEdit={(payload) => {
-          handleEdit(payload)
-        }}
-        onDelete={(id) => {
-          handleDelete(id)
-        }}
-        onStatusChange={handleStatusChange}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onAkhiri={handleAkhiri}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
+        addErrors={addErrors}
+        editErrors={editErrors}
+        onEditClose={() => setEditErrors(null)}
       />
     </>
   )

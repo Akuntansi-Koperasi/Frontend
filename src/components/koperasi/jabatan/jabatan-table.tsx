@@ -6,6 +6,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react'
+import { Toaster } from 'src/components/ui/sonner';
 import { JabatanAddDialog } from './jabatan-add-dialog'
 import { JabatanEditDialog } from './jabatan-edit-dialog'
 import { JabatanDeleteDialog } from './jabatan-delete-dialog'
@@ -25,7 +26,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { Toaster } from 'src/components/ui/sonner';
 
 interface JabatanTableProps {
   data: Array<JabatanRecord>
@@ -35,6 +35,8 @@ interface JabatanTableProps {
     pageCount: number
     total: number
   }
+  canManage: boolean
+  canDelete: boolean
   onEdit: (payload: { id: number; nama: string; kategori: string; multiple: boolean }) => Promise<boolean>
   onDelete: (id: number) => void
   onPageChange: (newPageIndex: number) => void
@@ -47,7 +49,22 @@ interface JabatanTableProps {
   onEditClose?: () => void
 }
 
-export function JabatanTable({ data, pagination, onEdit, onDelete, onPageChange, onPageSizeChange, addOpen, onAddOpenChange, onAdd, addErrors, editErrors, onEditClose }: JabatanTableProps) {
+export function JabatanTable({
+  data,
+  pagination,
+  canManage,
+  canDelete,
+  onEdit,
+  onDelete,
+  onPageChange,
+  onPageSizeChange,
+  addOpen,
+  onAddOpenChange,
+  onAdd,
+  addErrors,
+  editErrors,
+  onEditClose,
+}: JabatanTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [editOpen, setEditOpen] = React.useState(false)
   const [deleteOpen, setDeleteOpen] = React.useState(false)
@@ -98,40 +115,47 @@ export function JabatanTable({ data, pagination, onEdit, onDelete, onPageChange,
         )
       ),
     },
-    {
+  ]
+
+  if (canManage || canDelete) {
+    columns.push({
       id: 'actions',
       header: 'Action',
       cell: ({ row }) => (
         <div className="flex items-center gap-2 justify-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
-            onClick={() => {
-              setEditing(row.original)
-              setEditOpen(true)
-            }}
-            title="Edit"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
+          {canManage ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
+              onClick={() => {
+                setEditing(row.original)
+                setEditOpen(true)
+              }}
+              title="Edit"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          ) : null}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
-            onClick={() => {
-              setDeleting(row.original)
-              setDeleteOpen(true)
-            }}
-            title="Hapus"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {canDelete ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+              onClick={() => {
+                setDeleting(row.original)
+                setDeleteOpen(true)
+              }}
+              title="Hapus"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          ) : null}
         </div>
       ),
-    },
-  ]
+    })
+  }
 
   const table = useReactTable({
     data,
@@ -204,41 +228,47 @@ export function JabatanTable({ data, pagination, onEdit, onDelete, onPageChange,
         </CardContent>
       </Card>
       {/* Dialogs moved into table (add/edit/delete) */}
-      <JabatanAddDialog
-        open={addOpen}
-        onOpenChange={(isOpen) => onAddOpenChange(isOpen)}
-        onAdd={onAdd}
-        errors={addErrors}
-      />
+      {canManage ? (
+        <JabatanAddDialog
+          open={addOpen}
+          onOpenChange={(isOpen) => onAddOpenChange(isOpen)}
+          onAdd={onAdd}
+          errors={addErrors}
+        />
+      ) : null}
 
-      <JabatanEditDialog
-        open={editOpen}
-        onOpenChange={(isOpen) => {
-          if (!isOpen) {
-            setEditing(null)
-            onEditClose?.()
-          }
-          setEditOpen(isOpen)
-        }}
-        jabatan={editing}
-        onEdit={onEdit}
-        errors={editErrors}
-      />
+      {canManage ? (
+        <JabatanEditDialog
+          open={editOpen}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              setEditing(null)
+              onEditClose?.()
+            }
+            setEditOpen(isOpen)
+          }}
+          jabatan={editing}
+          onEdit={onEdit}
+          errors={editErrors}
+        />
+      ) : null}
 
-      <JabatanDeleteDialog
-        open={deleteOpen}
-        onOpenChange={(isOpen) => {
-          if (!isOpen) setDeleting(null)
-          setDeleteOpen(isOpen)
-        }}
-        jabatan={deleting}
-        onConfirm={(id) => {
-          onDelete(id)
-          setDeleteOpen(false)
-          setDeleting(null)
-        }}
-        isDeleting={false}
-      />
+      {canDelete ? (
+        <JabatanDeleteDialog
+          open={deleteOpen}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) setDeleting(null)
+            setDeleteOpen(isOpen)
+          }}
+          jabatan={deleting}
+          onConfirm={(id) => {
+            onDelete(id)
+            setDeleteOpen(false)
+            setDeleting(null)
+          }}
+          isDeleting={false}
+        />
+      ) : null}
 
       <Toaster
         position="top-right"

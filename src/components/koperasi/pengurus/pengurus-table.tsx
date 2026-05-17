@@ -6,13 +6,14 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { ArrowUpDown, Pencil, Power, Trash2 } from 'lucide-react'
+
 import { PengurusAddDialog } from './pengurus-add-dialog'
 import { PengurusEditDialog } from './pengurus-edit-dialog'
 import { PengurusDeleteDialog } from './pengurus-delete-dialog'
 import { PengurusAkhiriDialog } from './pengurus-akhiri-dialog'
 
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
-import type { PengurusRecord } from './types'
+import type { AnggotaOption, JabatanOption, PengurusFormErrors, PengurusRecord, PengurusUpsertPayload } from './types'
 
 import { DataTablePagination } from '@/components/data-table-pagination'
 import {
@@ -27,55 +28,53 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { Toaster } from '@/components/ui/sonner'
 
 interface PengurusTableProps {
   data: Array<PengurusRecord>
+  isLoading?: boolean
   pagination: {
     pageIndex: number
     pageSize: number
     pageCount: number
     total: number
   }
-  onEdit: (payload: {
-    id: number
-    anggotaId: string
-    nama: string
-    email: string
-    avatar?: string
-    jabatan: string
-    mulaiMenjabat: number
-    selesaiMenjabat: number
-    status: 'Aktif' | 'Tidak Aktif'
-  }) => void
-  onDelete: (id: number) => void
-  onStatusChange: (id: number, status: 'Aktif' | 'Tidak Aktif') => void
+  canManage: boolean
+  canDelete: boolean
+  anggotaOptions: Array<AnggotaOption>
+  jabatanOptions: Array<JabatanOption>
+  onEdit: (payload: PengurusUpsertPayload & { id: number }) => Promise<boolean>
+  onDelete: (id: number) => Promise<boolean>
+  onAkhiri: (id: number) => Promise<boolean>
   onPageChange: (newPageIndex: number) => void
   onPageSizeChange: (newPageSize: number) => void
   addOpen: boolean
   onAddOpenChange: (open: boolean) => void
-  onAdd: (payload: {
-    anggotaId: string
-    nama: string
-    email: string
-    avatar?: string
-    jabatan: string
-    mulaiMenjabat: number
-    selesaiMenjabat: number
-    status: 'Aktif' | 'Tidak Aktif'
-  }) => void
+  onAdd: (payload: PengurusUpsertPayload) => Promise<boolean>
+  addErrors?: PengurusFormErrors
+  editErrors?: PengurusFormErrors
+  onEditClose?: () => void
 }
 
 export function PengurusTable({
   data,
+  isLoading,
   pagination,
+  canManage,
+  canDelete,
+  anggotaOptions,
+  jabatanOptions,
   onEdit,
   onDelete,
-  onStatusChange,
+  onAkhiri,
   onPageChange,
   onPageSizeChange,
   addOpen,
   onAddOpenChange,
   onAdd,
+  addErrors,
+  editErrors,
+  onEditClose,
 }: PengurusTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [editOpen, setEditOpen] = React.useState(false)
@@ -92,10 +91,7 @@ export function PengurusTable({
       id: 'index',
       header: 'No.',
       cell: ({ row, table }) => {
-        const index =
-          row.index +
-          1 +
-          table.getState().pagination.pageIndex * table.getState().pagination.pageSize
+        const index = row.index + 1 + table.getState().pagination.pageIndex * table.getState().pagination.pageSize
         return <span className="text-muted-foreground font-medium">{index}.</span>
       },
     },
@@ -129,7 +125,12 @@ export function PengurusTable({
     {
       accessorKey: 'jabatan',
       header: 'Jabatan',
-      cell: ({ row }) => <span className="text-sm">{row.original.jabatan}</span>,
+      cell: ({ row }) => (
+        <div className="flex flex-col text-left text-sm">
+          <span className="font-medium text-slate-900">{row.original.jabatan}</span>
+          <span className="text-xs text-muted-foreground capitalize">{row.original.kategori}</span>
+        </div>
+      ),
     },
     {
       accessorKey: 'mulaiMenjabat',
@@ -139,66 +140,76 @@ export function PengurusTable({
     {
       accessorKey: 'selesaiMenjabat',
       header: 'Selesai Menjabat',
-      cell: ({ row }) => <span className="text-sm">{row.original.selesaiMenjabat}</span>,
+      cell: ({ row }) => <span className="text-sm">{row.original.selesaiMenjabat ?? '-'}</span>,
     },
     {
       accessorKey: 'status',
       header: 'Status',
-      cell: ({ row }) => (
-        row.original.status === 'Aktif' ? (
+      cell: ({ row }) =>
+        row.original.status === 'aktif' ? (
           <Badge variant={'green'}>Aktif</Badge>
         ) : (
-          <Badge variant={'secondary'}>Tidak Aktif</Badge>
-        )
-      ),
+          <Badge variant={'secondary'}>Selesai</Badge>
+        ),
     },
-    {
+  ]
+
+  if (canManage || canDelete) {
+    columns.push({
       id: 'actions',
       header: 'Action',
       cell: ({ row }) => (
         <div className="flex items-center gap-2 justify-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
-            onClick={() => {
-              setEditing(row.original)
-              setEditOpen(true)
-            }}
-            title="Edit"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
+          {canManage ? (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
+                onClick={() => {
+                  setEditing(row.original)
+                  setEditOpen(true)
+                }}
+                title="Edit"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
-            onClick={() => {
-              setDeleting(row.original)
-              setDeleteOpen(true)
-            }}
-            title="Hapus"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+              {row.original.status === 'aktif' ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                  onClick={() => {
+                    setAkhiring(row.original)
+                    setAkhiriOpen(true)
+                  }}
+                  title="Akhiri Jabatan"
+                >
+                  <Power className="h-4 w-4" />
+                </Button>
+              ) : null}
+            </>
+          ) : null}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
-            onClick={() => {
-              setAkhiring(row.original)
-              setAkhiriOpen(true)
-            }}
-            title="Akhiri Jabatan"
-          >
-            <Power className="h-4 w-4" />
-          </Button>
+          {canDelete ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+              onClick={() => {
+                setDeleting(row.original)
+                setDeleteOpen(true)
+              }}
+              title="Hapus"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          ) : null}
         </div>
       ),
-    },
-  ]
+    })
+  }
 
   const table = useReactTable({
     data,
@@ -211,27 +222,36 @@ export function PengurusTable({
     pageCount: pagination.pageCount,
   })
 
-  const handleDeleteConfirm = (id: number) => {
+  const handleDeleteConfirm = async (id: number) => {
     setIsDeletingLocal(true)
     try {
-      onDelete(id)
-      setDeleteOpen(false)
-      setDeleting(null)
+      const success = await onDelete(id)
+      if (success) {
+        setDeleteOpen(false)
+        setDeleting(null)
+      }
+      return success
     } finally {
       setIsDeletingLocal(false)
     }
   }
 
-  const handleAkhiriConfirm = (id: number) => {
+  const handleAkhiriConfirm = async (id: number) => {
     setIsAkhiriLoading(true)
     try {
-      onStatusChange(id, 'Tidak Aktif')
-      setAkhiriOpen(false)
-      setAkhiring(null)
+      const success = await onAkhiri(id)
+      if (success) {
+        setAkhiriOpen(false)
+        setAkhiring(null)
+      }
+      return success
     } finally {
       setIsAkhiriLoading(false)
     }
   }
+
+  const hasRows = table.getRowModel().rows.length > 0
+  const isInitialLoading = Boolean(isLoading) && !hasRows
 
   return (
     <>
@@ -257,7 +277,13 @@ export function PengurusTable({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.length ? (
+              {isInitialLoading ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                    Memuat data pengurus...
+                  </TableCell>
+                </TableRow>
+              ) : hasRows ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {
@@ -291,13 +317,36 @@ export function PengurusTable({
         </CardContent>
       </Card>
 
-      <PengurusAddDialog open={addOpen} onOpenChange={onAddOpenChange} onAdd={onAdd} />
+      {canManage ? (
+        <PengurusAddDialog
+          open={addOpen}
+          onOpenChange={onAddOpenChange}
+          anggotaOptions={anggotaOptions}
+          jabatanOptions={jabatanOptions}
+          onAdd={onAdd}
+          errors={addErrors}
+        />
+      ) : null}
 
-      {editing && (
-        <PengurusEditDialog open={editOpen} onOpenChange={setEditOpen} pengurus={editing} onEdit={onEdit} />
-      )}
+      {editing && canManage ? (
+        <PengurusEditDialog
+          open={editOpen}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              onEditClose?.()
+              setEditing(null)
+            }
+            setEditOpen(isOpen)
+          }}
+          pengurus={editing}
+          anggotaOptions={anggotaOptions}
+          jabatanOptions={jabatanOptions}
+          onEdit={onEdit}
+          errors={editErrors}
+        />
+      ) : null}
 
-      {deleting && (
+      {deleting && canDelete ? (
         <PengurusDeleteDialog
           open={deleteOpen}
           onOpenChange={setDeleteOpen}
@@ -305,9 +354,9 @@ export function PengurusTable({
           onConfirm={handleDeleteConfirm}
           isDeleting={isDeletingLocal}
         />
-      )}
+      ) : null}
 
-      {akhiring && (
+      {akhiring && canManage ? (
         <PengurusAkhiriDialog
           open={akhiriOpen}
           onOpenChange={setAkhiriOpen}
@@ -315,7 +364,9 @@ export function PengurusTable({
           onConfirm={handleAkhiriConfirm}
           isLoading={isAkhiriLoading}
         />
-      )}
+      ) : null}
+
+      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   )
 }

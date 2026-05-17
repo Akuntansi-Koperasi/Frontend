@@ -24,7 +24,7 @@ const HeaderComp = ({
       className: [icon.props.className, 'h-4 w-4'].filter(Boolean).join(' '),
     })
 
-  const hasActionButton = Boolean(actionLabel || icon || onAction)
+  const hasActionButton = Boolean(actionLabel && onAction)
 
   return (
     <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between">

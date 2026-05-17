@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import type { JabatanParams } from '@/services/jabatanService'
 import HeaderComp from '@/components/shared/header-comp'
 import { SearchBar } from '@/components/shared/search-bar'
+import { getPermissionAccess } from '@/services/permissionService'
 
 import { JabatanTable } from '@/components/koperasi/jabatan/jabatan-table'
 import {
@@ -36,6 +37,10 @@ function RouteComponent() {
   const searchQuery = (search.search ?? '').trim()
 
   const queryClient = useQueryClient()
+  const { canView, canManage, canDelete } = React.useMemo(
+    () => getPermissionAccess('jabatan'),
+    []
+  )
 
   const [addOpen, setAddOpen] = React.useState(false)
   const [addErrors, setAddErrors] = React.useState<Partial<Record<string, Array<string>>> | null>(null)
@@ -51,6 +56,7 @@ function RouteComponent() {
     queryKey: ['jabatan', params],
     queryFn: () => getJabatanList(params),
     staleTime: 1000 * 60 * 2,
+    enabled: canView,
   })
 
   const createMutation = useMutation({
@@ -167,8 +173,8 @@ function RouteComponent() {
         title="Manajemen Pengaturan Jabatan"
         description="Kelola jabatan koperasi"
         icon={<Plus />}
-        actionLabel="Tambah Jabatan"
-        onAction={() => setAddOpen(true)}
+        actionLabel={canManage ? 'Tambah Jabatan' : undefined}
+        onAction={canManage ? () => setAddOpen(true) : undefined}
       />
 
       <SearchBar
@@ -181,13 +187,16 @@ function RouteComponent() {
       <JabatanTable
         data={data?.data ?? []}
         pagination={pagination}
+        canManage={canManage}
+        canDelete={canDelete}
         addOpen={addOpen}
-        onAddOpenChange={(isOpen: boolean) => { setAddOpen(isOpen); if (!isOpen) setAddErrors(null) }}
+        onAddOpenChange={(isOpen: boolean) => {
+          setAddOpen(isOpen)
+          if (!isOpen) setAddErrors(null)
+        }}
         onAdd={handleAdd}
         onEdit={handleEdit}
-        onDelete={(id) => {
-          handleDelete(id)
-        }}
+        onDelete={(id) => handleDelete(id)}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         addErrors={addErrors}
