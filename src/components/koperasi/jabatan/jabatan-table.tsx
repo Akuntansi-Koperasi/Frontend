@@ -34,16 +34,19 @@ interface JabatanTableProps {
     pageCount: number
     total: number
   }
-  onEdit: (payload: { id: number; nama: string; kategori: string; multiple: boolean }) => void
+  onEdit: (payload: { id: number; nama: string; kategori: string; multiple: boolean }) => Promise<boolean>
   onDelete: (id: number) => void
   onPageChange: (newPageIndex: number) => void
   onPageSizeChange: (newPageSize: number) => void
   addOpen: boolean
   onAddOpenChange: (open: boolean) => void
-  onAdd: (payload: { nama: string; kategori: string; multiple: boolean }) => void
+  onAdd: (payload: { nama: string; kategori: string; multiple: boolean }) => Promise<boolean>
+  addErrors?: Partial<Record<string, Array<string>>> | null
+  editErrors?: Partial<Record<string, Array<string>>> | null
+  onEditClose?: () => void
 }
 
-export function JabatanTable({ data, pagination, onEdit, onDelete, onPageChange, onPageSizeChange, addOpen, onAddOpenChange, onAdd }: JabatanTableProps) {
+export function JabatanTable({ data, pagination, onEdit, onDelete, onPageChange, onPageSizeChange, addOpen, onAddOpenChange, onAdd, addErrors, editErrors, onEditClose }: JabatanTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [editOpen, setEditOpen] = React.useState(false)
   const [deleteOpen, setDeleteOpen] = React.useState(false)
@@ -203,24 +206,22 @@ export function JabatanTable({ data, pagination, onEdit, onDelete, onPageChange,
       <JabatanAddDialog
         open={addOpen}
         onOpenChange={(isOpen) => onAddOpenChange(isOpen)}
-        onAdd={(payload) => {
-          onAdd(payload)
-          onAddOpenChange(false)
-        }}
+        onAdd={onAdd}
+        errors={addErrors}
       />
 
       <JabatanEditDialog
         open={editOpen}
         onOpenChange={(isOpen) => {
-          if (!isOpen) setEditing(null)
+          if (!isOpen) {
+            setEditing(null)
+            onEditClose?.()
+          }
           setEditOpen(isOpen)
         }}
         jabatan={editing}
-        onEdit={(payload) => {
-          onEdit(payload)
-          setEditOpen(false)
-          setEditing(null)
-        }}
+        onEdit={onEdit}
+        errors={editErrors}
       />
 
       <JabatanDeleteDialog

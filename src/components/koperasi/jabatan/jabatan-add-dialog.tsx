@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -21,20 +21,24 @@ import {
 type JabatanAddDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onAdd: (payload: { nama: string; kategori: string; multiple: boolean }) => void
+  onAdd: (payload: { nama: string; kategori: string; multiple: boolean }) => Promise<boolean>
+  errors?: Partial<Record<string, Array<string>>> | null
 }
 
-export function JabatanAddDialog({ open, onOpenChange, onAdd }: JabatanAddDialogProps) {
+export function JabatanAddDialog({ open, onOpenChange, onAdd, errors }: JabatanAddDialogProps) {
   const [nama, setNama] = useState('')
-  const [kategori, setKategori] = useState('Pengurus')
+  const [kategori, setKategori] = useState('ketua')
   const [multiple, setMultiple] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const generalError = errors?.general?.[0]
+  const namaError = errors?.nama_posisi?.[0] ?? errors?.nama?.[0]
+  const kategoriError = errors?.jenis_posisi?.[0]
 
   const isFormValid = useMemo(() => nama.trim() !== '' && kategori.trim() !== '', [nama, kategori])
 
   const resetForm = () => {
     setNama('')
-    setKategori('Pengurus')
+    setKategori('ketua')
     setMultiple(false)
   }
 
@@ -45,10 +49,12 @@ export function JabatanAddDialog({ open, onOpenChange, onAdd }: JabatanAddDialog
     setIsLoading(true)
     try {
       await new Promise((r) => setTimeout(r, 350))
-      onAdd({ nama: nama.trim(), kategori: kategori.trim(), multiple })
-      toast.success('Jabatan berhasil ditambahkan')
-      onOpenChange(false)
-      resetForm()
+      const success = await onAdd({ nama: nama.trim(), kategori: kategori.trim(), multiple })
+      if (success) {
+        toast.success('Jabatan berhasil ditambahkan')
+        onOpenChange(false)
+        resetForm()
+      }
     } catch {
       toast.error('Gagal menambahkan jabatan')
     } finally {
@@ -82,23 +88,26 @@ export function JabatanAddDialog({ open, onOpenChange, onAdd }: JabatanAddDialog
                 placeholder="Masukkan nama"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {/* render first error for `nama_posisi` or `nama` */}
+              {namaError ? <p className="text-sm text-destructive mt-1">{namaError}</p> : null}
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="jabatan-kategori" className="text-slate-600 font-medium">
                 Kategori *
               </Label>
-              <Select onValueChange={(v) => setKategori(v)}>
+              <Select value={kategori} onValueChange={(v) => setKategori(v)}>
                 <SelectTrigger id="jabatan-kategori" className="h-auto min-h-12 w-full px-4 py-3 text-left">
                   <SelectValue placeholder="Pilih Kategori" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Ketua">Ketua</SelectItem>
-                  <SelectItem value="Sekretaris">Sekretaris</SelectItem>
-                  <SelectItem value="Bendahara">Bendahara</SelectItem>
-                  <SelectItem value="Lain-lain">Lain-lain</SelectItem>
+                  <SelectItem value="ketua">Ketua</SelectItem>
+                  <SelectItem value="sekretaris">Sekretaris</SelectItem>
+                  <SelectItem value="bendahara">Bendahara</SelectItem>
+                  <SelectItem value="lain-lain">Lain-lain</SelectItem>
                 </SelectContent>
               </Select>
+              {kategoriError ? <p className="text-sm text-destructive mt-1">{kategoriError}</p> : null}
             </div>
 
             <div className="flex items-center gap-3">
@@ -107,6 +116,13 @@ export function JabatanAddDialog({ open, onOpenChange, onAdd }: JabatanAddDialog
                 Multiple
               </Label>
             </div>
+
+            {generalError ? (
+              <div className="flex items-center gap-2 p-3 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md animate-in fade-in slide-in-from-top-1">
+                <AlertCircle className="h-4 w-4" />
+                {generalError}
+              </div>
+            ) : null}
           </DialogBody>
 
           <DialogFooter>

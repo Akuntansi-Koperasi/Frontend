@@ -1,12 +1,21 @@
 import * as React from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { z } from 'zod'
-import type { JabatanRecord } from '@/components/koperasi/jabatan/types'
+import { toast } from 'sonner'
+
+import type { JabatanParams } from '@/services/jabatanService'
 import HeaderComp from '@/components/shared/header-comp'
 import { SearchBar } from '@/components/shared/search-bar'
 
 import { JabatanTable } from '@/components/koperasi/jabatan/jabatan-table'
+import {
+  createJabatan,
+  deleteJabatan,
+  getJabatanList,
+  updateJabatan
+} from '@/services/jabatanService'
 
 const jabatanSearchSchema = z.object({
   page: z.number().int().positive().catch(1),
@@ -19,67 +28,105 @@ export const Route = createFileRoute('/_auth/koperasi/jabatan')({
   component: RouteComponent,
 })
 
-const MOCK_DATA: Array<JabatanRecord> = Array.from({ length: 22 }).map((_, i) => ({
-  id: i + 1,
-  nama: ['Sekretaris', 'Wakil Ketua', 'Ketua', 'Bendahara', 'Anggota'][i % 5] + ` ${i + 1}`,
-  kategori: 'Pengurus',
-  multiple: i % 3 === 0,
-}))
-
 function RouteComponent() {
   const navigate = useNavigate()
-  const [data, setData] = React.useState<Array<JabatanRecord>>(MOCK_DATA)
   const search = Route.useSearch()
   const page = search.page
   const perPage = search.per_page
-  const searchQuery = (search.search ?? '').trim().toLowerCase()
+  const searchQuery = (search.search ?? '').trim()
+
+  const queryClient = useQueryClient()
 
   const [addOpen, setAddOpen] = React.useState(false)
+  const [addErrors, setAddErrors] = React.useState<Partial<Record<string, Array<string>>> | null>(null)
+  const [editErrors, setEditErrors] = React.useState<Partial<Record<string, Array<string>>> | null>(null)
 
-  const filteredData = React.useMemo(() => {
-    if (!searchQuery) return data
-    return data.filter((item) => {
-      return (
-        item.nama.toLowerCase().includes(searchQuery) ||
-        item.kategori.toLowerCase().includes(searchQuery)
-      )
-    })
-  }, [data, searchQuery])
+  const params: JabatanParams = {
+    page,
+    per_page: perPage,
+    search: searchQuery || undefined,
+  }
 
-  const total = filteredData.length
-  const pageCount = Math.max(1, Math.ceil(total / perPage))
-  const safePage = Math.min(Math.max(page, 1), pageCount)
-  const pageIndex = safePage - 1
-  const paginated = filteredData.slice(pageIndex * perPage, pageIndex * perPage + perPage)
+  const { data } = useQuery<any>({
+    queryKey: ['jabatan', params],
+    queryFn: () => getJabatanList(params),
+    staleTime: 1000 * 60 * 2,
+  })
+
+  const createMutation = useMutation({
+    mutationFn: createJabatan,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['jabatan'] }),
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: any }) => updateJabatan(id, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['jabatan'] }),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteJabatan(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['jabatan'] }),
+  })
+
+  const normalizeApiErrors = (
+    err: any,
+    fallbackMessage: string
+  ): Partial<Record<string, Array<string>>> => {
+    const apiErrors = err?.apiErrors ?? err?.errors ?? {}
+    const message = err?.message ?? fallbackMessage
+
+    return {
+      ...apiErrors,
+      general: apiErrors.general?.length ? apiErrors.general : [message],
+    }
+  }
+
+  const safePage = Math.max(1, page)
+  const pageIndex = (safePage - 1)
 
   const pagination = {
     pageIndex,
     pageSize: perPage,
-    pageCount,
-    total,
+    pageCount: data ? Math.max(1, Math.ceil(data.total / data.per_page)) : 1,
+    total: data ? data.total : 0,
   }
 
   React.useEffect(() => {
-    if (safePage !== page) {
-      navigate({
-        to: '/koperasi/jabatan',
-        search: (prev: any) => ({ ...prev, page: safePage }),
-        replace: true,
-      })
+    if (page < 1) {
+      navigate({ to: '/koperasi/jabatan', search: (prev: any) => ({ ...prev, page: 1 }), replace: true })
     }
-  }, [navigate, page, safePage])
+  }, [navigate, page])
 
-  const handleAdd = (payload: { nama: string; kategori: string; multiple: boolean }) => {
-    const id = Math.max(0, ...data.map((d) => d.id)) + 1
-    setData((prev) => [{ id, ...payload }, ...prev])
+  const handleAdd = async (payload: { nama: string; kategori: string; multiple: boolean }) => {
+    try {
+      await createMutation.mutateAsync(payload)
+      setAddErrors(null)
+      return true
+    } catch (err: any) {
+      setAddErrors(normalizeApiErrors(err, 'Gagal menambahkan jabatan'))
+      toast.error(err?.message ?? 'Gagal menambahkan jabatan')
+      return false
+    }
   }
 
-  const handleEdit = (payload: { id: number; nama: string; kategori: string; multiple: boolean }) => {
-    setData((prev) => prev.map((d) => (d.id === payload.id ? { ...d, ...payload } : d)))
+  const handleEdit = async (payload: { id: number; nama: string; kategori: string; multiple: boolean }) => {
+    try {
+      await updateMutation.mutateAsync({ id: payload.id, payload: { nama: payload.nama, kategori: payload.kategori, multiple: payload.multiple } })
+      setEditErrors(null)
+      return true
+    } catch (err: any) {
+      setEditErrors(normalizeApiErrors(err, 'Gagal memperbarui jabatan'))
+      toast.error(err?.message ?? 'Gagal memperbarui jabatan')
+      return false
+    }
   }
 
-  const handleDelete = (id: number) => {
-    setData((prev) => prev.filter((d) => d.id !== id))
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteMutation.mutateAsync(id)
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Gagal menghapus jabatan')
+    }
   }
 
   const handlePageChange = (newPageIndex: number) => {
@@ -128,19 +175,20 @@ function RouteComponent() {
       />
 
       <JabatanTable
-        data={paginated}
+        data={data?.data ?? []}
         pagination={pagination}
         addOpen={addOpen}
-        onAddOpenChange={setAddOpen}
+        onAddOpenChange={(isOpen: boolean) => { setAddOpen(isOpen); if (!isOpen) setAddErrors(null) }}
         onAdd={handleAdd}
-        onEdit={(payload) => {
-          handleEdit(payload)
-        }}
+        onEdit={handleEdit}
         onDelete={(id) => {
           handleDelete(id)
         }}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
+        addErrors={addErrors}
+        editErrors={editErrors}
+        onEditClose={() => setEditErrors(null)}
       />
     </>
   )

@@ -28,7 +28,7 @@ Integrasikan halaman yang diberikan ke backend Laravel secara penuh, dengan meng
 ## Endpoint Laravel Yang Sudah Ada Di Proyek Ini
 Gunakan endpoint yang benar-benar tersedia di `routes/api.php` yang nanti diberikan:
 
-Kalau route frontend butuh data atau action yang belum tersedia di backend:
+Kalau route frontend butuh data / backend minta data yang tidak ada inputnya / action yang belum tersedia di backend:
 - tulis jelas `API NOT FOUND`
 - tulis itu di documentation dengan file (route).md isinya adalah permintaan api terkait misalany penjelasan apa yang dibutuhkan, apa request dan apa yang diharapkan responsenya
 - jangan mengarang endpoint
