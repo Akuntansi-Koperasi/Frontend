@@ -6,15 +6,16 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react'
-import { ProdukSimpananAddDialog } from './produk-simpanan-add-dialog'
-import { ProdukSimpananEditDialog } from './produk-simpanan-edit-dialog'
-import { ProdukSimpananDeleteDialog } from './produk-simpanan-delete-dialog'
-import type {
-  ColumnDef,
-  SortingState} from '@tanstack/react-table';
-import type { ProdukSimpananRecord } from './types'
-import { Card, CardContent } from '@/components/ui/card'
+
+import { ProdukPinjamanAddDialog } from './produk-pinjaman-add-dialog'
+import { ProdukPinjamanEditDialog } from './produk-pinjaman-edit-dialog'
+import { ProdukPinjamanDeleteDialog } from './produk-pinjaman-delete-dialog'
+import type { ProdukPinjamanRecord } from './types'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -23,11 +24,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
 import { DataTablePagination } from '@/components/data-table-pagination'
 
-interface ProdukSimpananTableProps {
-  data: Array<ProdukSimpananRecord>
+interface ProdukPinjamanTableProps {
+  data: Array<ProdukPinjamanRecord>
   pagination: {
     pageIndex: number
     pageSize: number
@@ -36,14 +36,14 @@ interface ProdukSimpananTableProps {
   }
   onPageChange: (newPageIndex: number) => void
   onPageSizeChange: (pageSize: number) => void
-  onAdd: (payload: Omit<ProdukSimpananRecord, 'id'>) => void
-  onEdit: (payload: ProdukSimpananRecord) => void
+  onAdd: (payload: Omit<ProdukPinjamanRecord, 'id'>) => void
+  onEdit: (payload: ProdukPinjamanRecord) => void
   onDelete: (id: number) => void
   addOpen: boolean
   onAddOpenChange: (open: boolean) => void
 }
 
-export function ProdukSimpananTable({
+export function ProdukPinjamanTable({
   data,
   pagination,
   onPageChange,
@@ -53,12 +53,12 @@ export function ProdukSimpananTable({
   onDelete,
   addOpen,
   onAddOpenChange,
-}: ProdukSimpananTableProps) {
+}: ProdukPinjamanTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [editOpen, setEditOpen] = React.useState(false)
   const [deleteOpen, setDeleteOpen] = React.useState(false)
-  const [editing, setEditing] = React.useState<ProdukSimpananRecord | undefined>()
-  const [deleting, setDeleting] = React.useState<ProdukSimpananRecord | undefined>()
+  const [editing, setEditing] = React.useState<ProdukPinjamanRecord | undefined>()
+  const [deleting, setDeleting] = React.useState<ProdukPinjamanRecord | undefined>()
   const [isDeletingLocal, setIsDeletingLocal] = React.useState(false)
 
   const handleDeleteConfirm = (id: number) => {
@@ -72,7 +72,7 @@ export function ProdukSimpananTable({
     }
   }
 
-  const columns: Array<ColumnDef<ProdukSimpananRecord>> = [
+  const columns: Array<ColumnDef<ProdukPinjamanRecord>> = [
     {
       accessorKey: 'id',
       header: () => <div className="text-center font-semibold text-slate-900">No.</div>,
@@ -102,29 +102,17 @@ export function ProdukSimpananTable({
       cell: ({ row }) => <div className="text-center font-medium text-slate-700">{row.original.jenis}</div>,
     },
     {
-      accessorKey: 'bunga',
-      header: () => <div className="text-center font-semibold text-slate-900">Bunga</div>,
-      cell: ({ row }) => (
-        <div className="flex justify-center">
-          <Badge
-            variant="purple"
-            className="cursor-default rounded-full h-8 px-3 font-bold"
-          >
-            {row.original.bunga.toFixed(2)}%
-          </Badge>
-        </div>
-      ),
+      accessorKey: 'periode',
+      header: () => <div className="text-center font-semibold text-slate-900">Periode Pinjaman</div>,
+      cell: ({ row }) => <div className="text-center font-medium text-slate-700">{row.original.periode}</div>,
     },
     {
-      accessorKey: 'nominal',
-      header: () => <div className="text-center font-semibold text-slate-900">Nominal/Jumlah (Rp)</div>,
+      accessorKey: 'bunga',
+      header: () => <div className="text-center font-semibold text-slate-900">Suku Bunga</div>,
       cell: ({ row }) => (
         <div className="flex justify-center">
-          <Badge
-            variant="green"
-            className="cursor-default rounded-full h-8 px-3 font-bold"
-          >
-            Rp {row.original.nominal.toLocaleString('id-ID')}
+          <Badge variant="purple" className="cursor-default rounded-full h-8 px-3 font-bold">
+            {row.original.bunga.toFixed(2)}%
           </Badge>
         </div>
       ),
@@ -227,25 +215,21 @@ export function ProdukSimpananTable({
                 </TableRow>
               )}
             </TableBody>
-          </Table>
+            </Table>
 
-          <DataTablePagination
-            pageIndex={pagination.pageIndex}
-            pageCount={pagination.pageCount}
-            pageSize={pagination.pageSize}
-            onPageChange={onPageChange}
-            onPageSizeChange={onPageSizeChange}
-          />
-        </CardContent>
-      </Card>
+            <DataTablePagination
+              pageIndex={pagination.pageIndex}
+              pageCount={pagination.pageCount}
+              pageSize={pagination.pageSize}
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
+            />
+          </CardContent>
+        </Card>
 
-      <ProdukSimpananAddDialog
-        open={addOpen}
-        onOpenChange={onAddOpenChange}
-        onAdd={onAdd}
-      />
+      <ProdukPinjamanAddDialog open={addOpen} onOpenChange={onAddOpenChange} onAdd={onAdd} />
 
-      <ProdukSimpananEditDialog
+      <ProdukPinjamanEditDialog
         open={editOpen}
         onOpenChange={setEditOpen}
         onEdit={onEdit}
@@ -253,7 +237,7 @@ export function ProdukSimpananTable({
         isEditing={false}
       />
 
-      <ProdukSimpananDeleteDialog
+      <ProdukPinjamanDeleteDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         onConfirm={handleDeleteConfirm}

@@ -128,27 +128,14 @@ export function RekeningSimpananTransactionsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[960px]">
-        <DialogHeader className="px-6 pt-4">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <DialogTitle className="text-2xl font-bold text-slate-900">Transaksi Rekening</DialogTitle>
-              <DialogDescription className="text-sm text-slate-600 mt-1">
-                {nomorRekening ?? '-'}
-              </DialogDescription>
-            </div>
-            <Button
-              type="button"
-              size="sm"
-              className="bg-slate-900 text-white hover:bg-slate-800 px-4"
-              onClick={handlePrint}
-            >
-              <Printer className="h-4 w-4 mr-2" />
-              Print
-            </Button>
-          </div>
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-slate-900">Transaksi Rekening</DialogTitle>
+          <DialogDescription className="text-sm text-slate-600 mt-1">
+            {nomorRekening ?? '-'}
+          </DialogDescription>
         </DialogHeader>
 
-        <DialogBody className="grid py-4 px-4">
+        <DialogBody className="grid gap-4 py-4">
           <Table className="w-full table-fixed">
             <TableHeader className="bg-slate-50">
               <TableRow className="hover:bg-slate-50">
@@ -192,14 +179,22 @@ export function RekeningSimpananTransactionsDialog({
           <span className="text-lg font-bold text-[#4F46E5]">{finalSaldoDisplay}</span>
         </div>
 
-        <DialogFooter className="px-6">
+        <DialogFooter>
           <Button
             type="button"
             variant="destructive"
-            className="h-11 min-w-28"
+            className="md:w-[50%] w-full h-12 cursor-pointer"
             onClick={() => onOpenChange(false)}
           >
             Tutup
+          </Button>
+          <Button
+            type="button"
+            className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12 cursor-pointer"
+            onClick={handlePrint}
+          >
+            <Printer className="h-4 w-4 mr-2" />
+            Print
           </Button>
         </DialogFooter>
       </DialogContent>

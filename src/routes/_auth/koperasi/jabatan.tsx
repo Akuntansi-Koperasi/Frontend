@@ -29,16 +29,28 @@ const MOCK_DATA: Array<JabatanRecord> = Array.from({ length: 22 }).map((_, i) =>
 function RouteComponent() {
   const navigate = useNavigate()
   const [data, setData] = React.useState<Array<JabatanRecord>>(MOCK_DATA)
-  const { page: pageSearch, per_page: perPageSearch } = Route.useSearch()
-  const page = pageSearch
-  const perPage = perPageSearch
+  const search = Route.useSearch()
+  const page = search.page
+  const perPage = search.per_page
+  const searchQuery = (search.search ?? '').trim().toLowerCase()
 
   const [addOpen, setAddOpen] = React.useState(false)
 
-  const total = data.length
+  const filteredData = React.useMemo(() => {
+    if (!searchQuery) return data
+    return data.filter((item) => {
+      return (
+        item.nama.toLowerCase().includes(searchQuery) ||
+        item.kategori.toLowerCase().includes(searchQuery)
+      )
+    })
+  }, [data, searchQuery])
+
+  const total = filteredData.length
   const pageCount = Math.max(1, Math.ceil(total / perPage))
-  const pageIndex = page - 1
-  const paginated = data.slice(pageIndex * perPage, pageIndex * perPage + perPage)
+  const safePage = Math.min(Math.max(page, 1), pageCount)
+  const pageIndex = safePage - 1
+  const paginated = filteredData.slice(pageIndex * perPage, pageIndex * perPage + perPage)
 
   const pagination = {
     pageIndex,
@@ -46,6 +58,16 @@ function RouteComponent() {
     pageCount,
     total,
   }
+
+  React.useEffect(() => {
+    if (safePage !== page) {
+      navigate({
+        to: '/koperasi/jabatan',
+        search: (prev: any) => ({ ...prev, page: safePage }),
+        replace: true,
+      })
+    }
+  }, [navigate, page, safePage])
 
   const handleAdd = (payload: { nama: string; kategori: string; multiple: boolean }) => {
     const id = Math.max(0, ...data.map((d) => d.id)) + 1
@@ -76,6 +98,18 @@ function RouteComponent() {
     })
   }
 
+  const handleSearchChange = (value: string) => {
+    navigate({
+      to: '/koperasi/jabatan',
+      search: (prev: any) => ({
+        ...prev,
+        search: value === '' ? undefined : value,
+        page: 1,
+      }),
+      replace: true,
+    })
+  }
+
   return (
     <>
       <HeaderComp
@@ -86,7 +120,12 @@ function RouteComponent() {
         onAction={() => setAddOpen(true)}
       />
 
-      <SearchBar placeholder="Cari jabatan..." className="mb-4" />
+      <SearchBar
+        placeholder="Cari jabatan..."
+        className="mb-4"
+        value={search.search ?? ''}
+        onChange={(event) => handleSearchChange(event.target.value)}
+      />
 
       <JabatanTable
         data={paginated}

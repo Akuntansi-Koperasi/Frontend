@@ -37,10 +37,13 @@ import {
 
 interface RekeningSimpananTableProps {
   data: Array<RekeningSimpananRecord>
-  total: number
-  pageIndex: number
-  pageSize: number
-  onPageChange: (page: number) => void
+  pagination: {
+    pageIndex: number
+    pageSize: number
+    pageCount: number
+    total: number
+  }
+  onPageChange: (newPageIndex: number) => void
   onPageSizeChange: (pageSize: number) => void
   onAdd: (
     payload: Omit<RekeningSimpananRecord, 'id' | 'statusTagih'> & {
@@ -57,9 +60,7 @@ const formatRupiah = (value: number) => `Rp ${value.toLocaleString('id-ID')}`
 
 export function RekeningSimpananTable({
   data,
-  total,
-  pageIndex,
-  pageSize,
+  pagination,
   onPageChange,
   onPageSizeChange,
   onAdd,
@@ -138,7 +139,7 @@ export function RekeningSimpananTable({
       header: () => <div className="text-center font-semibold text-slate-900">No.</div>,
       cell: ({ row }) => (
         <div className="text-center font-medium text-muted-foreground">
-          {row.index + 1 + pageIndex * pageSize}.
+          {row.index + 1 + pagination.pageIndex * pagination.pageSize}.
         </div>
       ),
     },
@@ -147,7 +148,7 @@ export function RekeningSimpananTable({
       header: ({ column }) => (
         <Button
           variant="ghost"
-          className="p-0 hover:bg-transparent font-semibold text-slate-900 justify-start"
+          className="p-0 hover:bg-transparent font-semibold text-slate-900 justify-start cursor-pointer"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           Anggota
@@ -168,13 +169,15 @@ export function RekeningSimpananTable({
 
         return (
           <div className="flex items-center gap-3">
-            <Avatar>
+            <Avatar className="h-9 w-9 border border-slate-200">
               <AvatarImage src={anggota?.avatarUrl} alt={anggota?.nama ?? 'Anggota'} />
-              <AvatarFallback>{fallback}</AvatarFallback>
+              <AvatarFallback className="bg-orange-100 text-orange-600 font-medium">
+                {fallback}
+              </AvatarFallback>
             </Avatar>
-            <div>
-              <div className="font-semibold text-slate-900">{anggota?.nama ?? '-'}</div>
-              <div className="text-xs text-muted-foreground">{anggota?.email ?? '-'}</div>
+            <div className="flex flex-col text-left">
+              <span className="font-semibold text-slate-900 text-sm">{anggota?.nama ?? '-'}</span>
+              <span className="text-xs text-muted-foreground">{anggota?.email ?? '-'}</span>
             </div>
           </div>
         )
@@ -243,11 +246,11 @@ export function RekeningSimpananTable({
       id: 'actions',
       header: () => <div className="text-center font-semibold text-slate-900">Action</div>,
       cell: ({ row }) => (
-        <div className="flex items-center justify-center gap-1">
+        <div className="flex items-center gap-2 justify-center">
           <Button
-            size="icon-sm"
             variant="ghost"
-            className="text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+            size="icon"
+            className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
             onClick={() => {
               setSelectedRekening(row.original)
               setTransactionsOpen(true)
@@ -257,9 +260,9 @@ export function RekeningSimpananTable({
           </Button>
 
           <Button
-            size="icon-sm"
             variant="ghost"
-            className="text-amber-500 hover:text-amber-600 hover:bg-amber-50"
+            size="icon"
+            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
             onClick={() => {
               setEditing(row.original)
               setEditOpen(true)
@@ -269,9 +272,9 @@ export function RekeningSimpananTable({
           </Button>
 
           <Button
-            size="icon-sm"
             variant="ghost"
-            className="text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+            size="icon"
+            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
             onClick={() => {
               setDeleting(row.original)
               setDeleteOpen(true)
@@ -303,13 +306,21 @@ export function RekeningSimpananTable({
             <TableHeader className="bg-slate-50/50">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="hover:bg-transparent">
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="font-semibold text-slate-900">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  ))}
+                  {headerGroup.headers.map((header, index) => {
+                    let alignClass = 'text-center'
+                    if (index === 1 || index === 2 || index === 3) alignClass = 'text-left'
+
+                    return (
+                      <TableHead
+                        key={header.id}
+                        className={`font-semibold text-slate-900 ${alignClass}`}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    )
+                  })}
                 </TableRow>
               ))}
             </TableHeader>
@@ -317,11 +328,16 @@ export function RekeningSimpananTable({
               {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="py-3">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell, index) => {
+                      let alignClass = 'text-center'
+                      if (index === 1 || index === 2 || index === 3) alignClass = 'text-left'
+
+                      return (
+                        <TableCell key={cell.id} className={`py-3 ${alignClass}`}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      )
+                    })}
                   </TableRow>
                 ))
               ) : (
@@ -332,17 +348,17 @@ export function RekeningSimpananTable({
                 </TableRow>
               )}
             </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </Table>
 
-      <DataTablePagination
-        pageIndex={pageIndex}
-        pageCount={Math.max(1, Math.ceil(total / pageSize))}
-        pageSize={pageSize}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
-      />
+            <DataTablePagination
+              pageIndex={pagination.pageIndex}
+              pageCount={pagination.pageCount}
+              pageSize={pagination.pageSize}
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
+            />
+          </CardContent>
+        </Card>
 
       <RekeningSimpananAddDialog
         open={addOpen}

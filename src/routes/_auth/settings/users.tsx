@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import type { UserRecord } from '@/services/userService'
 import { UserAddDialog } from '@/components/settings/users/user-add-dialog'
@@ -123,6 +123,7 @@ const MOCK_USERS: Array<UserRecord> = [
 
 // ─── Route Component ──────────────────────────────────────────────────────────
 function RouteComponent() {
+  const navigate = useNavigate()
   const search = Route.useSearch()
   const { page, per_page, search: searchQuery, role } = search
 
@@ -150,7 +151,8 @@ function RouteComponent() {
   // Paginasi manual
   const total = filtered.length
   const pageCount = Math.max(1, Math.ceil(total / per_page))
-  const pageIndex = page - 1 // 0-based
+  const safePage = Math.min(Math.max(page, 1), pageCount)
+  const pageIndex = safePage - 1
   const paginatedData = filtered.slice(pageIndex * per_page, pageIndex * per_page + per_page)
 
   const pagination = {
@@ -162,6 +164,28 @@ function RouteComponent() {
 
   const [open, setOpen] = useState(false)
 
+  useEffect(() => {
+    if (safePage !== page) {
+      navigate({
+        to: '/settings/users',
+        search: (prev: any) => ({ ...prev, page: safePage }),
+        replace: true,
+      })
+    }
+  }, [navigate, page, safePage])
+
+  const handleSearchChange = (value: string) => {
+    navigate({
+      to: '/settings/users',
+      search: (prev: any) => ({
+        ...prev,
+        search: value === '' ? undefined : value,
+        page: 1,
+      }),
+      replace: true,
+    })
+  }
+
   return (
     <>
       <HeaderComp
@@ -172,7 +196,12 @@ function RouteComponent() {
         onAction={() => setOpen(true)}
       />
       <UserAddDialog open={open} onOpenChange={setOpen} />
-      <SearchBar placeholder="Cari pengguna..." className="mb-4" />
+      <SearchBar
+        placeholder="Cari pengguna..."
+        className="mb-4"
+        value={search.search ?? ''}
+        onChange={(event) => handleSearchChange(event.target.value)}
+      />
 
       <UsersTable data={paginatedData} pagination={pagination} />
     </>

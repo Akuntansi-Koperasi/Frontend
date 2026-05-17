@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { z } from 'zod'
 import type { AnggotaRecord } from '@/components/koperasi/anggota/types'
 import { AnggotaAddDialog } from '@/components/koperasi/anggota/anggota-add-dialog'
@@ -129,7 +129,8 @@ function RouteComponent() {
 
   const total = filtered.length
   const pageCount = Math.max(1, Math.ceil(total / per_page))
-  const pageIndex = page - 1
+  const safePage = Math.min(Math.max(page, 1), pageCount)
+  const pageIndex = safePage - 1
   const paginatedData = filtered.slice(pageIndex * per_page, pageIndex * per_page + per_page)
 
   const pagination = {
@@ -137,6 +138,28 @@ function RouteComponent() {
     pageSize: per_page,
     pageCount,
     total,
+  }
+
+  useEffect(() => {
+    if (safePage !== page) {
+      navigate({
+        to: '/koperasi/anggota',
+        search: (prev: any) => ({ ...prev, page: safePage }),
+        replace: true,
+      })
+    }
+  }, [navigate, page, safePage])
+
+  const handleSearchChange = (value: string) => {
+    navigate({
+      to: '/koperasi/anggota',
+      search: (prev: any) => ({
+        ...prev,
+        search: value === '' ? undefined : value,
+        page: 1,
+      }),
+      replace: true,
+    })
   }
 
   return (
@@ -160,7 +183,12 @@ function RouteComponent() {
         }}
       />
 
-      <SearchBar placeholder="Cari anggota..." className="mb-4" />
+      <SearchBar
+        placeholder="Cari anggota..."
+        className="mb-4"
+        value={search.search ?? ''}
+        onChange={(event) => handleSearchChange(event.target.value)}
+      />
 
       <AnggotaTable
         data={paginatedData}

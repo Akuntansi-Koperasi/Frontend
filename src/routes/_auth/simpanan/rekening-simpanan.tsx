@@ -58,6 +58,12 @@ function RouteComponent() {
   const safePage = Math.min(Math.max(page, 1), pageCount)
   const pageIndex = safePage - 1
   const paginatedData = filteredData.slice(pageIndex * perPage, pageIndex * perPage + perPage)
+  const pagination = {
+    pageIndex,
+    pageSize: perPage,
+    pageCount,
+    total: filteredData.length,
+  }
 
   React.useEffect(() => {
     if (safePage !== page) {
@@ -140,9 +146,7 @@ function RouteComponent() {
 
       <RekeningSimpananTable
         data={paginatedData}
-        total={filteredData.length}
-        pageIndex={pageIndex}
-        pageSize={perPage}
+        pagination={pagination}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         onAdd={handleAdd}

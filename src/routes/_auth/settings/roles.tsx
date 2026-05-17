@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { z } from 'zod'
 
 import type { RoleRecord } from '@/components/settings/roles/types'
@@ -35,6 +35,7 @@ const INITIAL_ROLES: Array<RoleRecord> = [
 ]
 
 function RouteComponent() {
+  const navigate = useNavigate()
   const search = Route.useSearch()
   const { page, per_page, search: searchQuery } = search
 
@@ -49,8 +50,31 @@ function RouteComponent() {
 
   const total = filtered.length
   const pageCount = Math.max(1, Math.ceil(total / per_page))
-  const pageIndex = page - 1
+  const safePage = Math.min(Math.max(page, 1), pageCount)
+  const pageIndex = safePage - 1
   const paginatedData = filtered.slice(pageIndex * per_page, pageIndex * per_page + per_page)
+
+  useEffect(() => {
+    if (safePage !== page) {
+      navigate({
+        to: '/settings/roles',
+        search: (prev: any) => ({ ...prev, page: safePage }),
+        replace: true,
+      })
+    }
+  }, [navigate, page, safePage])
+
+  const handleSearchChange = (value: string) => {
+    navigate({
+      to: '/settings/roles',
+      search: (prev: any) => ({
+        ...prev,
+        search: value === '' ? undefined : value,
+        page: 1,
+      }),
+      replace: true,
+    })
+  }
 
   const pagination = {
     pageIndex,
@@ -78,7 +102,12 @@ function RouteComponent() {
           })
         }}
       />
-      <SearchBar placeholder="Cari peran..." className="mb-4" />
+      <SearchBar
+        placeholder="Cari peran..."
+        className="mb-4"
+        value={search.search ?? ''}
+        onChange={(event) => handleSearchChange(event.target.value)}
+      />
 
       <RolesTable
         data={paginatedData}

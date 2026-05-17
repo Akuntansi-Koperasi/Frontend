@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Save } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { z } from 'zod'
 
 import type { PermissionLevel, PermissionMenuItem } from '@/components/settings/roles/types'
@@ -70,7 +70,8 @@ function RouteComponent() {
 
   const total = filtered.length
   const pageCount = Math.max(1, Math.ceil(total / per_page))
-  const pageIndex = page - 1
+  const safePage = Math.min(Math.max(page, 1), pageCount)
+  const pageIndex = safePage - 1
   const paginated = filtered.slice(pageIndex * per_page, pageIndex * per_page + per_page)
 
   const pagination = {
@@ -84,6 +85,19 @@ function RouteComponent() {
       to: '/settings/permissions/$roleId',
       params: { roleId },
       search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
+      replace: true,
+    })
+  }
+
+  const handleSearchChange = (value: string) => {
+    navigate({
+      to: '/settings/permissions/$roleId',
+      params: { roleId },
+      search: (prev: any) => ({
+        ...prev,
+        search: value === '' ? undefined : value,
+        page: 1,
+      }),
       replace: true,
     })
   }
@@ -106,6 +120,17 @@ function RouteComponent() {
     navigate({ to: '/settings/roles' } as any)
   }
 
+  useEffect(() => {
+    if (safePage !== page) {
+      navigate({
+        to: '/settings/permissions/$roleId',
+        params: { roleId },
+        search: (prev: any) => ({ ...prev, page: safePage }),
+        replace: true,
+      })
+    }
+  }, [navigate, page, roleId, safePage])
+
   return (
     <>
       <HeaderComp
@@ -116,7 +141,12 @@ function RouteComponent() {
         onAction={handleSave}
       />
 
-      <SearchBar placeholder="Cari menu..." className="mb-4" />
+      <SearchBar
+        placeholder="Cari menu..."
+        className="mb-4"
+        value={searchQuery ?? ''}
+        onChange={(event) => handleSearchChange(event.target.value)}
+      />
 
       <PermissionsTable
         roleName={roleName}
