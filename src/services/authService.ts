@@ -59,39 +59,21 @@ export const login = async (email: string, password: string) => {
 }
 
 export const loginWithGoogle = async (idToken: string) => {
-  const formData = new FormData()
-  formData.append('id_token', idToken)
-  formData.append('device_name', 'web')
+  const response = await api.post<LoginResponse>('/auth/login-google', {
+    id_token: idToken,
+    device_name: 'web',
+  })
 
-  const response = await api.post('/auth/login-google', formData)
-
-  const token = response.data.data?.token
-  let user = response.data.data?.user
-
-  if (typeof window !== 'undefined' && token) {
-    localStorage.setItem('token', token)
-
-    if (!user) {
-      try {
-        console.log("User missing from login response, fetching manually...")
-        user = await fetchUserProfile()
-      } catch (error) {
-        console.error('Failed to fetch user profile after Google login', error)
-      }
-    }
-
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user))
-    }
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('token', response.data.data.token)
+    localStorage.setItem('user', JSON.stringify(response.data.data.user))
+    localStorage.setItem('koperasiList', JSON.stringify(response.data.data.koperasi))
+    localStorage.setItem('koperasiActive', JSON.stringify(response.data.data.koperasi[0]))
+    localStorage.setItem('anggota', JSON.stringify(response.data.data.koperasi[0].anggota))
+    localStorage.setItem('permissions', JSON.stringify(response.data.data.koperasi[0].permissions))
   }
 
-  return {
-    ...response.data,
-    data: {
-      ...response.data.data,
-      user: user,
-    },
-  }
+  return response.data
 }
 
 export const isAuthenticated = () => {
