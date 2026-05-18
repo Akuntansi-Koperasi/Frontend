@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, notFound } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { z } from 'zod'
@@ -49,6 +49,9 @@ function RouteComponent() {
     () => getPermissionAccess('pengurus'),
     []
   )
+  if (!canView && !canManage && !canDelete) {
+    throw notFound()
+  }
 
   const params: PengurusParams = {
     page,

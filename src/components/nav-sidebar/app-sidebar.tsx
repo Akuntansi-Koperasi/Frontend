@@ -6,6 +6,7 @@ import { LogOut, User } from 'lucide-react'
 import { navItems } from './nav-data'
 import { SearchBar } from './search-bar'
 import { logout } from '@/services/authService'
+import { getPermissionAccess } from '@/services/permissionService'
 import { useUserProfile } from '@/hooks/use-user-profile'
 import {
   Sidebar,
@@ -41,8 +42,39 @@ export function AppSidebar({
       .substring(0, 2)
   }
 
+  const filteredNavItems = React.useMemo(() => {
+    return navItems
+      .map((item) => {
+        if (item.items) {
+          const filteredSubItems = item.items.filter((subItem: any) => {
+            if (subItem.permission_class) {
+              const { canView, canManage, canDelete } = getPermissionAccess(subItem.permission_class)
+              return canView || canManage || canDelete
+            }
+            return true
+          })
+          return { ...item, items: filteredSubItems }
+        }
+        
+        // Handle parent items with permission_class
+        if ((item as any).permission_class) {
+          const { canView, canManage, canDelete } = getPermissionAccess((item as any).permission_class)
+          if (!canView && !canManage && !canDelete) return null
+        }
+        
+        return item
+      })
+      .filter((item): item is NonNullable<typeof item> => {
+        if (!item) return false
+        if (item.items) {
+          return item.items.length > 0
+        }
+        return true
+      })
+  }, [])
+
   React.useEffect(() => {
-    navItems.forEach((item) => {
+    filteredNavItems.forEach((item) => {
       if (!item.items?.length) {
         return
       }
@@ -58,7 +90,7 @@ export function AppSidebar({
         )
       }
     })
-  }, [pathname])
+  }, [pathname, filteredNavItems])
 
   const toggleSection = (key: string) => {
     setOpenSections((current) => ({
@@ -103,7 +135,7 @@ export function AppSidebar({
               <SidebarMenuItem>
                 <SearchBar className="sm:hidden block" />
               </SidebarMenuItem>
-              {navItems.map((item) => {
+              {filteredNavItems.map((item) => {
                 const isActive =
                   pathname === item.url || pathname.startsWith(`${item.url}/`)
                 const isSectionOpen = openSections[item.title] ?? false

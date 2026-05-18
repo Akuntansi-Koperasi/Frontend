@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, notFound } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { z } from 'zod'
@@ -41,6 +41,9 @@ function RouteComponent() {
     () => getPermissionAccess('jabatan'),
     []
   )
+  if (!canView && !canManage && !canDelete) {
+    throw notFound()
+  }
 
   const [addOpen, setAddOpen] = React.useState(false)
   const [addErrors, setAddErrors] = React.useState<Partial<Record<string, Array<string>>> | null>(null)

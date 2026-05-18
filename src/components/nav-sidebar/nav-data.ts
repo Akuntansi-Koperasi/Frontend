@@ -115,10 +115,12 @@ export const navItems = [
       {
         title: 'Pengurus Koperasi',
         url: '/koperasi/pengurus',
+        permission_class: 'pengurus',
       },
       {
         title: 'Pengaturan Jabatan',
         url: '/koperasi/jabatan',
+        permission_class: 'jabatan',
       },
     ]
   },
