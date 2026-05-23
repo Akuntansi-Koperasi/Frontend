@@ -77,6 +77,10 @@ Kalau route frontend butuh data / backend minta data yang tidak ada inputnya / a
 - level modifikasi (tingkatan atasnya lihat dia bisa mengakses halaman, menambahkan dan mengedit data sembuyikan tombol delete atau yang sejenis (tentunya yang diminta di route itu))
 - level admin (tingkatan puncak bisa segalanya termasuk hapus data)
 
+## Toast
+- pemanggilan api pasti ada message setiap api yang interaksi, yang menggubah data (selain get) tambahkan toast bahwa berhasil atau error
+- penerapannya baca dari component yang sudah menerapkan di `src/components` atau di route `src/routes`
+
 ## Checklist Verifikasi
 Jalankan ini setelah perubahan:
 ```bash
