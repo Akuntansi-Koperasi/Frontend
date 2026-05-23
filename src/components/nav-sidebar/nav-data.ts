@@ -132,6 +132,7 @@ export const navItems = [
       {
         title: 'Pengguna',
         url: '/settings/users',
+        permission_class: 'pengguna',
       },
       {
         title: 'Peran',

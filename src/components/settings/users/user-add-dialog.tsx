@@ -1,6 +1,10 @@
-import { useState } from "react"
+import {  useState } from "react"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import type {FormEvent} from "react";
+import type { AnggotaDropdownOption } from "@/services/anggotaService"
+import type { RoleOption } from "@/services/roleService"
+import type { UserFormErrors } from "@/services/userService"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -21,39 +25,20 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-const MOCK_ANGGOTA = [
-  { id: "1", nama: "Budi Santoso"},
-  { id: "2", nama: "Siti Rahayu"},
-  { id: "3", nama: "Ahmad Fauzi"},
-  { id: "4", nama: "Dewi Lestari"},
-  { id: "5", nama: "Rudi Hartono"},
-  { id: "6", nama: "Eka Wulandari"},
-  { id: "7", nama: "Hendra Gunawan"},
-  { id: "8", nama: "Nita Permata"},
-  { id: "9", nama: "Yusuf Ibrahim"},
-  { id: "10", nama: "Rina Marlina"},
-  { id: "11", nama: "Fajar Nugraha"},
-  { id: "12", nama: "Laila Sari"},
-]
-
-const MOCK_PERAN = [
-  { id: "admin", name: "Admin" },
-  { id: "bendahara", name: "Bendahara" },
-  { id: "kasir", name: "Kasir" },
-  { id: "manager", name: "Manager" },
-  { id: "pengawas", name: "Pengawas" },
-  { id: "anggota", name: "Anggota" },
-]
+// options and handlers are provided by parent route
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type UserAddDialogProps = {
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  onCreate: (payload: { anggota_id: number; role_id: number }) => Promise<boolean>
+  errors?: UserFormErrors
+  anggotaOptions: Array<AnggotaDropdownOption>
+  roleOptions: Array<RoleOption>
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export function UserAddDialog({ open, onOpenChange }: UserAddDialogProps) {
+export function UserAddDialog({ open, onOpenChange, onCreate, errors: _errors, anggotaOptions, roleOptions }: UserAddDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false)
   const isControlled = typeof open === "boolean" && typeof onOpenChange === "function"
   const dialogOpen = isControlled ? (open) : internalOpen
@@ -64,6 +49,7 @@ export function UserAddDialog({ open, onOpenChange }: UserAddDialogProps) {
   const [anggotaId, setAnggotaId] = useState("")
   const [peranId, setPeranId] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  // parent handles query invalidation
 
   const isFormValid = anggotaId !== "" && peranId !== ""
 
@@ -72,23 +58,17 @@ export function UserAddDialog({ open, onOpenChange }: UserAddDialogProps) {
     setPeranId("")
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!isFormValid) return
 
     setIsLoading(true)
     try {
-      // TODO: Ganti dengan API call sesungguhnya
-      await new Promise((res) => setTimeout(res, 800))
-
-      const anggota = MOCK_ANGGOTA.find((a) => a.id === anggotaId)
-      const peran = MOCK_PERAN.find((p) => p.id === peranId)
-
-      toast.success(
-        `Akun akses berhasil diaktifkan untuk ${anggota?.nama} sebagai ${peran?.name}`
-      )
-      setDialogOpen(false)
-      resetForm()
+      const success = await onCreate({ anggota_id: parseInt(anggotaId, 10), role_id: parseInt(peranId, 10) })
+      if (success) {
+        setDialogOpen(false)
+        resetForm()
+      }
     } catch {
       toast.error("Gagal mengaktifkan akun akses anggota")
     } finally {
@@ -100,6 +80,12 @@ export function UserAddDialog({ open, onOpenChange }: UserAddDialogProps) {
     if (!val) resetForm()
     setDialogOpen(val)
   }
+
+  const generalError = _errors?.general?.[0]
+  const anggotaError = _errors?.anggota_id?.[0] ?? _errors?.anggota?.[0]
+  const peranError = _errors?.role_id?.[0] ?? _errors?.role?.[0]
+
+  // options are provided by parent via props
 
   return (
     <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
@@ -123,13 +109,14 @@ export function UserAddDialog({ open, onOpenChange }: UserAddDialogProps) {
                   <SelectValue placeholder="Pilih anggota" />
                 </SelectTrigger>
                 <SelectContent>
-                  {MOCK_ANGGOTA.map((anggota) => (
-                    <SelectItem key={anggota.id} value={anggota.id}>
+                  {anggotaOptions.map((anggota) => (
+                    <SelectItem key={anggota.id} value={anggota.id.toString()}>
                       <span className="font-medium">{anggota.nama}</span>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {anggotaError ? <p className="text-sm text-destructive">{anggotaError}</p> : null}
             </div>
 
             {/* Peran */}
@@ -142,14 +129,16 @@ export function UserAddDialog({ open, onOpenChange }: UserAddDialogProps) {
                   <SelectValue placeholder="Pilih Peran" />
                 </SelectTrigger>
                 <SelectContent>
-                  {MOCK_PERAN.map((peran) => (
-                    <SelectItem key={peran.id} value={peran.id}>
+                  {roleOptions.map((peran) => (
+                    <SelectItem key={peran.id} value={peran.id.toString()}>
                       {peran.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {peranError ? <p className="text-sm text-destructive">{peranError}</p> : null}
             </div>
+            {generalError ? <p className="text-sm text-destructive">{generalError}</p> : null}
           </DialogBody>
 
           <DialogFooter>

@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { AlertTriangle, Loader2 } from "lucide-react"
 import type { UserRecord } from "@/services/userService"
 import {
@@ -15,17 +16,29 @@ interface UserDeleteDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   user: UserRecord | null
-  onConfirm: (id: number) => void
-  isDeleting: boolean
+  onConfirm: (id: number) => Promise<boolean>
 }
 
-export function UserDeleteDialog({ 
-  open, 
-  onOpenChange, 
-  user, 
-  onConfirm, 
-  isDeleting 
+export function UserDeleteDialog({
+  open,
+  onOpenChange,
+  user,
+  onConfirm,
 }: UserDeleteDialogProps) {
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleConfirm = async (id: number) => {
+    setIsDeleting(true)
+    try {
+      const success = await onConfirm(id)
+      if (success) {
+        onOpenChange(false)
+      }
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -46,7 +59,7 @@ export function UserDeleteDialog({
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
             onClick={(e) => {
               e.preventDefault()
-              if (user) onConfirm(user.id)
+              if (user) handleConfirm(user.id)
             }}
             disabled={isDeleting}
           >

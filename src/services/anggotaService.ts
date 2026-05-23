@@ -5,8 +5,9 @@ import type {
   AnggotaRecord,
   AnggotaStatus,
   AnggotaUpsertPayload,
-  RoleOption,
 } from '@/components/koperasi/anggota/types'
+
+export type { AnggotaDropdownOption } from '@/components/koperasi/anggota/types'
 
 export type AnggotaParams = {
   page?: number
@@ -145,15 +146,6 @@ export const getAnggotaNoUserDropdown = async (): Promise<Array<AnggotaDropdownO
   return response.data.data.map((anggota) => ({
     id: anggota.id,
     nama: anggota.nama,
-  }))
-}
-
-export const getRoleDropdown = async (): Promise<Array<RoleOption>> => {
-  const response = await api.get<ApiListResponse<{ id: number; name: string }>>('/role/dropdown')
-
-  return response.data.data.map((role) => ({
-    id: role.id,
-    name: role.name,
   }))
 }
 

@@ -1,5 +1,3 @@
-import { UserAddDialog } from "../settings/users/user-add-dialog"
-
 export function UsersHeader() {
   return (
     <div className="flex md:items-center items-start justify-between pt-4 flex-col md:flex-row gap-4">
@@ -10,7 +8,6 @@ export function UsersHeader() {
         </p>
       </div>
       
-      <UserAddDialog />
     </div>
   )
 }

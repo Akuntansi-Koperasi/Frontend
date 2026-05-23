@@ -1,8 +1,15 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
-import type { UserRecord } from '@/services/userService'
+import type { UserFormErrors, UserParams } from '@/services/userService';
+import { createUser, deleteUser, getUsers, updateUser  } from '@/services/userService'
+import { getAnggotaNoUserDropdown } from '@/services/anggotaService'
+import { getRoleDropdown } from '@/services/roleService'
+import { getPermissionAccess } from '@/services/permissionService'
+
 import { UserAddDialog } from '@/components/settings/users/user-add-dialog'
 import { UsersTable } from '@/components/settings/users/users-table'
 import HeaderComp from '@/components/shared/header-comp'
@@ -21,139 +28,56 @@ export const Route = createFileRoute('/_auth/settings/users')({
   component: RouteComponent,
 })
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-const MOCK_USERS: Array<UserRecord> = [
-  {
-    id: 1,
-    name: 'Budi Santoso',
-    username: 'budi.santoso',
-    email: 'budi.santoso@koperasi.id',
-    peran: 'admin',
-    profile_image: null,
-  },
-  {
-    id: 2,
-    name: 'Siti Rahayu',
-    username: 'siti.rahayu',
-    email: 'siti.rahayu@koperasi.id',
-    peran: 'employee',
-    profile_image: null,
-  },
-  {
-    id: 3,
-    name: 'Ahmad Fauzi',
-    username: 'ahmad.fauzi',
-    email: 'ahmad.fauzi@koperasi.id',
-    peran: 'employee',
-    profile_image: null,
-  },
-  {
-    id: 4,
-    name: 'Dewi Lestari',
-    username: 'dewi.lestari',
-    email: 'dewi.lestari@koperasi.id',
-    peran: 'admin',
-    profile_image: null,
-  },
-  {
-    id: 5,
-    name: 'Rudi Hartono',
-    username: 'rudi.hartono',
-    email: 'rudi.hartono@koperasi.id',
-    peran: 'employee',
-    profile_image: null,
-  },
-  {
-    id: 6,
-    name: 'Eka Wulandari',
-    username: 'eka.wulandari',
-    email: 'eka.wulandari@koperasi.id',
-    peran: 'employee',
-    profile_image: null,
-  },
-  {
-    id: 7,
-    name: 'Hendra Gunawan',
-    username: 'hendra.gunawan',
-    email: 'hendra.gunawan@koperasi.id',
-    peran: 'employee',
-    profile_image: null,
-  },
-  {
-    id: 8,
-    name: 'Nita Permata',
-    username: 'nita.permata',
-    email: 'nita.permata@koperasi.id',
-    peran: 'employee',
-    profile_image: null,
-  },
-  {
-    id: 9,
-    name: 'Yusuf Ibrahim',
-    username: 'yusuf.ibrahim',
-    email: 'yusuf.ibrahim@koperasi.id',
-    peran: 'admin',
-    profile_image: null,
-  },
-  {
-    id: 10,
-    name: 'Rina Marlina',
-    username: 'rina.marlina',
-    email: 'rina.marlina@koperasi.id',
-    peran: 'employee',
-    profile_image: null,
-  },
-  {
-    id: 11,
-    name: 'Fajar Nugraha',
-    username: 'fajar.nugraha',
-    email: 'fajar.nugraha@koperasi.id',
-    peran: 'employee',
-    profile_image: null,
-  },
-  {
-    id: 12,
-    name: 'Laila Sari',
-    username: 'laila.sari',
-    email: 'laila.sari@koperasi.id',
-    peran: 'employee',
-    profile_image: null,
-  },
-]
+// Data fetched from API via `getUsers`
 
 // ─── Route Component ──────────────────────────────────────────────────────────
 function RouteComponent() {
   const navigate = useNavigate()
   const search = Route.useSearch()
-  const { page, per_page, search: searchQuery, role } = search
+  const queryClient = useQueryClient()
+  const { canView, canManage, canDelete } = useMemo(() => getPermissionAccess('pengguna'), [])
 
-  // Filter mock data berdasarkan search params
-  const filtered = useMemo(() => {
-    let result = MOCK_USERS
+  if (!canView && !canManage && !canDelete) {
+    throw notFound()
+  }
 
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase()
-      result = result.filter(
-        (u) =>
-          u.name.toLowerCase().includes(q) ||
-          u.username.toLowerCase().includes(q) ||
-          u.email.toLowerCase().includes(q),
-      )
-    }
+  const { page, per_page, search: searchQuery } = search
 
-    if (role) {
-      result = result.filter((u) => u.peran === role)
-    }
+  const params: UserParams = {
+    page,
+    per_page,
+    search: searchQuery?.trim() || undefined,
+  }
 
-    return result
-  }, [searchQuery, role])
+  const usersQuery = useQuery({
+    queryKey: ['users', params],
+    queryFn: () => getUsers(params),
+    staleTime: 1000 * 60 * 2,
+    enabled: canView,
+  })
 
-  // Paginasi manual
-  const total = filtered.length
-  const pageCount = Math.max(1, Math.ceil(total / per_page))
+  const anggotaDropdownQuery = useQuery({
+    queryKey: ['anggota', 'no-user-dropdown'],
+    queryFn: getAnggotaNoUserDropdown,
+    staleTime: 1000 * 60 * 10,
+    enabled: canManage,
+  })
+
+  const roleDropdownQuery = useQuery({
+    queryKey: ['role', 'dropdown'],
+    queryFn: getRoleDropdown,
+    staleTime: 1000 * 60 * 10,
+    enabled: canManage,
+  })
+
+  const createMutation = useMutation({ mutationFn: createUser, onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }) })
+  const updateMutation = useMutation({ mutationFn: ({ id, payload }: { id: number; payload: any }) => updateUser(id, payload), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }) })
+  const deleteMutation = useMutation({ mutationFn: deleteUser, onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }) })
+
+  const total = usersQuery.data ? usersQuery.data.total : 0
+  const pageCount = usersQuery.data ? Math.max(1, Math.ceil(usersQuery.data.total / usersQuery.data.per_page)) : 1
   const safePage = Math.min(Math.max(page, 1), pageCount)
   const pageIndex = safePage - 1
-  const paginatedData = filtered.slice(pageIndex * per_page, pageIndex * per_page + per_page)
 
   const pagination = {
     pageIndex,
@@ -163,6 +87,18 @@ function RouteComponent() {
   }
 
   const [open, setOpen] = useState(false)
+  const [addErrors, setAddErrors] = useState<UserFormErrors>(null)
+  const [editErrors, setEditErrors] = useState<UserFormErrors>(null)
+
+  const normalizeApiErrors = (err: any, fallbackMessage: string): UserFormErrors => {
+    const apiErrors = err?.apiErrors ?? err?.errors ?? {}
+    const message = err?.message ?? fallbackMessage
+
+    return {
+      ...apiErrors,
+      general: apiErrors.general?.length ? apiErrors.general : [message],
+    }
+  }
 
   useEffect(() => {
     if (safePage !== page) {
@@ -185,6 +121,44 @@ function RouteComponent() {
       replace: true,
     })
   }
+  const handleAdd = async (payload: Parameters<typeof createUser>[0]) => {
+    try {
+      await createMutation.mutateAsync(payload)
+      setAddErrors(null)
+      toast.success('Pengguna berhasil dibuat')
+      return true
+    } catch (err: any) {
+      const apiErr = normalizeApiErrors(err, 'Gagal membuat pengguna')
+      setAddErrors(apiErr)
+      toast.error(err?.message ?? 'Gagal membuat pengguna')
+      return false
+    }
+  }
+
+  const handleEdit = async ({ id, role_id }: { id: number; role_id: number }) => {
+    try {
+      await updateMutation.mutateAsync({ id, payload: { role_id } })
+      setEditErrors(null)
+      toast.success('Pengguna berhasil diperbarui')
+      return true
+    } catch (err: any) {
+      const apiErr = normalizeApiErrors(err, 'Gagal memperbarui pengguna')
+      setEditErrors(apiErr)
+      toast.error(err?.message ?? 'Gagal memperbarui pengguna')
+      return false
+    }
+  }
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteMutation.mutateAsync(id)
+      toast.success('Pengguna berhasil dihapus')
+      return true
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Gagal menghapus pengguna')
+      return false
+    }
+  }
 
   return (
     <>
@@ -192,18 +166,46 @@ function RouteComponent() {
         title="Manajemen Pengguna"
         description="Kelola akun akses anggota"
         icon={<Plus />}
-        actionLabel='Aktifkan Pengguna'
-        onAction={() => setOpen(true)}
+        actionLabel={canManage ? 'Aktifkan Pengguna' : undefined}
+        onAction={canManage ? () => setOpen(true) : undefined}
       />
-      <UserAddDialog open={open} onOpenChange={setOpen} />
+
+      <UserAddDialog
+        open={open}
+        onOpenChange={(isOpen) => {
+          setOpen(isOpen)
+          if (!isOpen) setAddErrors(null)
+        }}
+        onCreate={handleAdd}
+        errors={addErrors}
+        anggotaOptions={anggotaDropdownQuery.data ?? []}
+        roleOptions={roleDropdownQuery.data ?? []}
+      />
+
       <SearchBar
         placeholder="Cari pengguna..."
         className="mb-4"
-        value={search.search ?? ''}
+        value={searchQuery ?? ''}
         onChange={(event) => handleSearchChange(event.target.value)}
       />
 
-      <UsersTable data={paginatedData} pagination={pagination} />
+      <UsersTable
+        data={usersQuery.data?.data ?? []}
+        isLoading={usersQuery.isLoading}
+        pagination={pagination}
+        canManage={canManage}
+        canDelete={canDelete}
+        onPageChange={(newPageIndex: number) => {
+          navigate({ to: '/settings/users', search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }), replace: true })
+        }}
+        onPageSizeChange={(newPageSize: number) => {
+          navigate({ to: '/settings/users', search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }), replace: true })
+        }}
+        onUpdate={handleEdit}
+        onDelete={handleDelete}
+        editErrors={editErrors}
+        roleOptions={roleDropdownQuery.data ?? []}
+      />
     </>
   )
 }

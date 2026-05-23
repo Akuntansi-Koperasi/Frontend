@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import {  useEffect, useState } from "react"
 import { Loader2 } from "lucide-react"
-import { toast } from "sonner"
-import type { UserRecord } from "@/services/userService"
+import type {FormEvent} from "react";
+import type { UserFormErrors, UserRecord } from "@/services/userService"
+import type { RoleOption } from "@/services/roleService"
 import { Button } from "@/components/ui/button"
 
 import { Label } from "@/components/ui/label"
@@ -23,78 +23,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { updateUser } from "@/services/userService"
 import { useUserProfile } from "@/hooks/use-user-profile"
 
-const MOCK_PERAN = [
-  { id: "1", name: "Admin" },
-  { id: "2", name: "Bendahara" },
-  { id: "3", name: "Kasir" },
-  { id: "4", name: "Manager" },
-  { id: "5", name: "Pengawas" },
-  { id: "6", name: "Anggota" },
-]
+
 
 interface UserEditDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   user: UserRecord | null
+  onSave: (payload: { id: number; role_id: number }) => Promise<boolean>
+  roleOptions: Array<RoleOption>
+  errors?: UserFormErrors
 }
 
-export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps) {
-  const queryClient = useQueryClient()
+export function UserEditDialog({ open, onOpenChange, user, onSave, roleOptions, errors }: UserEditDialogProps) {
   const { data: currentUser } = useUserProfile()
   const [name, setName] = useState("")
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
-  const [role, setRole] = useState<string>("employee")
+  const [role, setRole] = useState<string>("")
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     if (user) {
       setName(user.name)
       setUsername(user.username)
       setEmail(user.email)
-      const safeRole = (user.peran || "employee").toLowerCase() as "admin" | "employee"
-      setRole(safeRole)
+      setRole(user.role?.id ? String(user.role.id) : "")
     }
   }, [user])
 
-  const mutation = useMutation({
-    mutationFn: (data: any) => updateUser(user!.id, data),
-    onSuccess: (_, variables) => {
-      toast.success("User berhasil diperbarui")
-      queryClient.invalidateQueries({ queryKey: ["users"] })
-      if (currentUser && currentUser.id === user?.id) {
-        queryClient.invalidateQueries({ queryKey: ["profile"] })
-        const updatedUser = { ...currentUser, ...variables }
-        localStorage.setItem("user", JSON.stringify(updatedUser))
-      }
-
-      onOpenChange(false)
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Gagal memperbarui user")
-    }
-  })
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!user) return
-
-    mutation.mutate({
-      name,
-      username,
-      email,
-      role,
-    })
+    setIsLoading(true)
+    try {
+      const success = await onSave({ id: user.id, role_id: parseInt(role, 10) })
+      if (success) onOpenChange(false)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const isSelf = currentUser?.id === user?.id
-  
-  const isFormValid = 
-    name.trim() !== "" && 
-    username.trim() !== "" && 
-    email.trim() !== ""
+  const isFormValid = name.trim() !== "" && username.trim() !== "" && email.trim() !== ""
+
+  const generalError = errors?.general?.[0]
+  const roleError = errors?.role_id?.[0] ?? errors?.role?.[0]
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -117,16 +92,18 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
                   <SelectTrigger className={`h-auto min-h-12 cursor-pointer w-full px-4 py-3 ${isSelf ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={isSelf}>
                     <SelectValue placeholder="Pilih Peran" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {MOCK_PERAN.map((peran) => (
-                      <SelectItem key={peran.id} value={peran.id}>
-                        {peran.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+                    <SelectContent>
+                      {roleOptions.map((peran) => (
+                        <SelectItem key={peran.id} value={peran.id.toString()}>
+                          {peran.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                 </Select>
+                {roleError ? <p className="text-sm text-destructive">{roleError}</p> : null}
               </div>
             </div>
+            {generalError ? <p className="text-sm text-destructive">{generalError}</p> : null}
           </DialogBody>
 
           <DialogFooter>
@@ -141,9 +118,9 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
             <Button 
               type="submit" 
               className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12 cursor-pointer"
-              disabled={mutation.isPending || !isFormValid}
+              disabled={isLoading || !isFormValid}
             >
-              {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Simpan
             </Button>
           </DialogFooter>

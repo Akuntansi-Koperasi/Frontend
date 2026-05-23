@@ -4,15 +4,15 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { useNavigate } from "@tanstack/react-router"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+// parent handles queryClient and mutations
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react"
-import { toast } from "sonner"
 import { UserDeleteDialog } from "./user-delete-dialog"
 import { UserEditDialog } from "./user-edit-dialog"
 import type { ColumnDef, SortingState } from "@tanstack/react-table"
-import type { UserRecord } from "@/services/userService"
+import type { UserFormErrors, UserRecord } from "@/services/userService"
+import type { RoleOption } from "@/services/roleService"
 import { DataTablePagination } from "@/components/data-table-pagination"
+import { Toaster } from "@/components/ui/sonner"
 
 import {
   Table,
@@ -27,63 +27,47 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 
-import { deleteUser } from "@/services/userService"
-
 interface UsersTableProps {
   data: Array<UserRecord>
+  isLoading?: boolean
   pagination: {
     pageIndex: number
     pageSize: number
     pageCount: number
     total: number
   }
+  canManage?: boolean
+  canDelete?: boolean
+  editErrors?: UserFormErrors
+  onPageChange: (newPageIndex: number) => void
+  onPageSizeChange: (newPageSize: number) => void
+  onUpdate?: (payload: { id: number; role_id: number }) => Promise<boolean>
+  onDelete?: (id: number) => Promise<boolean>
+  roleOptions?: Array<RoleOption>
 }
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-export function UsersTable({ data, pagination }: UsersTableProps) {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
+export function UsersTable({ data, isLoading, pagination, canManage, canDelete, onPageChange, onPageSizeChange, onUpdate, onDelete, roleOptions, editErrors }: UsersTableProps) {
   const [sorting] = React.useState<SortingState>([])
 
   const [userToDelete, setUserToDelete] = React.useState<UserRecord | null>(null)
   const [userToEdit, setUserToEdit] = React.useState<UserRecord | null>(null)
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteUser(id),
-    onSuccess: () => {
-      toast.success("User berhasil dihapus")
-      queryClient.invalidateQueries({ queryKey: ["users"] })
-      setUserToDelete(null)
-    },
-    onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || "Gagal menghapus user"
-      toast.error(errorMessage)
-    },
-  })
-
   const handlePageChange = (newPageIndex: number) => {
-    navigate({
-      to: '/settings/users',
-      search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
-      replace: true,
-    })
+    if (typeof onPageChange === 'function') onPageChange(newPageIndex)
   }
 
   const handlePageSizeChange = (newPageSize: number) => {
-    navigate({
-      to: '/settings/users',
-      search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
-      replace: true,
-    })
+    if (typeof onPageSizeChange === 'function') onPageSizeChange(newPageSize)
   }
 
   const columns: Array<ColumnDef<UserRecord>> = [
     {
       id: "index",
       header: "No.",
-      cell: ({ row, table }) => {
-        const index = row.index + 1 + (table.getState().pagination.pageIndex * table.getState().pagination.pageSize)
+      cell: ({ row }) => {
+        const index = row.index + 1 + (pagination.pageIndex * pagination.pageSize)
         return <span className="text-muted-foreground font-medium">{index}.</span>
       },
     },
@@ -132,23 +116,27 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
       header: "Action",
       cell: ({ row }) => (
         <div className="flex items-center gap-2 justify-center">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
-            onClick={() => setUserToEdit(row.original)}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
+          {canManage ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
+              onClick={() => setUserToEdit(row.original)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          ) : null}
 
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
-            onClick={() => setUserToDelete(row.original)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {canDelete ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+              onClick={() => setUserToDelete(row.original)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          ) : null}
         </div>
       ),
     },
@@ -162,6 +150,9 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
     manualPagination: true,
     pageCount: pagination.pageCount,
   })
+
+  const hasRows = table.getRowModel().rows.length > 0
+  const isInitialLoading = Boolean(isLoading) && !hasRows
 
   return (
     <>
@@ -184,7 +175,13 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.length ? (
+              {isInitialLoading ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                    Memuat data pengguna...
+                  </TableCell>
+                </TableRow>
+              ) : hasRows ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {
@@ -222,15 +219,24 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
         open={!!userToEdit}
         onOpenChange={(isOpen) => !isOpen && setUserToEdit(null)}
         user={userToEdit}
+        onSave={async (payload) => {
+          if (typeof onUpdate === 'function') return onUpdate(payload)
+          return false
+        }}
+        roleOptions={roleOptions ?? []}
+        errors={editErrors}
       />
 
       <UserDeleteDialog 
         open={!!userToDelete} 
         onOpenChange={(isOpen) => !isOpen && setUserToDelete(null)}
         user={userToDelete}
-        onConfirm={(id) => deleteMutation.mutate(id)}
-        isDeleting={deleteMutation.isPending}
+        onConfirm={(id) => {
+          if (typeof onDelete === 'function') return onDelete(id)
+          return Promise.resolve(false)
+        }}
       />
+      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   )
 }

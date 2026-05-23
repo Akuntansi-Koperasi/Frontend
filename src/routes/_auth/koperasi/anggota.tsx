@@ -15,9 +15,9 @@ import {
   createAnggota,
   deleteAnggota,
   getAnggotaList,
-  getRoleDropdown,
   updateAnggota,
 } from '@/services/anggotaService'
+import { getRoleDropdown } from '@/services/roleService'
 import { getPermissionAccess } from '@/services/permissionService'
 
 export const Route = createFileRoute('/_auth/koperasi/anggota')({
