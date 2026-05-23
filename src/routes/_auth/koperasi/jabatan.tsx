@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createFileRoute, useNavigate, notFound } from '@tanstack/react-router'
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { z } from 'zod'
@@ -55,7 +55,7 @@ function RouteComponent() {
     search: searchQuery || undefined,
   }
 
-  const { data } = useQuery<any>({
+  const { data, isLoading } = useQuery<any>({
     queryKey: ['jabatan', params],
     queryFn: () => getJabatanList(params),
     staleTime: 1000 * 60 * 2,
@@ -111,7 +111,6 @@ function RouteComponent() {
       await createMutation.mutateAsync(payload)
       setAddErrors(null)
       toast.success('Jabatan berhasil ditambahkan')
-      toast
       return true
     } catch (err: any) {
       setAddErrors(normalizeApiErrors(err, 'Gagal menambahkan jabatan'))
@@ -189,6 +188,7 @@ function RouteComponent() {
 
       <JabatanTable
         data={data?.data ?? []}
+        isLoading={isLoading}
         pagination={pagination}
         canManage={canManage}
         canDelete={canDelete}

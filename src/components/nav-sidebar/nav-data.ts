@@ -111,6 +111,7 @@ export const navItems = [
       {
         title: 'Anggota',
         url: '/koperasi/anggota',
+        permission_class: 'anggota',
       },
       {
         title: 'Pengurus Koperasi',

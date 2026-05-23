@@ -1,12 +1,24 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import * as React from 'react'
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
 import { z } from 'zod'
-import type { AnggotaRecord } from '@/components/koperasi/anggota/types'
+import { toast } from 'sonner'
+import type { AnggotaParams } from '@/services/anggotaService'
+import type { AnggotaFormErrors } from '@/components/koperasi/anggota/types'
 import { AnggotaAddDialog } from '@/components/koperasi/anggota/anggota-add-dialog'
 import { AnggotaTable } from '@/components/koperasi/anggota/anggota-table'
 import HeaderComp from '@/components/shared/header-comp'
 import { SearchBar } from '@/components/shared/search-bar'
+import {
+  aktifkanAnggota,
+  createAnggota,
+  deleteAnggota,
+  getAnggotaList,
+  getRoleDropdown,
+  updateAnggota,
+} from '@/services/anggotaService'
+import { getPermissionAccess } from '@/services/permissionService'
 
 export const Route = createFileRoute('/_auth/koperasi/anggota')({
   validateSearch: z.object({
@@ -17,130 +29,80 @@ export const Route = createFileRoute('/_auth/koperasi/anggota')({
   component: RouteComponent,
 })
 
-const MOCK_ANGGOTA: Array<AnggotaRecord> = [
-  {
-    id: 1,
-    nama: 'Alice Smith',
-    email: 'aff@example.com',
-    photo_profile: null,
-    nomor_ktp: '3471234567890001',
-    nomor_telepon: '081234567890',
-    gender: 'Perempuan',
-    tanggal_masuk: '2026-01-03',
-    status: 'aktif',
-    akses_sistem: true,
-    role: 'employee',
-    tanggal_keluar: null,
-  },
-  {
-    id: 2,
-    nama: 'Bob Johnson',
-    email: 'bobj@example.com',
-    photo_profile: null,
-    nomor_ktp: '3471234567890002',
-    nomor_telepon: '081234567891',
-    gender: 'Perempuan',
-    tanggal_masuk: '2026-02-10',
-    status: 'tidak_aktif',
-    akses_sistem: false,
-    role: null,
-    tanggal_keluar: null,
-  },
-  {
-    id: 3,
-    nama: 'Clara Garcia',
-    email: 'clara@example.com',
-    photo_profile: null,
-    nomor_ktp: '3471234567890003',
-    nomor_telepon: '081234567892',
-    gender: 'Perempuan',
-    tanggal_masuk: '2026-03-20',
-    status: 'keluar',
-    akses_sistem: false,
-    role: null,
-    tanggal_keluar: '2026-05-01',
-  },
-  {
-    id: 4,
-    nama: 'David Brown',
-    email: 'david@example.com',
-    photo_profile: null,
-    nomor_ktp: '3471234567890004',
-    nomor_telepon: '081234567893',
-    gender: 'Perempuan',
-    tanggal_masuk: '2026-04-07',
-    status: 'tidak_aktif',
-    akses_sistem: false,
-    role: null,
-    tanggal_keluar: null,
-  },
-  {
-    id: 5,
-    nama: 'Emma Lee',
-    email: 'emma@example.com',
-    photo_profile: null,
-    nomor_ktp: '3471234567890005',
-    nomor_telepon: '081234567894',
-    gender: 'Perempuan',
-    tanggal_masuk: '2026-04-20',
-    status: 'aktif',
-    akses_sistem: true,
-    role: 'admin',
-    tanggal_keluar: null,
-  },
-  {
-    id: 6,
-    nama: 'Frank Wong',
-    email: 'frank@example.com',
-    photo_profile: null,
-    nomor_ktp: '3471234567890006',
-    nomor_telepon: '081234567895',
-    gender: 'Perempuan',
-    tanggal_masuk: '2026-04-25',
-    status: 'tidak_aktif',
-    akses_sistem: false,
-    role: null,
-    tanggal_keluar: null,
-  },
-]
-
 function RouteComponent() {
   const navigate = useNavigate()
   const search = Route.useSearch()
-  const { page, per_page, search: searchQuery } = search
+  const queryClient = useQueryClient()
+  const { canView, canManage, canDelete } = React.useMemo(() => getPermissionAccess('anggota'), [])
+  const canActivateAccess = React.useMemo(() => getPermissionAccess('pengguna').canManage, [])
 
-  const [openAdd, setOpenAdd] = useState(false)
-  const [anggotaList, setAnggotaList] = useState<Array<AnggotaRecord>>(() => MOCK_ANGGOTA)
-
-  const filtered = useMemo(() => {
-    let result = anggotaList
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase()
-      result = result.filter(
-        (a) =>
-          a.nama.toLowerCase().includes(q) ||
-          a.email.toLowerCase().includes(q) ||
-          (a.nomor_ktp || '').toLowerCase().includes(q) ||
-          (a.nomor_telepon || '').toLowerCase().includes(q),
-      )
-    }
-    return result
-  }, [anggotaList, searchQuery])
-
-  const total = filtered.length
-  const pageCount = Math.max(1, Math.ceil(total / per_page))
-  const safePage = Math.min(Math.max(page, 1), pageCount)
-  const pageIndex = safePage - 1
-  const paginatedData = filtered.slice(pageIndex * per_page, pageIndex * per_page + per_page)
-
-  const pagination = {
-    pageIndex,
-    pageSize: per_page,
-    pageCount,
-    total,
+  if (!canView && !canManage && !canDelete) {
+    throw notFound()
   }
 
-  useEffect(() => {
+  const { page, per_page, search: searchQuery } = search
+
+  const [openAdd, setOpenAdd] = React.useState(false)
+  const [addErrors, setAddErrors] = React.useState<AnggotaFormErrors>(null)
+  const [editErrors, setEditErrors] = React.useState<AnggotaFormErrors>(null)
+
+  const params: AnggotaParams = {
+    page,
+    per_page,
+    search: searchQuery?.trim() || undefined,
+  }
+
+  const anggotaQuery = useQuery({
+    queryKey: ['anggota', params],
+    queryFn: () => getAnggotaList(params),
+    staleTime: 1000 * 60 * 2,
+    enabled: canView,
+  })
+
+  const roleQuery = useQuery({
+    queryKey: ['anggota', 'role-dropdown'],
+    queryFn: getRoleDropdown,
+    staleTime: 1000 * 60 * 10,
+    enabled: canActivateAccess,
+  })
+
+  const createMutation = useMutation({
+    mutationFn: createAnggota,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['anggota'] }),
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: Parameters<typeof updateAnggota>[1] }) =>
+      updateAnggota(id, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['anggota'] }),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteAnggota,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['anggota'] }),
+  })
+
+  const activateMutation = useMutation({
+    mutationFn: ({ id, roleId }: { id: number; roleId: number }) => aktifkanAnggota(id, roleId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['anggota'] }),
+  })
+
+  const normalizeApiErrors = (err: any, fallbackMessage: string): AnggotaFormErrors => {
+    const apiErrors = err?.apiErrors ?? err?.errors ?? {}
+    const message = err?.message ?? fallbackMessage
+
+    return {
+      ...apiErrors,
+      general: apiErrors.general?.length ? apiErrors.general : [message],
+    }
+  }
+
+  const total = anggotaQuery.data ? anggotaQuery.data.total : 0
+  const pageCount = anggotaQuery.data ? Math.max(1, Math.ceil(anggotaQuery.data.total / anggotaQuery.data.per_page)) : 1
+  const safePage = Math.min(Math.max(page, 1), pageCount)
+  const pageIndex = safePage - 1
+
+  React.useEffect(() => {
     if (safePage !== page) {
       navigate({
         to: '/koperasi/anggota',
@@ -149,6 +111,92 @@ function RouteComponent() {
       })
     }
   }, [navigate, page, safePage])
+
+  const handleAdd = async (payload: Parameters<typeof createAnggota>[0]) => {
+    try {
+      await createMutation.mutateAsync(payload)
+      setAddErrors(null)
+      toast.success('Anggota berhasil ditambahkan')
+      return true
+    } catch (err: any) {
+      setAddErrors(normalizeApiErrors(err, 'Gagal menambahkan anggota'))
+      toast.error(err?.message ?? 'Gagal menambahkan anggota')
+      return false
+    }
+  }
+
+  const handleEdit = async (payload: Parameters<typeof updateAnggota>[1] & { id: number }) => {
+    try {
+      await updateMutation.mutateAsync({ id: payload.id, payload })
+      setEditErrors(null)
+      toast.success('Data anggota berhasil diperbarui')
+      return true
+    } catch (err: any) {
+      setEditErrors(normalizeApiErrors(err, 'Gagal memperbarui anggota'))
+      toast.error(err?.message ?? 'Gagal memperbarui anggota')
+      return false
+    }
+  }
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteMutation.mutateAsync(id)
+      toast.success('Anggota berhasil dihapus')
+      return true
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Gagal menghapus anggota')
+      return false
+    }
+  }
+
+  const handleActivate = async ({ id, roleId }: { id: number; roleId: number }) => {
+    try {
+      await activateMutation.mutateAsync({ id, roleId })
+      toast.success('Akun akses anggota berhasil diaktifkan')
+      return true
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Gagal mengaktifkan akun akses anggota')
+      return false
+    }
+  }
+
+  const handleKeluarkan = async ({ id, tanggal_keluar }: { id: number; tanggal_keluar: string }) => {
+    const current = anggotaQuery.data?.data.find((item) => item.id === id)
+
+    if (!current) {
+      toast.error('Data anggota tidak ditemukan')
+      return false
+    }
+
+    try {
+      await updateMutation.mutateAsync({
+        id,
+        payload: {
+          nama: current.nama,
+          ktp: current.ktp,
+          email: current.email,
+          telp: current.telp,
+          gender: current.gender,
+          photo_profile: current.photo_profile,
+          tanggal_masuk: current.tanggal_masuk,
+          tanggal_keluar,
+          status: 'keluar',
+        },
+      })
+      toast.success('Anggota berhasil dikeluarkan')
+      return true
+    } catch (err: any) {
+      toast.error(err?.message ?? 'Gagal mengeluarkan anggota')
+      return false
+    }
+  }
+
+  const pagination = {
+    pageIndex,
+    pageSize: per_page,
+    pageCount,
+    total,
+  }
 
   const handleSearchChange = (value: string) => {
     navigate({
@@ -168,19 +216,18 @@ function RouteComponent() {
         title="Manajemen Anggota"
         description="Kelola anggota koperasi"
         icon={<Plus />}
-        actionLabel="Tambah Anggota"
-        onAction={() => setOpenAdd(true)}
+        actionLabel={canManage ? 'Tambah Anggota' : undefined}
+        onAction={canManage ? () => setOpenAdd(true) : undefined}
       />
 
       <AnggotaAddDialog
         open={openAdd}
-        onOpenChange={setOpenAdd}
-        onCreate={(payload) => {
-          setAnggotaList((prev) => {
-            const nextId = prev.length ? Math.max(...prev.map((p) => p.id)) + 1 : 1
-            return [{ id: nextId, ...payload }, ...prev]
-          })
+        onOpenChange={(isOpen) => {
+          setOpenAdd(isOpen)
+          if (!isOpen) setAddErrors(null)
         }}
+        onCreate={handleAdd}
+        errors={addErrors}
       />
 
       <SearchBar
@@ -191,8 +238,14 @@ function RouteComponent() {
       />
 
       <AnggotaTable
-        data={paginatedData}
+        data={anggotaQuery.data?.data ?? []}
+        isLoading={anggotaQuery.isLoading}
         pagination={pagination}
+        canManage={canManage}
+        canDelete={canDelete}
+        canActivateAccess={canActivateAccess}
+        roleOptions={roleQuery.data ?? []}
+        editErrors={editErrors}
         onPageChange={(newPageIndex) => {
           navigate({
             to: '/koperasi/anggota',
@@ -207,36 +260,10 @@ function RouteComponent() {
             replace: true,
           })
         }}
-        onUpdate={(payload) => {
-          setAnggotaList((prev) => prev.map((p) => (p.id === payload.id ? payload : p)))
-        }}
-        onDelete={(id) => {
-          setAnggotaList((prev) => prev.filter((p) => p.id !== id))
-        }}
-        onActivateAccess={({ id, role }) => {
-          setAnggotaList((prev) =>
-            prev.map((p) =>
-              p.id === id
-                ? { ...p, akses_sistem: true, role, status: p.status === 'keluar' ? 'keluar' : p.status }
-                : p,
-            ),
-          )
-        }}
-        onKeluarkan={({ id, tanggal_keluar }) => {
-          setAnggotaList((prev) =>
-            prev.map((p) =>
-              p.id === id
-                ? {
-                    ...p,
-                    status: 'keluar',
-                    tanggal_keluar,
-                    akses_sistem: false,
-                    role: null,
-                  }
-                : p,
-            ),
-          )
-        }}
+        onUpdate={handleEdit}
+        onDelete={handleDelete}
+        onActivateAccess={handleActivate}
+        onKeluarkan={handleKeluarkan}
       />
     </>
   )

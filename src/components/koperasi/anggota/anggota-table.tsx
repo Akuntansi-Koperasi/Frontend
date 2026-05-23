@@ -7,13 +7,14 @@ import { AnggotaDeleteDialog } from "./anggota-delete-dialog"
 import { AnggotaEditDialog } from "./anggota-edit-dialog"
 import { AnggotaKeluarkanDialog } from "./anggota-keluarkan-dialog"
 import type { ColumnDef, SortingState } from "@tanstack/react-table"
-import type { AnggotaRecord } from "./types"
+import type { AnggotaFormErrors, AnggotaRecord, AnggotaUpsertPayload, RoleOption } from "./types"
 
 import { DataTablePagination } from "@/components/data-table-pagination"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Toaster } from "@/components/ui/sonner"
 import {
   Table,
   TableBody,
@@ -25,23 +26,35 @@ import {
 
 interface AnggotaTableProps {
   data: Array<AnggotaRecord>
+  isLoading?: boolean
   pagination: {
     pageIndex: number
     pageSize: number
     pageCount: number
     total: number
   }
+  canManage: boolean
+  canDelete: boolean
+  canActivateAccess: boolean
+  roleOptions: Array<RoleOption>
   onPageChange: (newPageIndex: number) => void
   onPageSizeChange: (newPageSize: number) => void
-  onUpdate: (payload: AnggotaRecord) => void
-  onDelete: (id: number) => void
-  onActivateAccess: (payload: { id: number; role: "admin" | "employee" }) => void
-  onKeluarkan: (payload: { id: number; tanggal_keluar: string }) => void
+  onUpdate: (payload: AnggotaUpsertPayload & { id: number }) => Promise<boolean>
+  onDelete: (id: number) => Promise<boolean>
+  onActivateAccess: (payload: { id: number; roleId: number }) => Promise<boolean>
+  onKeluarkan: (payload: { id: number; tanggal_keluar: string }) => Promise<boolean>
+  editErrors?: AnggotaFormErrors
+}
+
+function formatStatusLabel(status: AnggotaRecord["status"]) {
+  if (status === "tetap") return "Tetap"
+  if (status === "tidak tetap") return "Tidak Tetap"
+  return "Keluar"
 }
 
 function StatusBadge({ status }: { status: AnggotaRecord["status"] }) {
-  const label = status === "aktif" ? "Aktif" : status === "tidak_aktif" ? "Tidak Aktif" : "Keluar"
-  const variant = status === "aktif" ? "green" : status === "tidak_aktif" ? "destructive" : "secondary"
+  const label = formatStatusLabel(status)
+  const variant = status === "tetap" ? "green" : status === "tidak tetap" ? "secondary" : "destructive"
   return (
     <Badge variant={variant} className="cursor-default rounded-full h-8 px-3 font-bold">
       {label}
@@ -49,26 +62,33 @@ function StatusBadge({ status }: { status: AnggotaRecord["status"] }) {
   )
 }
 
-function AksesBadge({ aktif }: { aktif: boolean }) {
+function AksesBadge({ akses }: { akses: string | null }) {
+  const aktif = akses === "Aktif"
   return (
     <Badge
       variant={aktif ? "green" : "destructive"}
       className="cursor-default rounded-full h-8 px-3 font-bold"
     >
-      {aktif ? "Aktif" : "Tidak Aktif"}
+      {akses ?? "Tidak Aktif"}
     </Badge>
   )
 }
 
 export function AnggotaTable({
   data,
+  isLoading,
   pagination,
+  canManage,
+  canDelete,
+  canActivateAccess,
+  roleOptions,
   onPageChange,
   onPageSizeChange,
   onUpdate,
   onDelete,
   onActivateAccess,
   onKeluarkan,
+  editErrors,
 }: AnggotaTableProps) {
   const [sorting] = React.useState<SortingState>([])
 
@@ -108,17 +128,17 @@ export function AnggotaTable({
       {
         accessorKey: "nomor_ktp",
         header: "Nomor KTP",
-        cell: ({ row }) => row.original.nomor_ktp || "—",
+        cell: ({ row }) => row.original.ktp || "—",
       },
       {
-        accessorKey: "nomor_telepon",
+        accessorKey: "telp",
         header: "Nomor Telepon",
-        cell: ({ row }) => row.original.nomor_telepon || "—",
+        cell: ({ row }) => row.original.telp || "—",
       },
       {
         accessorKey: "gender",
         header: "Gender",
-        cell: ({ row }) => row.original.gender || "—",
+        cell: ({ row }) => (row.original.gender === "pria" ? "Pria" : "Wanita"),
       },
       {
         accessorKey: "status",
@@ -126,20 +146,26 @@ export function AnggotaTable({
         cell: ({ row }) => <StatusBadge status={row.original.status} />,
       },
       {
-        id: "akses_sistem",
+        id: "akses",
         header: "Akses Sistem",
-        cell: ({ row }) => <AksesBadge aktif={row.original.akses_sistem} />,
+        cell: ({ row }) => <AksesBadge akses={row.original.akses} />,
       },
       {
         accessorKey: "tanggal_keluar",
         header: "Tanggal Keluar",
         cell: ({ row }) => row.original.tanggal_keluar || "—",
       },
-      {
-        id: "actions",
-        header: "Action",
-        cell: ({ row }) => (
-          <div className="flex items-center gap-2 justify-center">
+    ],
+    [pagination.pageIndex, pagination.pageSize],
+  )
+
+  if (canManage || canDelete || canActivateAccess) {
+    columns.push({
+      id: "actions",
+      header: "Action",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2 justify-center">
+          {canActivateAccess && row.original.akses !== "Aktif" ? (
             <Button
               variant="ghost"
               size="icon"
@@ -149,7 +175,9 @@ export function AnggotaTable({
             >
               <Power className="h-4 w-4" />
             </Button>
+          ) : null}
 
+          {canManage ? (
             <Button
               variant="ghost"
               size="icon"
@@ -159,7 +187,9 @@ export function AnggotaTable({
             >
               <Pencil className="h-4 w-4" />
             </Button>
+          ) : null}
 
+          {canDelete ? (
             <Button
               variant="ghost"
               size="icon"
@@ -169,7 +199,9 @@ export function AnggotaTable({
             >
               <Trash2 className="h-4 w-4" />
             </Button>
+          ) : null}
 
+          {canManage && row.original.status !== "keluar" ? (
             <Button
               variant="ghost"
               size="icon"
@@ -179,12 +211,11 @@ export function AnggotaTable({
             >
               <UserMinus className="h-4 w-4" />
             </Button>
-          </div>
-        ),
-      },
-    ],
-    [pagination.pageIndex, pagination.pageSize],
-  )
+          ) : null}
+        </div>
+      ),
+    })
+  }
 
   const table = useReactTable({
     data,
@@ -194,6 +225,9 @@ export function AnggotaTable({
     manualPagination: true,
     pageCount: pagination.pageCount,
   })
+
+  const hasRows = table.getRowModel().rows.length > 0
+  const isInitialLoading = Boolean(isLoading) && !hasRows
 
   return (
     <>
@@ -219,7 +253,13 @@ export function AnggotaTable({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.length ? (
+              {isInitialLoading ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                    Memuat data anggota...
+                  </TableCell>
+                </TableRow>
+              ) : hasRows ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {
@@ -258,40 +298,34 @@ export function AnggotaTable({
         onOpenChange={(isOpen) => !isOpen && setAnggotaToEdit(null)}
         anggota={anggotaToEdit}
         onSave={(payload) => {
-          onUpdate(payload)
-          setAnggotaToEdit(null)
+          return onUpdate(payload)
         }}
+        errors={editErrors}
       />
 
       <AnggotaActivateAccessDialog
         open={!!anggotaToActivate}
         onOpenChange={(isOpen) => !isOpen && setAnggotaToActivate(null)}
         anggota={anggotaToActivate}
-        onActivate={(payload) => {
-          onActivateAccess(payload)
-          setAnggotaToActivate(null)
-        }}
+        roleOptions={roleOptions}
+        onActivate={onActivateAccess}
       />
 
       <AnggotaKeluarkanDialog
         open={!!anggotaToKeluarkan}
         onOpenChange={(isOpen) => !isOpen && setAnggotaToKeluarkan(null)}
         anggota={anggotaToKeluarkan}
-        onConfirm={(payload) => {
-          onKeluarkan(payload)
-          setAnggotaToKeluarkan(null)
-        }}
+        onConfirm={onKeluarkan}
       />
 
       <AnggotaDeleteDialog
         open={!!anggotaToDelete}
         onOpenChange={(isOpen) => !isOpen && setAnggotaToDelete(null)}
         anggota={anggotaToDelete}
-        onConfirm={(id) => {
-          onDelete(id)
-          setAnggotaToDelete(null)
-        }}
+        onConfirm={onDelete}
       />
+
+      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   )
 }

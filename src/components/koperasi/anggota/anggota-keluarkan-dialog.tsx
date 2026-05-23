@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
 import { Loader2 } from "lucide-react"
-import { toast } from "sonner"
 import type { AnggotaRecord } from "./types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,7 +19,7 @@ type AnggotaKeluarkanDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   anggota: AnggotaRecord | null
-  onConfirm: (payload: { id: number; tanggal_keluar: string }) => void
+  onConfirm: (payload: { id: number; tanggal_keluar: string }) => Promise<boolean>
 }
 
 export function AnggotaKeluarkanDialog({
@@ -49,13 +48,10 @@ export function AnggotaKeluarkanDialog({
 
     setIsLoading(true)
     try {
-      // dummy; API nanti
-      await new Promise((r) => setTimeout(r, 400))
-      onConfirm({ id: anggota.id, tanggal_keluar: tanggalKeluar })
-      toast.success(`Anggota ${anggota.nama} berhasil dikeluarkan`)
-      onOpenChange(false)
-    } catch {
-      toast.error("Gagal mengeluarkan anggota")
+      const success = await onConfirm({ id: anggota.id, tanggal_keluar: tanggalKeluar })
+      if (success) {
+        onOpenChange(false)
+      }
     } finally {
       setIsLoading(false)
     }

@@ -339,7 +339,6 @@ export function PengurusTable({
             setEditOpen(isOpen)
           }}
           pengurus={editing}
-          anggotaOptions={anggotaOptions}
           jabatanOptions={jabatanOptions}
           onEdit={onEdit}
           errors={editErrors}

@@ -25,6 +25,34 @@ Integrasikan halaman yang diberikan ke backend Laravel secara penuh, dengan meng
 - Ikuti pattern komponen yang sudah ada di `src/components`.
 - Jangan pakai `any` kalau bisa dihindari.
 
+## Permission Frontend
+- Jangan baca `localStorage.permissions` langsung di setiap route.
+- Pakai helper terpusat di `src/services/permissionService.ts`.
+- Pattern yang dipakai adalah `getPermissionAccess(prefix)`.
+- Hasilnya selalu:
+	- `canView` untuk `prefix.lihat`, `prefix.modifikasi`, atau `prefix.admin`.
+	- `canManage` untuk `prefix.modifikasi` atau `prefix.admin`.
+	- `canDelete` hanya untuk `prefix.admin`.
+- Gunakan prefix sesuai modul, misalnya `pengurus` atau `jabatan`.
+- Kalau user tidak punya akses sama sekali untuk prefix tersebut, route boleh diarahkan ke `notFound()` atau tampilan akses ditolak sesuai pola halaman yang ada.
+- Kalau permission ada tetapi action tertentu tidak, sembunyikan tombolnya, jangan tetap render lalu berharap backend menolak.
+
+## Permission Yang Wajib Dicek Saat Integrasi
+- `lihat`: halaman bisa dibuka, tabel/list boleh tampil, semua tombol aksi disembunyikan.
+- `modifikasi`: halaman bisa dibuka, tombol tambah dan edit boleh tampil, tombol hapus disembunyikan.
+- `admin`: halaman bisa dibuka, semua aksi termasuk delete boleh tampil.
+- Terapkan aturan ini di route dan komponen tabel/dialog, bukan hanya di backend.
+- Kalau modul punya dropdown atau action tambahan, cocokkan dengan level permission yang benar sebelum memanggil endpoint.
+
+## Helper Permission
+- File helper yang dipakai saat ini: `src/services/permissionService.ts`.
+- Format pemakaian:
+```ts
+const { canView, canManage, canDelete } = getPermissionAccess('jabatan')
+```
+- Jangan duplikasi logic baca storage di route baru kalau prefix dan aturan levelnya sama.
+- Jika perlu modul lain, cukup ganti prefix.
+
 ## Endpoint Laravel Yang Sudah Ada Di Proyek Ini
 Gunakan endpoint yang benar-benar tersedia di `routes/api.php` yang nanti diberikan:
 

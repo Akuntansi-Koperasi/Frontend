@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react"
 import { Loader2 } from "lucide-react"
-import { toast } from "sonner"
-import type { AnggotaGender, AnggotaRecord, AnggotaStatus } from "./types"
+import type { AnggotaFormErrors, AnggotaGender, AnggotaStatus, AnggotaUpsertPayload } from "./types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,10 +25,11 @@ import {
 type AnggotaAddDialogProps = {
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  onCreate: (payload: Omit<AnggotaRecord, "id">) => void
+  onCreate: (payload: AnggotaUpsertPayload) => Promise<boolean>
+  errors?: AnggotaFormErrors
 }
 
-export function AnggotaAddDialog({ open, onOpenChange, onCreate }: AnggotaAddDialogProps) {
+export function AnggotaAddDialog({ open, onOpenChange, onCreate, errors }: AnggotaAddDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false)
   const isControlled = open !== undefined && onOpenChange !== undefined
   const dialogOpen = isControlled ? open : internalOpen
@@ -43,10 +43,25 @@ export function AnggotaAddDialog({ open, onOpenChange, onCreate }: AnggotaAddDia
   const [tanggalMasuk, setTanggalMasuk] = useState("")
   const [status, setStatus] = useState<AnggotaStatus | "">("")
   const [isLoading, setIsLoading] = useState(false)
+  const generalError = errors?.general?.[0]
+  const namaError = errors?.nama?.[0]
+  const emailError = errors?.email?.[0]
+  const ktpError = errors?.ktp?.[0]
+  const telpError = errors?.telp?.[0]
+  const genderError = errors?.gender?.[0]
+  const statusError = errors?.status?.[0]
+  const tanggalMasukError = errors?.tanggal_masuk?.[0]
 
   const isFormValid = useMemo(() => {
-    return nama.trim() !== "" && email.trim() !== ""
-  }, [nama, email])
+    return (
+      nama.trim() !== "" &&
+      email.trim() !== "" &&
+      nomorTelepon.trim() !== "" &&
+      gender !== "" &&
+      tanggalMasuk.trim() !== "" &&
+      status !== ""
+    )
+  }, [nama, email, nomorTelepon, gender, tanggalMasuk, status])
 
   const resetForm = () => {
     setNama("")
@@ -64,26 +79,21 @@ export function AnggotaAddDialog({ open, onOpenChange, onCreate }: AnggotaAddDia
 
     setIsLoading(true)
     try {
-      // dummy; API nanti
-      await new Promise((r) => setTimeout(r, 400))
-      onCreate({
+      const success = await onCreate({
         nama,
         email,
+        ktp: nomorKtp.trim() === "" ? null : nomorKtp.trim(),
+        telp: nomorTelepon.trim(),
+        gender: gender as AnggotaGender,
         photo_profile: null,
-        nomor_ktp: nomorKtp.trim() === "" ? null : nomorKtp.trim(),
-        nomor_telepon: nomorTelepon.trim() === "" ? null : nomorTelepon.trim(),
-        gender: gender === "" ? null : gender,
-        tanggal_masuk: tanggalMasuk.trim() === "" ? null : tanggalMasuk.trim(),
-        status: status === "" ? "aktif" : status,
-        akses_sistem: false,
-        role: null,
+        tanggal_masuk: tanggalMasuk.trim(),
         tanggal_keluar: null,
+        status: status as AnggotaStatus,
       })
-      toast.success("Anggota berhasil ditambahkan")
-      setDialogOpen(false)
-      resetForm()
-    } catch {
-      toast.error("Gagal menambahkan anggota")
+      if (success) {
+        setDialogOpen(false)
+        resetForm()
+      }
     } finally {
       setIsLoading(false)
     }
@@ -112,6 +122,7 @@ export function AnggotaAddDialog({ open, onOpenChange, onCreate }: AnggotaAddDia
                 placeholder="Masukkan nama"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {namaError ? <p className="text-sm text-destructive">{namaError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -122,6 +133,7 @@ export function AnggotaAddDialog({ open, onOpenChange, onCreate }: AnggotaAddDia
                 placeholder="Masukkan Email"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {emailError ? <p className="text-sm text-destructive">{emailError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -132,24 +144,26 @@ export function AnggotaAddDialog({ open, onOpenChange, onCreate }: AnggotaAddDia
                 placeholder="Masukkan Nomor KTP"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {ktpError ? <p className="text-sm text-destructive">{ktpError}</p> : null}
             </div>
 
             <div className="grid gap-2">
-              <Label className="text-slate-600 font-medium">Nomor Telepon</Label>
+              <Label className="text-slate-600 font-medium">Nomor Telepon*</Label>
               <Input
                 value={nomorTelepon}
                 onChange={(e) => setNomorTelepon(e.target.value)}
                 placeholder="Masukkan Nomor Telepon"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {telpError ? <p className="text-sm text-destructive">{telpError}</p> : null}
             </div>
 
             <div className="grid gap-2">
-              <Label className="text-slate-600 font-medium">Gender</Label>
+              <Label className="text-slate-600 font-medium">Gender*</Label>
               <Select
                 value={gender}
                 onValueChange={(v) => {
-                  if (v === "Laki-Laki" || v === "Perempuan") setGender(v)
+                  if (v === "pria" || v === "wanita") setGender(v)
                   else setGender("")
                 }}
               >
@@ -157,28 +171,30 @@ export function AnggotaAddDialog({ open, onOpenChange, onCreate }: AnggotaAddDia
                   <SelectValue placeholder="Pilih Gender" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Laki-Laki">Laki-Laki</SelectItem>
-                  <SelectItem value="Perempuan">Perempuan</SelectItem>
+                  <SelectItem value="pria">Pria</SelectItem>
+                  <SelectItem value="wanita">Wanita</SelectItem>
                 </SelectContent>
               </Select>
+              {genderError ? <p className="text-sm text-destructive">{genderError}</p> : null}
             </div>
 
             <div className="grid gap-2">
-              <Label className="text-slate-600 font-medium">Tanggal Masuk</Label>
+              <Label className="text-slate-600 font-medium">Tanggal Masuk*</Label>
               <Input
                 type="date"
                 value={tanggalMasuk}
                 onChange={(e) => setTanggalMasuk(e.target.value)}
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {tanggalMasukError ? <p className="text-sm text-destructive">{tanggalMasukError}</p> : null}
             </div>
 
             <div className="grid gap-2">
-              <Label className="text-slate-600 font-medium">Status</Label>
+              <Label className="text-slate-600 font-medium">Status*</Label>
               <Select
                 value={status}
                 onValueChange={(v) => {
-                  if (v === "aktif" || v === "tidak_aktif") setStatus(v)
+                  if (v === "tetap" || v === "tidak tetap" || v === "keluar") setStatus(v)
                   else setStatus("")
                 }}
               >
@@ -186,11 +202,15 @@ export function AnggotaAddDialog({ open, onOpenChange, onCreate }: AnggotaAddDia
                   <SelectValue placeholder="Pilih Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="aktif">Aktif</SelectItem>
-                  <SelectItem value="tidak_aktif">Tidak Aktif</SelectItem>
+                  <SelectItem value="tetap">Tetap</SelectItem>
+                  <SelectItem value="tidak tetap">Tidak Tetap</SelectItem>
+                  <SelectItem value="keluar">Keluar</SelectItem>
                 </SelectContent>
               </Select>
+              {statusError ? <p className="text-sm text-destructive">{statusError}</p> : null}
             </div>
+
+            {generalError ? <p className="text-sm text-destructive">{generalError}</p> : null}
           </DialogBody>
 
           <DialogFooter>

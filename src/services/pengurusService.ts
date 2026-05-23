@@ -153,7 +153,6 @@ export const createPengurus = async (payload: PengurusUpsertPayload) => {
 
 export const updatePengurus = async (id: number, payload: PengurusUpsertPayload) => {
   const body = {
-    anggota_id: payload.anggotaId,
     jabatan_id: payload.jabatanId,
     mulai: String(payload.mulaiMenjabat),
     selesai: payload.selesaiMenjabat == null ? null : String(payload.selesaiMenjabat),

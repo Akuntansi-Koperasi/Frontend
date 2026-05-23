@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { AlertTriangle, Loader2 } from "lucide-react"
 import type { AnggotaRecord } from "./types"
 import {
@@ -15,8 +16,7 @@ interface AnggotaDeleteDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   anggota: AnggotaRecord | null
-  onConfirm: (id: number) => void
-  isDeleting?: boolean
+  onConfirm: (id: number) => Promise<boolean>
 }
 
 export function AnggotaDeleteDialog({
@@ -24,8 +24,21 @@ export function AnggotaDeleteDialog({
   onOpenChange,
   anggota,
   onConfirm,
-  isDeleting = false,
 }: AnggotaDeleteDialogProps) {
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleConfirm = async (id: number) => {
+    setIsDeleting(true)
+    try {
+      const success = await onConfirm(id)
+      if (success) {
+        onOpenChange(false)
+      }
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -51,7 +64,7 @@ export function AnggotaDeleteDialog({
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
             onClick={(e) => {
               e.preventDefault()
-              if (anggota) onConfirm(anggota.id)
+              if (anggota) handleConfirm(anggota.id)
             }}
             disabled={isDeleting}
           >

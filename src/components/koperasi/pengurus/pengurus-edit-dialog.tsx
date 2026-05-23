@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AlertCircle, Loader2 } from 'lucide-react'
 
-import type { AnggotaOption, JabatanOption, PengurusFormErrors, PengurusRecord, PengurusUpsertPayload } from './types'
+import type { JabatanOption, PengurusFormErrors, PengurusRecord, PengurusUpsertPayload } from './types'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,7 +22,6 @@ type PengurusEditDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   pengurus: PengurusRecord | null
-  anggotaOptions: Array<AnggotaOption>
   jabatanOptions: Array<JabatanOption>
   onEdit: (payload: PengurusUpsertPayload & { id: number }) => Promise<boolean>
   errors?: PengurusFormErrors
@@ -32,12 +31,10 @@ export function PengurusEditDialog({
   open,
   onOpenChange,
   pengurus,
-  anggotaOptions,
   jabatanOptions,
   onEdit,
   errors,
 }: PengurusEditDialogProps) {
-  const [anggotaId, setAnggotaId] = useState('')
   const [jabatanId, setJabatanId] = useState('')
   const [mulaiMenjabat, setMulaiMenjabat] = useState('')
   const [selesaiMenjabat, setSelesaiMenjabat] = useState('')
@@ -45,7 +42,6 @@ export function PengurusEditDialog({
   const [isLoading, setIsLoading] = useState(false)
 
   const generalError = errors?.general?.[0]
-  const anggotaError = errors?.anggota_id?.[0] ?? errors?.anggota?.[0]
   const jabatanError = errors?.jabatan_id?.[0] ?? errors?.jabatan?.[0]
   const mulaiError = errors?.mulai?.[0]
   const selesaiError = errors?.selesai?.[0]
@@ -53,7 +49,6 @@ export function PengurusEditDialog({
 
   useEffect(() => {
     if (open && pengurus) {
-      setAnggotaId(String(pengurus.anggotaId))
       setJabatanId(String(pengurus.jabatanId))
       setMulaiMenjabat(String(pengurus.mulaiMenjabat))
       setSelesaiMenjabat(pengurus.selesaiMenjabat == null ? '' : String(pengurus.selesaiMenjabat))
@@ -61,7 +56,6 @@ export function PengurusEditDialog({
     }
   }, [open, pengurus])
 
-  const selectedAnggota = anggotaOptions.find((item) => String(item.id) === anggotaId)
   const selectedJabatan = jabatanOptions.find((item) => String(item.id) === jabatanId)
   const currentJabatanOption = pengurus
     ? jabatanOptions.find((item) => String(item.id) === String(pengurus.jabatanId)) ?? {
@@ -80,24 +74,22 @@ export function PengurusEditDialog({
 
   const isFormValid = useMemo(
     () =>
-      anggotaId.trim() !== '' &&
       jabatanId.trim() !== '' &&
       mulaiMenjabat.trim() !== '' &&
-      Boolean(selectedAnggota) &&
       Boolean(selectedJabatan) &&
       Boolean(pengurus),
-    [anggotaId, jabatanId, mulaiMenjabat, selectedAnggota, selectedJabatan, pengurus]
+    [jabatanId, mulaiMenjabat, selectedJabatan, pengurus]
   )
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!pengurus || !isFormValid || !selectedAnggota || !selectedJabatan) return
+    if (!pengurus || !isFormValid || !selectedJabatan) return
 
     setIsLoading(true)
     try {
       const success = await onEdit({
         id: pengurus.id,
-        anggotaId: Number(anggotaId),
+        anggotaId: pengurus.anggotaId,
         jabatanId: Number(jabatanId),
         mulaiMenjabat: Number(mulaiMenjabat),
         selesaiMenjabat: selesaiMenjabat.trim() === '' ? null : Number(selesaiMenjabat),
@@ -114,7 +106,6 @@ export function PengurusEditDialog({
 
   const handleOpenChange = (val: boolean) => {
     if (!val) {
-      setAnggotaId('')
       setJabatanId('')
       setMulaiMenjabat('')
       setSelesaiMenjabat('')
@@ -134,23 +125,11 @@ export function PengurusEditDialog({
 
           <DialogBody className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="edit-pengurus-anggota" className="text-slate-600 font-medium">
-                Anggota *
-              </Label>
-              <Select value={anggotaId} onValueChange={setAnggotaId}>
-                <SelectTrigger id="edit-pengurus-anggota" className="h-auto min-h-12 w-full px-4 py-3 text-left">
-                  <SelectValue placeholder="Pilih anggota" />
-                </SelectTrigger>
-                <SelectContent>
-                  {anggotaOptions.map((anggota) => (
-                    <SelectItem key={anggota.id} value={String(anggota.id)}>
-                      <span className="font-medium">{anggota.nama}</span>
-                      <span className="text-muted-foreground ml-2 text-xs">{anggota.email}</span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {anggotaError ? <p className="text-sm text-destructive">{anggotaError}</p> : null}
+              <Label className="text-slate-600 font-medium">Anggota</Label>
+              <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="font-medium text-slate-900">{pengurus?.nama ?? '-'}</p>
+                <p className="text-xs text-muted-foreground">{pengurus?.email ?? ''}</p>
+              </div>
             </div>
 
             <div className="grid gap-2">

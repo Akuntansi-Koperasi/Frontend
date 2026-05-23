@@ -1,20 +1,50 @@
-export type AnggotaGender = 'Laki-Laki' | 'Perempuan'
+export type AnggotaGender = 'pria' | 'wanita'
 
-export type AnggotaStatus = 'aktif' | 'tidak_aktif' | 'keluar'
+export type AnggotaStatus = 'tetap' | 'tidak tetap' | 'keluar'
 
-export type AnggotaAccessRole = 'admin' | 'employee'
+export type AnggotaDropdownOption = {
+  id: number
+  nama: string
+}
+
+export type RoleOption = {
+  id: number
+  name: string
+}
+
+export type AnggotaUser = {
+  id: number
+  email: string
+  photo_profile: string | null
+}
 
 export type AnggotaRecord = {
   id: number
   nama: string
+  ktp: string | null
   email: string
+  telp: string
+  gender: AnggotaGender
   photo_profile: string | null
-  nomor_ktp: string | null
-  nomor_telepon: string | null
-  gender: AnggotaGender | null
-  tanggal_masuk: string | null
+  tanggal_masuk: string
+  tanggal_keluar: string | null
   status: AnggotaStatus
   akses_sistem: boolean
-  role: AnggotaAccessRole | null
-  tanggal_keluar: string | null
+  akses: string | null
+  user: AnggotaUser | null
+  role: RoleOption | null
 }
+
+export type AnggotaUpsertPayload = {
+  nama: string
+  ktp: string | null
+  email: string
+  telp: string
+  gender: AnggotaGender
+  photo_profile: string | null
+  tanggal_masuk: string
+  tanggal_keluar: string | null
+  status: AnggotaStatus
+}
+
+export type AnggotaFormErrors = Partial<Record<string, Array<string>>> | null
