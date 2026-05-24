@@ -1,3 +1,4 @@
+import { AlertTriangle, Loader2 } from 'lucide-react'
 import type { RekeningSimpananRecord } from './types'
 
 import {
@@ -6,6 +7,7 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
@@ -29,22 +31,40 @@ export function RekeningSimpananDeleteDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Hapus Data Rekening Simpanan?</AlertDialogTitle>
+          <div className="flex items-center gap-2 text-rose-600">
+            <AlertTriangle className="h-5 w-5" />
+            <AlertDialogTitle>Hapus Data Rekening Simpanan?</AlertDialogTitle>
+          </div>
           <AlertDialogDescription>
             Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="flex gap-3">
-          <AlertDialogCancel className="flex-1">Batal</AlertDialogCancel>
+        <AlertDialogFooter>
+          <AlertDialogCancel
+            disabled={isDeleting}
+            className="md:w-[50%] w-full bg-slate-900 text-white hover:text-white hover:bg-slate-800 h-12 cursor-pointer"
+          >
+            Batal
+          </AlertDialogCancel>
           <AlertDialogAction
             disabled={isDeleting}
-            onClick={() => rekening !== undefined && onConfirm(rekening.id)}
-            className="flex-1 bg-red-600 hover:bg-red-700"
+            onClick={(e) => {
+              e.preventDefault()
+              if (rekening !== undefined) onConfirm(rekening.id)
+            }}
+            className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
           >
-            {isDeleting ? 'Menghapus...' : 'Ya, Hapus'}
+            {isDeleting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Menghapus...
+              </>
+            ) : (
+              'Ya, Hapus'
+            )}
           </AlertDialogAction>
-        </div>
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   )

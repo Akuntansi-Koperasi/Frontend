@@ -84,7 +84,15 @@ export function UserEditDialog({ open, onOpenChange, user, onSave, roleOptions, 
           
           <DialogBody className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label className="text-slate-500">
+              <Label className="text-slate-600 font-medium">Anggota</Label>
+              <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="font-medium text-slate-900">{user?.name ?? '-'}</p>
+                <p className="text-xs text-muted-foreground">{user?.email ?? ''}</p>
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label className="text-slate-600 font-medium">
                 Peran* {isSelf && <span className="text-xs text-amber-600 font-normal ml-2">(Tidak dapat mengubah role sendiri)</span>}
               </Label>
               <div>

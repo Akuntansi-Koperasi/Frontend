@@ -20,31 +20,33 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-interface FormattedTransaction {
+interface FormattedCoaTransaction {
   id: number
-  tanggal: string // pre-formatted date e.g. '2026-05-17'
-  jenis: string
-  keterangan: string
+  tanggal: string
+  jenisTransaksi: string
+  deskripsi: string
   debitDisplay: string
   kreditDisplay: string
   saldoDisplay: string
 }
 
-interface RekeningSimpananTransactionsDialogProps {
+interface CoaTransactionsDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  nomorRekening?: string
-  transactions: Array<FormattedTransaction>
+  namaAkun?: string
+  kodeAkun?: string
+  transactions: Array<FormattedCoaTransaction>
   finalSaldoDisplay: string
 }
 
-export function RekeningSimpananTransactionsDialog({
+export function CoaTransactionsDialog({
   open,
   onOpenChange,
-  nomorRekening,
+  namaAkun,
+  kodeAkun,
   transactions,
   finalSaldoDisplay,
-}: RekeningSimpananTransactionsDialogProps) {
+}: CoaTransactionsDialogProps) {
   const handlePrint = () => {
     try {
       const printWindow = window.open('', '_blank')
@@ -55,8 +57,8 @@ export function RekeningSimpananTransactionsDialog({
           (t) => `
             <tr>
               <td style="padding:8px">${t.tanggal}</td>
-              <td style="padding:8px">${t.jenis}</td>
-              <td style="padding:8px">${t.keterangan}</td>
+              <td style="padding:8px">${t.jenisTransaksi}</td>
+              <td style="padding:8px">${t.deskripsi}</td>
               <td style="padding:8px;text-align:right">${t.debitDisplay}</td>
               <td style="padding:8px;text-align:right">${t.kreditDisplay}</td>
               <td style="padding:8px;text-align:right">${t.saldoDisplay}</td>
@@ -69,7 +71,7 @@ export function RekeningSimpananTransactionsDialog({
         <html>
           <head>
             <meta charset="utf-8" />
-            <title>Transaksi Rekening</title>
+            <title>Transaksi ${namaAkun ?? 'COA'}</title>
             <style>
               :root { color-scheme: light dark; }
               body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; padding: 18px; color: #0f172a }
@@ -81,7 +83,7 @@ export function RekeningSimpananTransactionsDialog({
               tbody td { padding: 12px; border-bottom: 1px solid #eef2f6; color: #374151 }
               .right { text-align: right }
               .col-date { width: 110px }
-              .col-jenis { width: 140px }
+              .col-jenis { width: 200px }
               .col-num { width: 110px }
               .saldo { font-weight: 700; color: #4f46e5 }
             </style>
@@ -89,8 +91,8 @@ export function RekeningSimpananTransactionsDialog({
           <body>
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
               <div>
-                <h1>Transaksi Rekening</h1>
-                <div class="muted">${nomorRekening ?? ''}</div>
+                <h1>Transaksi ${namaAkun ?? ''}</h1>
+                <div class="muted">${kodeAkun ?? ''}</div>
               </div>
             </div>
             <div class="card">
@@ -99,7 +101,7 @@ export function RekeningSimpananTransactionsDialog({
                   <tr>
                     <th class="col-date">Tanggal</th>
                     <th class="col-jenis">Jenis Transaksi</th>
-                    <th>Keterangan</th>
+                    <th>Deskripsi</th>
                     <th class="col-num right">Debit</th>
                     <th class="col-num right">Kredit</th>
                     <th class="col-num right">Saldo</th>
@@ -119,7 +121,6 @@ export function RekeningSimpananTransactionsDialog({
       printWindow.document.close()
       printWindow.focus()
       printWindow.print()
-      // do not close immediately to allow print dialog in some browsers
     } catch (err) {
       console.error('print error', err)
     }
@@ -129,9 +130,11 @@ export function RekeningSimpananTransactionsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[960px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-slate-900">Transaksi Rekening</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-slate-900">
+            Transaksi {namaAkun ?? ''}
+          </DialogTitle>
           <DialogDescription className="text-sm text-slate-600 mt-1">
-            {nomorRekening ?? '-'}
+            {kodeAkun ?? '-'}
           </DialogDescription>
         </DialogHeader>
 
@@ -140,8 +143,8 @@ export function RekeningSimpananTransactionsDialog({
             <TableHeader className="bg-slate-50">
               <TableRow className="hover:bg-slate-50">
                 <TableHead className="w-[110px] font-semibold text-slate-700">Tanggal</TableHead>
-                <TableHead className="w-[140px] font-semibold text-slate-700">Jenis Transaksi</TableHead>
-                <TableHead className="font-semibold text-slate-700">Keterangan</TableHead>
+                <TableHead className="w-[200px] font-semibold text-slate-700">Jenis Transaksi</TableHead>
+                <TableHead className="font-semibold text-slate-700">Deskripsi</TableHead>
                 <TableHead className="w-[110px] text-right font-semibold text-slate-700">Debit</TableHead>
                 <TableHead className="w-[110px] text-right font-semibold text-slate-700">Kredit</TableHead>
                 <TableHead className="w-[110px] text-right font-semibold text-slate-700">Saldo</TableHead>
@@ -152,9 +155,9 @@ export function RekeningSimpananTransactionsDialog({
                 transactions.map((transaction) => (
                   <TableRow key={transaction.id} className="hover:bg-slate-50/60">
                     <TableCell className="font-medium text-slate-700">{transaction.tanggal}</TableCell>
-                    <TableCell className="text-slate-700 whitespace-normal break-words">{transaction.jenis}</TableCell>
+                    <TableCell className="text-slate-700 whitespace-normal break-words">{transaction.jenisTransaksi}</TableCell>
                     <TableCell className="text-slate-700 whitespace-normal break-words">
-                      {transaction.keterangan}
+                      {transaction.deskripsi}
                     </TableCell>
                     <TableCell className="text-right text-slate-700">{transaction.debitDisplay}</TableCell>
                     <TableCell className="text-right text-slate-700">{transaction.kreditDisplay}</TableCell>

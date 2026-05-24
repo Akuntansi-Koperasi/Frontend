@@ -1,14 +1,15 @@
 import { AlertTriangle, Loader2 } from 'lucide-react'
 import type { TokoRecord } from '@/services/deprecated/tokoService'
-import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 interface TokoDeleteDialogProps {
   open: boolean
@@ -33,31 +34,28 @@ export function TokoDeleteDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
-        <DialogHeader>
-          <div className="flex items-center gap-2 text-rose-600 mb-2">
-            <AlertTriangle className="h-6 w-6" />
-            <DialogTitle className="text-xl font-bold">Hapus Toko?</DialogTitle>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <div className="flex items-center gap-2 text-rose-600">
+            <AlertTriangle className="h-5 w-5" />
+            <AlertDialogTitle>Hapus Toko?</AlertDialogTitle>
           </div>
-          <DialogDescription className="text-slate-600">
+          <AlertDialogDescription>
             Apakah Anda yakin ingin menghapus <b>{toko?.name}</b>?
             <br />
-            Data yang dihapus tidak dapat dikembalikan dan presensi di lokasi
-            ini tidak akan valid lagi.
-          </DialogDescription>
-        </DialogHeader>
+            Data yang dihapus tidak dapat dikembalikan dan presensi di lokasi ini tidak akan valid lagi.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
-        <DialogFooter>
-          <Button
-            variant="outline"
-            className="md:w-[50%] w-full bg-slate-900 text-white hover:text-white hover:bg-slate-800 h-12 cursor-pointer"
-            onClick={() => onOpenChange(false)}
+        <AlertDialogFooter>
+          <AlertDialogCancel
             disabled={isDeleting}
+            className="md:w-[50%] w-full bg-slate-900 text-white hover:text-white hover:bg-slate-800 h-12 cursor-pointer"
           >
             Batal
-          </Button>
-          <Button
+          </AlertDialogCancel>
+          <AlertDialogAction
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
             onClick={handleConfirm}
             disabled={isDeleting}
@@ -70,9 +68,9 @@ export function TokoDeleteDialog({
             ) : (
               'Ya, Hapus'
             )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

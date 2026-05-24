@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import type { RekeningSimpananRecord } from './types'
+import type { AnggotaOption, ProdukSimpananOption, RekeningSimpananRecord } from './types'
 
 import {
   Dialog,
@@ -24,6 +24,8 @@ interface RekeningSimpananEditDialogProps {
   rekening?: RekeningSimpananRecord
   onEdit: (payload: RekeningSimpananRecord) => void
   isEditing?: boolean
+  anggotaOptions: Array<AnggotaOption>
+  produkOptions: Array<ProdukSimpananOption>
 }
 
 export function RekeningSimpananEditDialog({
@@ -32,6 +34,8 @@ export function RekeningSimpananEditDialog({
   rekening,
   onEdit,
   isEditing = false,
+  anggotaOptions,
+  produkOptions,
 }: RekeningSimpananEditDialogProps) {
   const [nominal, setNominal] = React.useState('')
   const [bungaTahunan, setBungaTahunan] = React.useState('')
@@ -93,6 +97,36 @@ export function RekeningSimpananEditDialog({
           </DialogHeader>
 
           <DialogBody className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label className="text-slate-600 font-medium">Anggota</Label>
+              <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="font-medium text-slate-900">
+                  {rekening ? anggotaOptions.find((a) => a.id === rekening.anggotaId)?.nama ?? '-' : '-'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {rekening ? anggotaOptions.find((a) => a.id === rekening.anggotaId)?.email ?? '' : ''}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label className="text-slate-600 font-medium">Produk Simpanan</Label>
+                <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 h-full">
+                  <p className="font-medium text-slate-900">
+                    {rekening ? produkOptions.find((p) => p.id === rekening.produkId)?.nama ?? '-' : '-'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label className="text-slate-600 font-medium">Nomor Rekening</Label>
+                <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 h-full">
+                  <p className="font-medium text-slate-900">{rekening?.nomorRekening ?? '-'}</p>
+                </div>
+              </div>
+            </div>
+
             <div className="grid gap-2">
               <Label htmlFor="nominal-edit" className="text-slate-600 font-medium">
                 Nominal/Jumlah (Rp)

@@ -1,5 +1,5 @@
 import { AlertTriangle, Loader2 } from 'lucide-react'
-import type { ProdukPinjamanRecord } from './types'
+import type { CoaRecord } from './types'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,33 +11,36 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
-interface ProdukPinjamanDeleteDialogProps {
+interface CoaDeleteDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  coa?: CoaRecord
   onConfirm: (id: number) => void
-  produk?: ProdukPinjamanRecord
   isDeleting?: boolean
 }
 
-export function ProdukPinjamanDeleteDialog({
+export function CoaDeleteDialog({
   open,
   onOpenChange,
+  coa,
   onConfirm,
-  produk,
   isDeleting = false,
-}: ProdukPinjamanDeleteDialogProps) {
+}: CoaDeleteDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <div className="flex items-center gap-2 text-rose-600">
             <AlertTriangle className="h-5 w-5" />
-            <AlertDialogTitle>Hapus Data Produk Pinjaman?</AlertDialogTitle>
+            <AlertDialogTitle>Hapus Data COA?</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+            Apakah Anda yakin ingin menghapus data ini? (COA yang sudah digunakan di transaksi tidak bisa dihapus).
+            <br />
+            Tindakan ini tidak dapat dibatalkan.
           </AlertDialogDescription>
         </AlertDialogHeader>
+
         <AlertDialogFooter>
           <AlertDialogCancel
             disabled={isDeleting}
@@ -46,12 +49,12 @@ export function ProdukPinjamanDeleteDialog({
             Batal
           </AlertDialogCancel>
           <AlertDialogAction
-            className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
+            disabled={isDeleting}
             onClick={(e) => {
               e.preventDefault()
-              if (produk !== undefined) onConfirm(produk.id)
+              if (coa !== undefined) onConfirm(coa.id)
             }}
-            disabled={isDeleting}
+            className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
           >
             {isDeleting ? (
               <>
