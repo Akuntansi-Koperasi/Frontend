@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
+import type { RoleFormErrors } from '@/services/roleService'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,10 +19,11 @@ import {
 type RoleAddDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onAdd: (payload: { name: string }) => void
+  onAdd: (payload: { name: string }) => Promise<boolean>
+  errors?: RoleFormErrors
 }
 
-export function RoleAddDialog({ open, onOpenChange, onAdd }: RoleAddDialogProps) {
+export function RoleAddDialog({ open, onOpenChange, onAdd, errors }: RoleAddDialogProps) {
   const [name, setName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -36,13 +37,11 @@ export function RoleAddDialog({ open, onOpenChange, onAdd }: RoleAddDialogProps)
 
     setIsLoading(true)
     try {
-      await new Promise((r) => setTimeout(r, 400))
-      onAdd({ name: name.trim() })
-      toast.success('Peran berhasil ditambahkan')
-      onOpenChange(false)
-      resetForm()
-    } catch {
-      toast.error('Gagal menambahkan peran')
+      const success = await onAdd({ name: name.trim() })
+      if (success) {
+        onOpenChange(false)
+        resetForm()
+      }
     } finally {
       setIsLoading(false)
     }
@@ -52,6 +51,9 @@ export function RoleAddDialog({ open, onOpenChange, onAdd }: RoleAddDialogProps)
     if (!val) resetForm()
     onOpenChange(val)
   }
+
+  const generalError = errors?.general?.[0]
+  const nameError = errors?.name?.[0]
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -74,7 +76,9 @@ export function RoleAddDialog({ open, onOpenChange, onAdd }: RoleAddDialogProps)
                 placeholder="Masukkan nama peran"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {nameError ? <p className="text-sm text-destructive">{nameError}</p> : null}
             </div>
+            {generalError ? <p className="text-sm text-destructive">{generalError}</p> : null}
           </DialogBody>
 
           <DialogFooter>

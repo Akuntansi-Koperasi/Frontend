@@ -5,9 +5,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { ArrowUpDown, Eye, Pencil, Trash2 } from 'lucide-react'
-import { toast } from 'sonner'
 
 import { RoleDeleteDialog } from './role-delete-dialog'
 import { RoleEditDialog } from './role-edit-dialog'
@@ -16,6 +15,7 @@ import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import type { RoleRecord } from './types'
 
 import { DataTablePagination } from '@/components/data-table-pagination'
+import { Toaster } from '@/components/ui/sonner'
 import {
   Table,
   TableBody,
@@ -29,18 +29,23 @@ import { Card, CardContent } from '@/components/ui/card'
 
 interface RolesTableProps {
   data: Array<RoleRecord>
+  isLoading?: boolean
   pagination: {
     pageIndex: number
     pageSize: number
     pageCount: number
     total: number
   }
-  onEdit: (payload: { id: number; name: string }) => void
-  onDelete: (id: number) => void
+  canManage?: boolean
+  canDelete?: boolean
+  onEdit: (payload: { id: number; name: string }) => Promise<boolean>
+  onDelete: (id: number) => Promise<boolean>
+  editErrors?: Partial<Record<string, Array<string>>> | null
+  onPageChange: (newPageIndex: number) => void
+  onPageSizeChange: (newPageSize: number) => void
 }
 
-export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTableProps) {
-  const navigate = useNavigate()
+export function RolesTable({ data, isLoading, pagination, canManage, canDelete, onEdit, onDelete, editErrors, onPageChange, onPageSizeChange }: RolesTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
 
   const [roleToDelete, setRoleToDelete] = React.useState<RoleRecord | null>(null)
@@ -48,19 +53,11 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
   const [isDeleting, setIsDeleting] = React.useState(false)
 
   const handlePageChange = (newPageIndex: number) => {
-    navigate({
-      to: '/settings/roles',
-      search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
-      replace: true,
-    })
+    onPageChange(newPageIndex)
   }
 
   const handlePageSizeChange = (newPageSize: number) => {
-    navigate({
-      to: '/settings/roles',
-      search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
-      replace: true,
-    })
+    onPageSizeChange(newPageSize)
   }
 
   const columns: Array<ColumnDef<RoleRecord>> = [
@@ -96,21 +93,23 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
       header: 'Permission',
       cell: ({ row }) => (
         <div className="flex items-center justify-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            asChild
-            className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
-            title="Lihat / Atur Hak Akses"
-          >
-            <Link
-              to="/settings/permissions/$roleId"
-              params={{ roleId: String(row.original.id) }}
-              search={{ page: 1, per_page: 10 }}
+          {canManage ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
+              title="Lihat / Atur Hak Akses"
             >
-              <Eye className="h-4 w-4" />
-            </Link>
-          </Button>
+              <Link
+                to="/settings/permissions/$roleId"
+                params={{ roleId: String(row.original.id) }}
+                search={{ page: 1, per_page: 10 }}
+              >
+                <Eye className="h-4 w-4" />
+              </Link>
+            </Button>
+          ) : null}
         </div>
       ),
     },
@@ -119,25 +118,29 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
       header: 'Action',
       cell: ({ row }) => (
         <div className="flex items-center gap-2 justify-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
-            onClick={() => setRoleToEdit(row.original)}
-            title="Edit"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
+          {canManage ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
+              onClick={() => setRoleToEdit(row.original)}
+              title="Edit"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          ) : null}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
-            onClick={() => setRoleToDelete(row.original)}
-            title="Hapus"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {canDelete ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+              onClick={() => setRoleToDelete(row.original)}
+              title="Hapus"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          ) : null}
         </div>
       ),
     },
@@ -157,16 +160,15 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
   const handleDelete = async (id: number) => {
     setIsDeleting(true)
     try {
-      await new Promise((r) => setTimeout(r, 350))
-      onDelete(id)
-      toast.success('Peran berhasil dihapus')
-      setRoleToDelete(null)
-    } catch {
-      toast.error('Gagal menghapus peran')
+      const success = await onDelete(id)
+      if (success) setRoleToDelete(null)
     } finally {
       setIsDeleting(false)
     }
   }
+
+  const hasRows = table.getRowModel().rows.length > 0
+  const isInitialLoading = Boolean(isLoading) && !hasRows
 
   return (
     <>
@@ -192,7 +194,13 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.length ? (
+              {isInitialLoading ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                    Memuat data peran...
+                  </TableCell>
+                </TableRow>
+              ) : hasRows ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {
@@ -230,10 +238,12 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
         open={!!roleToEdit}
         onOpenChange={(isOpen) => !isOpen && setRoleToEdit(null)}
         role={roleToEdit}
-        onEdit={(payload) => {
-          onEdit(payload)
-          setRoleToEdit(null)
+        onEdit={async (payload) => {
+          const success = await onEdit(payload)
+          if (success) setRoleToEdit(null)
+          return success
         }}
+        errors={editErrors}
       />
 
       <RoleDeleteDialog
@@ -243,6 +253,7 @@ export function RolesTable({ data, pagination, onEdit, onDelete }: RolesTablePro
         onConfirm={handleDelete}
         isDeleting={isDeleting}
       />
+      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   )
 }

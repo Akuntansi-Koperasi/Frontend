@@ -1,14 +1,18 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { z } from 'zod'
+import { toast } from 'sonner'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import type { RoleRecord } from '@/components/settings/roles/types'
+import type { RoleFormErrors, RoleParams } from '@/services/roleService'
 
 import { RoleAddDialog } from '@/components/settings/roles/role-add-dialog'
 import { RolesTable } from '@/components/settings/roles/roles-table'
 import HeaderComp from '@/components/shared/header-comp'
 import { SearchBar } from '@/components/shared/search-bar'
+import { createRole, deleteRole, getRoleList, updateRole } from '@/services/roleService'
+import { getPermissionAccess } from '@/services/permissionService'
 
 const rolesSearchSchema = z.object({
   page: z.number().int().positive().catch(1),
@@ -21,57 +25,95 @@ export const Route = createFileRoute('/_auth/settings/roles')({
   component: RouteComponent,
 })
 
-const INITIAL_ROLES: Array<RoleRecord> = [
-  { id: 1, name: 'Admin' },
-  { id: 2, name: 'Anggota' },
-  { id: 3, name: 'Super Admin' },
-  { id: 4, name: 'Karyawan' },
-  { id: 5, name: 'Test' },
-  { id: 6, name: 'Test' },
-  { id: 7, name: 'Test' },
-  { id: 8, name: 'Test' },
-  { id: 9, name: 'Test' },
-  { id: 10, name: 'Test' },
-]
-
 function RouteComponent() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const search = Route.useSearch()
+  const { canView, canManage, canDelete } = useMemo(() => getPermissionAccess('peran'), [])
+
+  if (!canView && !canManage && !canDelete) {
+    throw notFound()
+  }
+
   const { page, per_page, search: searchQuery } = search
 
-  const [roles, setRoles] = useState<Array<RoleRecord>>(() => INITIAL_ROLES)
   const [openAdd, setOpenAdd] = useState(false)
+  const [addErrors, setAddErrors] = useState<RoleFormErrors>(null)
+  const [editErrors, setEditErrors] = useState<RoleFormErrors>(null)
 
-  const filtered = useMemo(() => {
-    if (!searchQuery) return roles
-    const q = searchQuery.toLowerCase()
-    return roles.filter((r) => r.name.toLowerCase().includes(q))
-  }, [roles, searchQuery])
+  const params: RoleParams = {
+    page,
+    per_page,
+    search: searchQuery?.trim() || undefined,
+  }
 
-  const total = filtered.length
-  const pageCount = Math.max(1, Math.ceil(total / per_page))
+  const rolesQuery = useQuery({
+    queryKey: ['roles', params],
+    queryFn: () => getRoleList(params),
+    staleTime: 1000 * 60 * 2,
+    enabled: canView,
+  })
+
+  const createMutation = useMutation({
+    mutationFn: createRole,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['roles'] }),
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: { name: string } }) => updateRole(id, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['roles'] }),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteRole,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['roles'] }),
+  })
+
+  const normalizeApiErrors = (
+    err: unknown,
+    fallbackMessage: string
+  ): Partial<Record<string, Array<string>>> => {
+    const error = err as {
+      apiErrors?: Partial<Record<string, Array<string>>>
+      errors?: Partial<Record<string, Array<string>>>
+      message?: string
+    }
+    const apiErrors = error.apiErrors ?? error.errors ?? {}
+    const message = error.message ?? fallbackMessage
+
+    return {
+      ...apiErrors,
+      general: apiErrors.general?.length ? apiErrors.general : [message],
+    }
+  }
+
+  const total = rolesQuery.data ? rolesQuery.data.total : 0
+  const pageCount = rolesQuery.data ? Math.max(1, Math.ceil(rolesQuery.data.total / rolesQuery.data.per_page)) : 1
   const safePage = Math.min(Math.max(page, 1), pageCount)
   const pageIndex = safePage - 1
-  const paginatedData = filtered.slice(pageIndex * per_page, pageIndex * per_page + per_page)
 
   useEffect(() => {
     if (safePage !== page) {
       navigate({
         to: '/settings/roles',
-        search: (prev: any) => ({ ...prev, page: safePage }),
+        search: {
+          page: safePage,
+          per_page,
+          search: searchQuery,
+        },
         replace: true,
       })
     }
-  }, [navigate, page, safePage])
+  }, [navigate, page, per_page, safePage, searchQuery])
 
   const handleSearchChange = (value: string) => {
     navigate({
       to: '/settings/roles',
-      search: (prev: any) => ({
-        ...prev,
-        search: value === '' ? undefined : value,
+      search: {
         page: 1,
-      }),
+        per_page,
+        search: value === '' ? undefined : value,
+      },
       replace: true,
     })
   }
@@ -83,24 +125,63 @@ function RouteComponent() {
     total,
   }
 
+  const handleAdd = async (payload: { name: string }) => {
+    try {
+      await createMutation.mutateAsync(payload)
+      setAddErrors(null)
+      toast.success('Peran berhasil ditambahkan')
+      return true
+    } catch (err) {
+      setAddErrors(normalizeApiErrors(err, 'Gagal menambahkan peran'))
+      const error = err as { message?: string }
+      toast.error(error.message ?? 'Gagal menambahkan peran')
+      return false
+    }
+  }
+
+  const handleEdit = async ({ id, name }: { id: number; name: string }) => {
+    try {
+      await updateMutation.mutateAsync({ id, payload: { name } })
+      setEditErrors(null)
+      toast.success('Peran berhasil diperbarui')
+      return true
+    } catch (err) {
+      setEditErrors(normalizeApiErrors(err, 'Gagal memperbarui peran'))
+      const error = err as { message?: string }
+      toast.error(error.message ?? 'Gagal memperbarui peran')
+      return false
+    }
+  }
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteMutation.mutateAsync(id)
+      toast.success('Peran berhasil dihapus')
+      return true
+    } catch (err) {
+      const error = err as { message?: string }
+      toast.error(error.message ?? 'Gagal menghapus peran')
+      return false
+    }
+  }
+
   return (
     <>
       <HeaderComp
         title="Manajemen Peran"
         description="Kelola peran"
         icon={<Plus />}
-        actionLabel="Tambah Peran"
-        onAction={() => setOpenAdd(true)}
+        actionLabel={canManage ? 'Tambah Peran' : undefined}
+        onAction={canManage ? () => setOpenAdd(true) : undefined}
       />
       <RoleAddDialog
         open={openAdd}
-        onOpenChange={setOpenAdd}
-        onAdd={({ name }) => {
-          setRoles((prev) => {
-            const nextId = prev.length ? Math.max(...prev.map((r) => r.id)) + 1 : 1
-            return [{ id: nextId, name }, ...prev]
-          })
+        onOpenChange={(isOpen) => {
+          setOpenAdd(isOpen)
+          if (!isOpen) setAddErrors(null)
         }}
+        onAdd={handleAdd}
+        errors={addErrors}
       />
       <SearchBar
         placeholder="Cari peran..."
@@ -110,13 +191,35 @@ function RouteComponent() {
       />
 
       <RolesTable
-        data={paginatedData}
+        data={rolesQuery.data?.data ?? []}
+        isLoading={rolesQuery.isLoading}
         pagination={pagination}
-        onEdit={({ id, name }) => {
-          setRoles((prev) => prev.map((r) => (r.id === id ? { ...r, name } : r)))
+        canManage={canManage}
+        canDelete={canDelete}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        editErrors={editErrors}
+        onPageChange={(newPageIndex: number) => {
+          navigate({
+            to: '/settings/roles',
+            search: {
+              page: newPageIndex + 1,
+              per_page,
+              search: searchQuery,
+            },
+            replace: true,
+          })
         }}
-        onDelete={(id) => {
-          setRoles((prev) => prev.filter((r) => r.id !== id))
+        onPageSizeChange={(newPageSize: number) => {
+          navigate({
+            to: '/settings/roles',
+            search: {
+              page: 1,
+              per_page: newPageSize,
+              search: searchQuery,
+            },
+            replace: true,
+          })
         }}
       />
     </>

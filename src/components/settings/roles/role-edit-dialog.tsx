@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
+import type { RoleFormErrors } from '@/services/roleService'
 
 import type { RoleRecord } from './types'
 
@@ -22,10 +22,11 @@ type RoleEditDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   role: RoleRecord | null
-  onEdit: (payload: { id: number; name: string }) => void
+  onEdit: (payload: { id: number; name: string }) => Promise<boolean>
+  errors?: RoleFormErrors
 }
 
-export function RoleEditDialog({ open, onOpenChange, role, onEdit }: RoleEditDialogProps) {
+export function RoleEditDialog({ open, onOpenChange, role, onEdit, errors }: RoleEditDialogProps) {
   const [name, setName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -43,12 +44,8 @@ export function RoleEditDialog({ open, onOpenChange, role, onEdit }: RoleEditDia
 
     setIsLoading(true)
     try {
-      await new Promise((r) => setTimeout(r, 350))
-      onEdit({ id: role.id, name: name.trim() })
-      toast.success('Peran berhasil diperbarui')
-      onOpenChange(false)
-    } catch {
-      toast.error('Gagal memperbarui peran')
+      const success = await onEdit({ id: role.id, name: name.trim() })
+      if (success) onOpenChange(false)
     } finally {
       setIsLoading(false)
     }
@@ -58,6 +55,9 @@ export function RoleEditDialog({ open, onOpenChange, role, onEdit }: RoleEditDia
     if (!val) setName('')
     onOpenChange(val)
   }
+
+  const generalError = errors?.general?.[0]
+  const nameError = errors?.name?.[0]
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -80,7 +80,9 @@ export function RoleEditDialog({ open, onOpenChange, role, onEdit }: RoleEditDia
                 placeholder="Masukkan nama peran"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {nameError ? <p className="text-sm text-destructive">{nameError}</p> : null}
             </div>
+            {generalError ? <p className="text-sm text-destructive">{generalError}</p> : null}
           </DialogBody>
 
           <DialogFooter>
