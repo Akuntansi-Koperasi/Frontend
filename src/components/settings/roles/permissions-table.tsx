@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/table'
 
 const DEFAULT_LEVEL_OPTIONS: Array<{ id: PermissionLevel; label: string }> = [
+  { id: 'tanpa_akses', label: 'Tanpa Akses' },
   { id: 'lihat', label: 'Lihat' },
   { id: 'modifikasi', label: 'Modifikasi' },
   { id: 'admin', label: 'Admin' },
@@ -36,6 +37,7 @@ interface PermissionsTableProps {
   totalMenus: number
   levels: Record<string, PermissionLevel>
   onChangeLevel: (menuKey: string, level: PermissionLevel) => void
+  disabled?: boolean
   levelOptions?: Array<{ id: PermissionLevel; label: string }>
   pagination: {
     pageIndex: number
@@ -50,6 +52,7 @@ export function PermissionsTable({
   menus,
   levels,
   onChangeLevel,
+  disabled = false,
   levelOptions = DEFAULT_LEVEL_OPTIONS,
   pagination,
   onPageChange,
@@ -78,10 +81,10 @@ export function PermissionsTable({
       cell: ({ row }) => (
         <div className="flex justify-center">
           <Select
-            value={levels[row.original.key] ?? 'lihat'}
+            value={(levels[row.original.key]) ?? 'tanpa_akses'}
             onValueChange={(v) => onChangeLevel(row.original.key, v as PermissionLevel)}
           >
-            <SelectTrigger className="h-9 w-auto min-w-fit bg-white cursor-pointer text-sm">
+            <SelectTrigger className="h-9 w-auto min-w-fit bg-white cursor-pointer text-sm" disabled={disabled}>
               <SelectValue placeholder="Pilih level" />
             </SelectTrigger>
             <SelectContent>

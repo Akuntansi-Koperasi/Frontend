@@ -1,13 +1,18 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router'
 import { Save } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { z } from 'zod'
 
-import type { PermissionLevel, PermissionMenuItem } from '@/components/settings/roles/types'
-
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import type { PermissionLevel } from '@/components/settings/roles/types'
 import { PermissionsTable } from '@/components/settings/roles/permissions-table'
 import HeaderComp from '@/components/shared/header-comp'
 import { SearchBar } from '@/components/shared/search-bar'
+import { Toaster } from '@/components/ui/sonner'
+import { getPermissionAccess } from '@/services/permissionService'
+import { getAllPermissions, getRolePermissions, updateRolePermissions } from '@/services/rolePermissionService'
+import { getRoleDropdown } from '@/services/roleService'
 
 const permissionsSearchSchema = z.object({
   page: z.number().int().positive().catch(1),
@@ -20,53 +25,114 @@ export const Route = createFileRoute('/_auth/settings/permissions/$roleId')({
   component: RouteComponent,
 })
 
-const MOCK_ROLE_NAMES: Record<string, string> = {
-  '1': 'Admin',
-  '2': 'Anggota',
-  '3': 'Super Admin',
-  '4': 'Karyawan',
-}
-
-const ALL_MENUS: Array<PermissionMenuItem> = [
-  { key: 'dashboard', label: 'Dashboard' },
-  { key: 'simpanan', label: 'Simpanan' },
-  { key: 'pinjaman', label: 'Pinjaman' },
-  { key: 'gerai_retail', label: 'Gerai / Retail' },
-  { key: 'laporan_retail', label: 'Laporan Retail' },
-  { key: 'akuntansi', label: 'Akuntansi' },
-  { key: 'laporan_akuntansi', label: 'Laporan Akuntansi' },
-  { key: 'koperasi', label: 'Koperasi' },
-  { key: 'pengaturan_pengguna', label: 'Pengaturan - Pengguna' },
-  { key: 'pengaturan_peran', label: 'Pengaturan - Peran' },
-  { key: 'pengaturan_migrasi', label: 'Pengaturan - Migrasi' },
-  { key: 'anggota', label: 'Anggota' },
-  { key: 'laporan_simpanan', label: 'Laporan Simpanan' },
-  { key: 'laporan_pinjaman', label: 'Laporan Pinjaman' },
-  { key: 'jurnal', label: 'Jurnal' },
-  { key: 'buku_besar', label: 'Buku Besar' },
-  { key: 'neraca', label: 'Neraca' },
-  { key: 'laba_rugi', label: 'Laba Rugi' },
-  { key: 'arus_kas', label: 'Arus Kas' },
-  { key: 'notifikasi', label: 'Notifikasi' },
-  { key: 'profil', label: 'Profil' },
-]
+// ALL_MENUS removed — master menu list is derived from API or role permissions
 
 function RouteComponent() {
   const { roleId } = Route.useParams()
   const navigate = useNavigate()
-  const roleName = MOCK_ROLE_NAMES[roleId] ?? `Peran #${roleId}`
+  const [roleName, setRoleName] = useState<string | null>(null)
+
+  const { canManage, canDelete } = useMemo(() => getPermissionAccess('peran'), [])
+
+  if (!canManage && !canDelete) {
+    throw notFound()
+  }
 
   const { page, per_page, search: searchQuery } = Route.useSearch()
 
-  const [levels, setLevels] = useState<Record<string, PermissionLevel>>(() =>
-    Object.fromEntries(ALL_MENUS.map((m) => [m.key, 'lihat'])),
-  )
+  const [levels, setLevels] = useState<Record<string, PermissionLevel>>({})
+
+  const queryClient = useQueryClient()
+
+  const rolePermissionsQuery = useQuery({
+    queryKey: ['roles', 'permissions', roleId],
+    queryFn: () => getRolePermissions(roleId),
+    staleTime: 1000 * 60 * 2,
+  })
+
+  const roleDropdownQuery = useQuery({
+    queryKey: ['roles', 'dropdown'],
+    queryFn: () => getRoleDropdown(),
+    staleTime: 1000 * 60 * 10,
+  })
+
+  const allPermissionsQuery = useQuery({
+    queryKey: ['permissions', 'all'],
+    queryFn: () => getAllPermissions(),
+    staleTime: 1000 * 60 * 60,
+  })
+
+  const masterMenus = useMemo(() => {
+    if (Array.isArray(allPermissionsQuery.data) && allPermissionsQuery.data.length > 0) {
+      const items = allPermissionsQuery.data
+      const map = new Map<string, string>()
+      items.forEach((p) => map.set(p.class, p.menu))
+      return Array.from(map.entries()).map(([key, label]) => ({ key, label }))
+    }
+
+    if (rolePermissionsQuery.data && Array.isArray(rolePermissionsQuery.data.permissions) && rolePermissionsQuery.data.permissions.length > 0) {
+      const items = rolePermissionsQuery.data.permissions
+      const map = new Map<string, string>()
+      items.forEach((p) => map.set(p.class, p.menu))
+      return Array.from(map.entries()).map(([key, label]) => ({ key, label }))
+    }
+
+    return []
+  }, [allPermissionsQuery.data, rolePermissionsQuery.data])
+
+  useEffect(() => {
+    const perms = rolePermissionsQuery.data?.permissions ?? []
+    if (perms.length > 0 || masterMenus.length > 0) {
+      const nextLevels: Record<string, PermissionLevel> = Object.fromEntries(
+        masterMenus.map((m) => [m.key, 'tanpa_akses'] as const),
+      )
+      perms.forEach((p) => {
+        if (p.class && Object.prototype.hasOwnProperty.call(nextLevels, p.class)) {
+          nextLevels[p.class] = p.level
+        }
+      })
+      setLevels(nextLevels)
+    }
+
+    if (roleDropdownQuery.data) {
+      const found = roleDropdownQuery.data.find((r) => String(r.id) === String(roleId))
+      if (found) setRoleName(found.name)
+    }
+  }, [masterMenus, rolePermissionsQuery.data, roleDropdownQuery.data, roleId])
+
+
+  const normalizeApiErrors = (
+    err: unknown,
+    fallbackMessage: string,
+  ): Partial<Record<string, Array<string>>> => {
+    const error = err as {
+      apiErrors?: Partial<Record<string, Array<string>>>
+      errors?: Partial<Record<string, Array<string>>>
+      message?: string
+    }
+    const apiErrors = error.apiErrors ?? error.errors ?? {}
+    const message = error.message ?? fallbackMessage
+
+    return {
+      ...apiErrors,
+      general: apiErrors.general?.length ? apiErrors.general : [message],
+    }
+  }
+
+  const updateMutation = useMutation({
+    mutationFn: ({ rId, permissions }: { rId: string | number; permissions: Array<{ class: string; level: string }> }) =>
+      updateRolePermissions(rId, permissions),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['roles'] })
+      queryClient.invalidateQueries({ queryKey: ['roles', 'permissions', roleId] })
+    },
+  })
 
   const filtered = useMemo(() => {
-    if (!searchQuery) return ALL_MENUS
+    if (!searchQuery) return masterMenus
     const q = searchQuery.toLowerCase()
-    return ALL_MENUS.filter((m) => m.label.toLowerCase().includes(q))
-  }, [searchQuery])
+    return masterMenus.filter((m) => m.label.toLowerCase().includes(q))
+  }, [searchQuery, masterMenus])
 
   const total = filtered.length
   const pageCount = Math.max(1, Math.ceil(total / per_page))
@@ -115,9 +181,22 @@ function RouteComponent() {
     setLevels((prev) => ({ ...prev, [menuKey]: level }))
   }
 
-  const handleSave = () => {
-    console.log('Saved permissions for role', roleId, levels)
-    navigate({ to: '/settings/roles' } as any)
+  const handleSave = async (): Promise<boolean> => {
+    if (!canManage) return false
+    const payload = Object.entries(levels)
+      .filter(([, level]) => level !== 'tanpa_akses')
+      .map(([cls, level]) => ({ class: cls, level }))
+    try {
+      await updateMutation.mutateAsync({ rId: roleId, permissions: payload })
+      toast.success('Hak akses peran berhasil diperbarui')
+      return true
+    } catch (err) {
+      const apiErrors = normalizeApiErrors(err, 'Gagal menyimpan hak akses peran')
+      const error = err as { message?: string }
+      const toastMessage = error.message ?? apiErrors.general?.[0] ?? 'Gagal memperbarui hak akses peran'
+      toast.error(toastMessage)
+      return false
+    }
   }
 
   useEffect(() => {
@@ -148,16 +227,20 @@ function RouteComponent() {
         onChange={(event) => handleSearchChange(event.target.value)}
       />
 
+      
+
       <PermissionsTable
-        roleName={roleName}
+        roleName={roleName ?? `Peran #${roleId}`}
         menus={paginated}
-        totalMenus={ALL_MENUS.length}
+        totalMenus={masterMenus.length}
         levels={levels}
         onChangeLevel={handleChangeLevel}
+        disabled={!canManage}
         pagination={pagination}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
       />
+      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   )
 }

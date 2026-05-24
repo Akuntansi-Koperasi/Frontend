@@ -3,7 +3,7 @@ export type RoleRecord = {
   name: string
 }
 
-export type PermissionLevel = 'lihat' | 'modifikasi' | 'admin'
+export type PermissionLevel = 'tanpa_akses' | 'lihat' | 'modifikasi' | 'admin'
 
 export type PermissionMenuItem = {
   key: string
