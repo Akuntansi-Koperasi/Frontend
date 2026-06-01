@@ -9,6 +9,7 @@ import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react'
 import { ProdukSimpananAddDialog } from './produk-simpanan-add-dialog'
 import { ProdukSimpananEditDialog } from './produk-simpanan-edit-dialog'
 import { ProdukSimpananDeleteDialog } from './produk-simpanan-delete-dialog'
+import { Toaster } from '@/components/ui/sonner'
 import type {
   ColumnDef,
   SortingState} from '@tanstack/react-table';
@@ -36,11 +37,17 @@ interface ProdukSimpananTableProps {
   }
   onPageChange: (newPageIndex: number) => void
   onPageSizeChange: (pageSize: number) => void
-  onAdd: (payload: Omit<ProdukSimpananRecord, 'id'>) => void
-  onEdit: (payload: ProdukSimpananRecord) => void
+  onAdd: (payload: Omit<ProdukSimpananRecord, 'id'>) => Promise<boolean>
+  onEdit: (payload: ProdukSimpananRecord) => Promise<boolean>
   onDelete: (id: number) => void
   addOpen: boolean
   onAddOpenChange: (open: boolean) => void
+  isLoading?: boolean
+  canManage: boolean
+  canDelete: boolean
+  addErrors?: Partial<Record<string, Array<string>>> | null
+  editErrors?: Partial<Record<string, Array<string>>> | null
+  onEditClose?: () => void
 }
 
 export function ProdukSimpananTable({
@@ -53,6 +60,12 @@ export function ProdukSimpananTable({
   onDelete,
   addOpen,
   onAddOpenChange,
+  isLoading,
+  canManage,
+  canDelete,
+  addErrors,
+  editErrors,
+  onEditClose,
 }: ProdukSimpananTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [editOpen, setEditOpen] = React.useState(false)
@@ -134,37 +147,44 @@ export function ProdukSimpananTable({
       header: () => <div className="text-left font-semibold text-slate-900">Keterangan</div>,
       cell: ({ row }) => <div className="text-slate-700">{row.original.keterangan}</div>,
     },
-    {
+  ]
+
+  if (canManage || canDelete) {
+    columns.push({
       id: 'actions',
       header: () => <div className="text-center font-semibold text-slate-900">Action</div>,
       cell: ({ row }) => (
         <div className="flex items-center gap-2 justify-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
-            onClick={() => {
-              setEditing(row.original)
-              setEditOpen(true)
-            }}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
-            onClick={() => {
-              setDeleting(row.original)
-              setDeleteOpen(true)
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {canManage && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
+              onClick={() => {
+                setEditing(row.original)
+                setEditOpen(true)
+              }}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+          {canDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+              onClick={() => {
+                setDeleting(row.original)
+                setDeleteOpen(true)
+              }}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       ),
-    },
-  ]
+    })
+  }
 
   const table = useReactTable({
     data,
@@ -204,7 +224,13 @@ export function ProdukSimpananTable({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.length ? (
+              {isLoading && !table.getRowModel().rows.length ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                    Memuat data...
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {
@@ -239,27 +265,42 @@ export function ProdukSimpananTable({
         </CardContent>
       </Card>
 
-      <ProdukSimpananAddDialog
-        open={addOpen}
-        onOpenChange={onAddOpenChange}
-        onAdd={onAdd}
-      />
+      {canManage && (
+        <ProdukSimpananAddDialog
+          open={addOpen}
+          onOpenChange={onAddOpenChange}
+          onAdd={onAdd}
+          errors={addErrors}
+        />
+      )}
 
-      <ProdukSimpananEditDialog
-        open={editOpen}
-        onOpenChange={setEditOpen}
-        onEdit={onEdit}
-        produk={editing}
-        isEditing={false}
-      />
+      {canManage && (
+        <ProdukSimpananEditDialog
+          open={editOpen}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              setEditing(undefined)
+              onEditClose?.()
+            }
+            setEditOpen(isOpen)
+          }}
+          onEdit={onEdit}
+          produk={editing}
+          errors={editErrors}
+        />
+      )}
 
-      <ProdukSimpananDeleteDialog
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        onConfirm={handleDeleteConfirm}
-        produk={deleting}
-        isDeleting={isDeletingLocal}
-      />
+      {canDelete && (
+        <ProdukSimpananDeleteDialog
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+          onConfirm={handleDeleteConfirm}
+          produk={deleting}
+          isDeleting={isDeletingLocal}
+        />
+      )}
+
+      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   )
 }

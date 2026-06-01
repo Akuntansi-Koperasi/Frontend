@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { JENIS_SIMPANAN } from './types'
@@ -14,16 +14,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface ProdukSimpananAddDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onAdd: (payload: Omit<ProdukSimpananRecord, 'id'>) => void
+  onAdd: (payload: Omit<ProdukSimpananRecord, 'id'>) => Promise<boolean>
+  errors?: Partial<Record<string, Array<string>>> | null
 }
 
-export function ProdukSimpananAddDialog({ open, onOpenChange, onAdd }: ProdukSimpananAddDialogProps) {
+export function ProdukSimpananAddDialog({ open, onOpenChange, onAdd, errors }: ProdukSimpananAddDialogProps) {
   const [nama, setNama] = React.useState('')
-  const [jenis, setJenis] = React.useState<'Sukarela' | 'Wajib'>('Sukarela')
+  const [jenis, setJenis] = React.useState<'Sukarela' | 'Wajib' | 'Pokok'>('Sukarela')
   const [bunga, setBunga] = React.useState('')
   const [nominal, setNominal] = React.useState('')
   const [keterangan, setKeterangan] = React.useState('')
   const [isLoading, setIsLoading] = React.useState(false)
+
+  const generalError = errors?.general?.[0]
+  const namaError = errors?.nama?.[0]
+  const jenisError = errors?.tipe?.[0]
+  const bungaError = errors?.suku_bunga?.[0]
+  const nominalError = errors?.jumlah?.[0]
+  const keteranganError = errors?.keterangan?.[0]
 
   const isFormValid = React.useMemo(
     () => nama.trim() !== '' && bunga.trim() !== '' && nominal.trim() !== '',
@@ -53,17 +61,18 @@ export function ProdukSimpananAddDialog({ open, onOpenChange, onAdd }: ProdukSim
 
     setIsLoading(true)
     try {
-      await Promise.resolve()
-      onAdd({
+      await new Promise((r) => setTimeout(r, 350))
+      const success = await onAdd({
         nama: nama.trim(),
         jenis,
         bunga: parseFloat(bunga),
         nominal: parseInt(nominal, 10),
         keterangan: keterangan.trim(),
       })
-      toast.success('Produk simpanan berhasil ditambahkan')
-      onOpenChange(false)
-      resetForm()
+      if (success) {
+        onOpenChange(false)
+        resetForm()
+      }
     } finally {
       setIsLoading(false)
     }
@@ -90,13 +99,14 @@ export function ProdukSimpananAddDialog({ open, onOpenChange, onAdd }: ProdukSim
                 onChange={(e) => setNama(e.target.value)}
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {namaError ? <p className="text-sm text-destructive mt-1">{namaError}</p> : null}
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="jenis" className="text-slate-600 font-medium">
                 Jenis Simpanan*
               </Label>
-              <Select value={jenis} onValueChange={(value) => setJenis(value as 'Sukarela' | 'Wajib')}>
+              <Select value={jenis} onValueChange={(value) => setJenis(value as 'Sukarela' | 'Wajib' | 'Pokok')}>
                 <SelectTrigger id="jenis" className="h-auto min-h-12 cursor-pointer w-full px-4 py-3">
                   <SelectValue placeholder="Pilih jenis simpanan" />
                 </SelectTrigger>
@@ -108,6 +118,7 @@ export function ProdukSimpananAddDialog({ open, onOpenChange, onAdd }: ProdukSim
                   ))}
                 </SelectContent>
               </Select>
+              {jenisError ? <p className="text-sm text-destructive mt-1">{jenisError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -123,6 +134,7 @@ export function ProdukSimpananAddDialog({ open, onOpenChange, onAdd }: ProdukSim
                 step="0.01"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {bungaError ? <p className="text-sm text-destructive mt-1">{bungaError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -137,6 +149,7 @@ export function ProdukSimpananAddDialog({ open, onOpenChange, onAdd }: ProdukSim
                 onChange={(e) => setNominal(e.target.value)}
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {nominalError ? <p className="text-sm text-destructive mt-1">{nominalError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -151,7 +164,15 @@ export function ProdukSimpananAddDialog({ open, onOpenChange, onAdd }: ProdukSim
                 rows={3}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
+              {keteranganError ? <p className="text-sm text-destructive mt-1">{keteranganError}</p> : null}
             </div>
+
+            {generalError ? (
+              <div className="flex items-center gap-2 p-3 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md animate-in fade-in slide-in-from-top-1">
+                <AlertCircle className="h-4 w-4" />
+                {generalError}
+              </div>
+            ) : null}
           </DialogBody>
 
           <DialogFooter>
