@@ -38,6 +38,7 @@ export const navItems = [
       {
         title: 'Produk Simpanan',
         url: '/simpanan/produk-simpanan',
+        permission_class: 'produksimpanan',
       },
       {
         title: 'Rekening Simpanan',
@@ -56,6 +57,7 @@ export const navItems = [
       {
         title: 'Produk Pinjaman',
         url: '/pinjaman/produk-pinjaman',
+        permission_class: 'produkpinjaman',
       },
       {
         title: 'Pengajuan Pinjaman',

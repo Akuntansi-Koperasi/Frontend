@@ -9,11 +9,11 @@ import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react'
 import { ProdukSimpananAddDialog } from './produk-simpanan-add-dialog'
 import { ProdukSimpananEditDialog } from './produk-simpanan-edit-dialog'
 import { ProdukSimpananDeleteDialog } from './produk-simpanan-delete-dialog'
-import { Toaster } from '@/components/ui/sonner'
 import type {
   ColumnDef,
   SortingState} from '@tanstack/react-table';
 import type { ProdukSimpananRecord } from './types'
+import { Toaster } from '@/components/ui/sonner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {

@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { JENIS_PINJAMAN, PERIODE_PINJAMAN } from './types'
 import type { JenisPinjaman, PeriodePinjaman, ProdukPinjamanRecord } from './types'
 
-import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogBody,
@@ -16,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -29,9 +29,9 @@ import {
 interface ProdukPinjamanEditDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onEdit: (payload: ProdukPinjamanRecord) => void
+  onEdit: (payload: ProdukPinjamanRecord) => Promise<boolean>
   produk?: ProdukPinjamanRecord
-  isEditing?: boolean
+  errors?: Partial<Record<string, Array<string>>> | null
 }
 
 export function ProdukPinjamanEditDialog({
@@ -39,13 +39,21 @@ export function ProdukPinjamanEditDialog({
   onOpenChange,
   onEdit,
   produk,
-  isEditing = false,
+  errors,
 }: ProdukPinjamanEditDialogProps) {
   const [nama, setNama] = React.useState('')
   const [jenis, setJenis] = React.useState<JenisPinjaman>('Menurun')
   const [periode, setPeriode] = React.useState<PeriodePinjaman>('Harian')
   const [bunga, setBunga] = React.useState('')
   const [keterangan, setKeterangan] = React.useState('')
+  const [isLoading, setIsLoading] = React.useState(false)
+
+  const generalError = errors?.general?.[0]
+  const namaError = errors?.nama?.[0]
+  const jenisError = errors?.type?.[0]
+  const periodeError = errors?.periode_pinjaman?.[0]
+  const bungaError = errors?.suku_bunga?.[0]
+  const keteranganError = errors?.keterangan?.[0]
 
   const isFormValid = React.useMemo(
     () => nama.trim() !== '' && bunga.trim() !== '' && Boolean(produk),
@@ -80,9 +88,10 @@ export function ProdukPinjamanEditDialog({
       return
     }
 
+    setIsLoading(true)
     try {
-      await Promise.resolve()
-      onEdit({
+      await new Promise((r) => setTimeout(r, 350))
+      const success = await onEdit({
         id: produk.id,
         nama: nama.trim(),
         jenis,
@@ -90,11 +99,12 @@ export function ProdukPinjamanEditDialog({
         bunga: parseFloat(bunga),
         keterangan: keterangan.trim(),
       })
-      toast.success('Produk pinjaman berhasil diperbarui')
-      onOpenChange(false)
-      resetForm()
-    } catch {
-      toast.error('Gagal memperbarui produk pinjaman')
+      if (success) {
+        onOpenChange(false)
+        resetForm()
+      }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -109,7 +119,7 @@ export function ProdukPinjamanEditDialog({
         <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Edit Produk Pinjaman</DialogTitle>
-            <DialogDescription>Silakan edit data produk pinjaman ini</DialogDescription>
+            <DialogDescription>Silakan ubah data produk pinjaman</DialogDescription>
           </DialogHeader>
 
           <DialogBody className="grid gap-4 py-4">
@@ -124,6 +134,7 @@ export function ProdukPinjamanEditDialog({
                 placeholder="Masukkan Nama"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {namaError ? <p className="text-sm text-destructive mt-1">{namaError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -142,6 +153,7 @@ export function ProdukPinjamanEditDialog({
                   ))}
                 </SelectContent>
               </Select>
+              {jenisError ? <p className="text-sm text-destructive mt-1">{jenisError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -160,6 +172,7 @@ export function ProdukPinjamanEditDialog({
                   ))}
                 </SelectContent>
               </Select>
+              {periodeError ? <p className="text-sm text-destructive mt-1">{periodeError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -174,6 +187,7 @@ export function ProdukPinjamanEditDialog({
                 step="0.01"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {bungaError ? <p className="text-sm text-destructive mt-1">{bungaError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -187,7 +201,15 @@ export function ProdukPinjamanEditDialog({
                 rows={3}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
+              {keteranganError ? <p className="text-sm text-destructive mt-1">{keteranganError}</p> : null}
             </div>
+
+            {generalError ? (
+              <div className="flex items-center gap-2 p-3 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md animate-in fade-in slide-in-from-top-1">
+                <AlertCircle className="h-4 w-4" />
+                {generalError}
+              </div>
+            ) : null}
           </DialogBody>
 
           <DialogFooter>
@@ -196,16 +218,16 @@ export function ProdukPinjamanEditDialog({
               variant="destructive"
               className="md:w-[50%] w-full h-12 cursor-pointer"
               onClick={() => handleOpenChange(false)}
-              disabled={isEditing}
+              disabled={isLoading}
             >
               Batal
             </Button>
             <Button
               type="submit"
               className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12 cursor-pointer"
-              disabled={isEditing || !isFormValid}
+              disabled={isLoading || !isFormValid}
             >
-              {isEditing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Simpan
             </Button>
           </DialogFooter>

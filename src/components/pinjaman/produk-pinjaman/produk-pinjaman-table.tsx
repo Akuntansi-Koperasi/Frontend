@@ -6,16 +6,16 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react'
-
 import { ProdukPinjamanAddDialog } from './produk-pinjaman-add-dialog'
 import { ProdukPinjamanEditDialog } from './produk-pinjaman-edit-dialog'
 import { ProdukPinjamanDeleteDialog } from './produk-pinjaman-delete-dialog'
+import type {
+  ColumnDef,
+  SortingState} from '@tanstack/react-table';
 import type { ProdukPinjamanRecord } from './types'
-import type { ColumnDef, SortingState } from '@tanstack/react-table'
-
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Toaster } from '@/components/ui/sonner'
 import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -24,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
 import { DataTablePagination } from '@/components/data-table-pagination'
 
 interface ProdukPinjamanTableProps {
@@ -36,11 +37,17 @@ interface ProdukPinjamanTableProps {
   }
   onPageChange: (newPageIndex: number) => void
   onPageSizeChange: (pageSize: number) => void
-  onAdd: (payload: Omit<ProdukPinjamanRecord, 'id'>) => void
-  onEdit: (payload: ProdukPinjamanRecord) => void
+  onAdd: (payload: Omit<ProdukPinjamanRecord, 'id'>) => Promise<boolean>
+  onEdit: (payload: ProdukPinjamanRecord) => Promise<boolean>
   onDelete: (id: number) => void
   addOpen: boolean
   onAddOpenChange: (open: boolean) => void
+  isLoading?: boolean
+  canManage: boolean
+  canDelete: boolean
+  addErrors?: Partial<Record<string, Array<string>>> | null
+  editErrors?: Partial<Record<string, Array<string>>> | null
+  onEditClose?: () => void
 }
 
 export function ProdukPinjamanTable({
@@ -53,6 +60,12 @@ export function ProdukPinjamanTable({
   onDelete,
   addOpen,
   onAddOpenChange,
+  isLoading,
+  canManage,
+  canDelete,
+  addErrors,
+  editErrors,
+  onEditClose,
 }: ProdukPinjamanTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [editOpen, setEditOpen] = React.useState(false)
@@ -122,37 +135,44 @@ export function ProdukPinjamanTable({
       header: () => <div className="text-left font-semibold text-slate-900">Keterangan</div>,
       cell: ({ row }) => <div className="text-slate-700">{row.original.keterangan}</div>,
     },
-    {
+  ]
+
+  if (canManage || canDelete) {
+    columns.push({
       id: 'actions',
       header: () => <div className="text-center font-semibold text-slate-900">Action</div>,
       cell: ({ row }) => (
         <div className="flex items-center gap-2 justify-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
-            onClick={() => {
-              setEditing(row.original)
-              setEditOpen(true)
-            }}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
-            onClick={() => {
-              setDeleting(row.original)
-              setDeleteOpen(true)
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {canManage && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
+              onClick={() => {
+                setEditing(row.original)
+                setEditOpen(true)
+              }}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+          {canDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+              onClick={() => {
+                setDeleting(row.original)
+                setDeleteOpen(true)
+              }}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       ),
-    },
-  ]
+    })
+  }
 
   const table = useReactTable({
     data,
@@ -192,7 +212,13 @@ export function ProdukPinjamanTable({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.length ? (
+              {isLoading && !table.getRowModel().rows.length ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                    Memuat data...
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {
@@ -215,35 +241,54 @@ export function ProdukPinjamanTable({
                 </TableRow>
               )}
             </TableBody>
-            </Table>
+          </Table>
 
-            <DataTablePagination
-              pageIndex={pagination.pageIndex}
-              pageCount={pagination.pageCount}
-              pageSize={pagination.pageSize}
-              onPageChange={onPageChange}
-              onPageSizeChange={onPageSizeChange}
-            />
-          </CardContent>
-        </Card>
+          <DataTablePagination
+            pageIndex={pagination.pageIndex}
+            pageCount={pagination.pageCount}
+            pageSize={pagination.pageSize}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+          />
+        </CardContent>
+      </Card>
 
-      <ProdukPinjamanAddDialog open={addOpen} onOpenChange={onAddOpenChange} onAdd={onAdd} />
+      {canManage && (
+        <ProdukPinjamanAddDialog
+          open={addOpen}
+          onOpenChange={onAddOpenChange}
+          onAdd={onAdd}
+          errors={addErrors}
+        />
+      )}
 
-      <ProdukPinjamanEditDialog
-        open={editOpen}
-        onOpenChange={setEditOpen}
-        onEdit={onEdit}
-        produk={editing}
-        isEditing={false}
-      />
+      {canManage && (
+        <ProdukPinjamanEditDialog
+          open={editOpen}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              setEditing(undefined)
+              onEditClose?.()
+            }
+            setEditOpen(isOpen)
+          }}
+          onEdit={onEdit}
+          produk={editing}
+          errors={editErrors}
+        />
+      )}
 
-      <ProdukPinjamanDeleteDialog
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        onConfirm={handleDeleteConfirm}
-        produk={deleting}
-        isDeleting={isDeletingLocal}
-      />
+      {canDelete && (
+        <ProdukPinjamanDeleteDialog
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+          onConfirm={handleDeleteConfirm}
+          produk={deleting}
+          isDeleting={isDeletingLocal}
+        />
+      )}
+
+      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   )
 }

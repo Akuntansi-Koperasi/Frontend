@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { JENIS_PINJAMAN, PERIODE_PINJAMAN } from './types'
@@ -29,13 +29,15 @@ import {
 interface ProdukPinjamanAddDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onAdd: (payload: Omit<ProdukPinjamanRecord, 'id'>) => void
+  onAdd: (payload: Omit<ProdukPinjamanRecord, 'id'>) => Promise<boolean>
+  errors?: Partial<Record<string, Array<string>>> | null
 }
 
 export function ProdukPinjamanAddDialog({
   open,
   onOpenChange,
   onAdd,
+  errors,
 }: ProdukPinjamanAddDialogProps) {
   const [nama, setNama] = React.useState('')
   const [jenis, setJenis] = React.useState<JenisPinjaman>('Menurun')
@@ -43,6 +45,13 @@ export function ProdukPinjamanAddDialog({
   const [bunga, setBunga] = React.useState('')
   const [keterangan, setKeterangan] = React.useState('')
   const [isLoading, setIsLoading] = React.useState(false)
+
+  const generalError = errors?.general?.[0]
+  const namaError = errors?.nama?.[0]
+  const jenisError = errors?.type?.[0]
+  const periodeError = errors?.periode_pinjaman?.[0]
+  const bungaError = errors?.suku_bunga?.[0]
+  const keteranganError = errors?.keterangan?.[0]
 
   const isFormValid = React.useMemo(
     () => nama.trim() !== '' && bunga.trim() !== '',
@@ -72,17 +81,18 @@ export function ProdukPinjamanAddDialog({
 
     setIsLoading(true)
     try {
-      await Promise.resolve()
-      onAdd({
+      await new Promise((r) => setTimeout(r, 350))
+      const success = await onAdd({
         nama: nama.trim(),
         jenis,
         periode,
         bunga: parseFloat(bunga),
         keterangan: keterangan.trim(),
       })
-      toast.success('Produk pinjaman berhasil ditambahkan')
-      onOpenChange(false)
-      resetForm()
+      if (success) {
+        onOpenChange(false)
+        resetForm()
+      }
     } finally {
       setIsLoading(false)
     }
@@ -109,6 +119,7 @@ export function ProdukPinjamanAddDialog({
                 onChange={(e) => setNama(e.target.value)}
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {namaError ? <p className="text-sm text-destructive mt-1">{namaError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -127,6 +138,7 @@ export function ProdukPinjamanAddDialog({
                   ))}
                 </SelectContent>
               </Select>
+              {jenisError ? <p className="text-sm text-destructive mt-1">{jenisError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -145,6 +157,7 @@ export function ProdukPinjamanAddDialog({
                   ))}
                 </SelectContent>
               </Select>
+              {periodeError ? <p className="text-sm text-destructive mt-1">{periodeError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -160,6 +173,7 @@ export function ProdukPinjamanAddDialog({
                 step="0.01"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
+              {bungaError ? <p className="text-sm text-destructive mt-1">{bungaError}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -168,13 +182,21 @@ export function ProdukPinjamanAddDialog({
               </Label>
               <textarea
                 id="keterangan"
-                placeholder="Tambahkan keterangan akun..."
+                placeholder="Tambahkan keterangan produk pinjaman..."
                 value={keterangan}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setKeterangan(e.target.value)}
                 rows={3}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
+              {keteranganError ? <p className="text-sm text-destructive mt-1">{keteranganError}</p> : null}
             </div>
+
+            {generalError ? (
+              <div className="flex items-center gap-2 p-3 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md animate-in fade-in slide-in-from-top-1">
+                <AlertCircle className="h-4 w-4" />
+                {generalError}
+              </div>
+            ) : null}
           </DialogBody>
 
           <DialogFooter>
