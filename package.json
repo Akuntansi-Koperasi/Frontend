@@ -9,7 +9,7 @@
     "test": "vitest run",
     "lint": "eslint",
     "format": "prettier",
-    "check": "prettier --write . && eslint --fix"
+    "fix": "eslint . --ext .ts,.tsx --fix && prettier --write ."
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
