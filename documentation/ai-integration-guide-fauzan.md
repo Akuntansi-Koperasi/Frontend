@@ -3,8 +3,8 @@
 ## Konteks Proyek Ini
 - Frontend memakai TanStack Start, TanStack Query, Zod, Sonner, dan service layer di `src/services`.
 - Route aktif ada di `src/routes/_auth/**` dan beberapa halaman masih memakai pola lokal/mock, jadi jangan bikin arsitektur baru kalau pola existing sudah ada.
-- Backend memakai Laravel 12, Sanctum token-based auth.
-- Token disimpan di cookies http-only, tidak perlu baca localStorage di service.
+- Backend memakai Laravel 12, Sanctum token-based auth dan Spatie Permission.
+- Axios frontend mengirim `Authorization: Bearer <token>` dan header `X-Koperasi-ID` dari `localStorage.koperasiActive`.
 
 ## Tujuan
 Integrasikan halaman yang diberikan ke backend Laravel secara penuh, dengan mengikuti pattern yang sudah dipakai project ini.
@@ -19,15 +19,12 @@ Integrasikan halaman yang diberikan ke backend Laravel secara penuh, dengan meng
 
 ## Pola Frontend Yang Harus Diikuti
 - Tempatkan logika API di `src/services`.
-- logika service harus menggunakan createServerFn sehingga bisa berjalan di server.
-- Kemudian token dibuat di cookies http-only untuk token, jadi tidak perlu baca localStorage di service. kalau data lain disimpan maka pakai cookie tanpa http-only atau localStorage, tapi pastikan itu memang diperlukan dan tidak bisa diambil dari response API langsung.
 - Gunakan `createFileRoute`, `validateSearch`, dan search params untuk page/filter/sort/search.
 - Gunakan TanStack Query untuk fetch dan mutation.
 - Sinkronkan URL dengan state UI.
 - Tampilkan loading, empty, error, dan submit state.
 - Ikuti pattern komponen yang sudah ada di `src/components`.
 - Jangan pakai `any` kalau bisa dihindari.
-- gunakan useServerFn untuk memanggil service yang sudah dibuat, jangan panggil service langsung di komponen.
 
 ## Permission Frontend
 - Jangan baca `localStorage.permissions` langsung di setiap route.
@@ -99,8 +96,6 @@ Target akhir:
 - semua endpoint yang ada sudah terhubung
 - semua action UI yang memang tersedia benar-benar bekerja
 - kalau endpoint belum ada, laporkan sebagai API NOT FOUND
-- semua serverside function sudah menggunakan createServerFn
-- semua serverside function dipanggil pakai useServerFn, tidak ada pemanggilan service langsung di komponen
 
 ## Format Laporan Akhir
 Laporkan singkat:
