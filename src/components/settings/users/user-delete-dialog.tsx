@@ -1,6 +1,6 @@
-import { useState } from "react"
-import { AlertTriangle, Loader2 } from "lucide-react"
-import type { UserRecord } from "@/services/userService"
+import { useState } from "react";
+import { AlertTriangle, Loader2 } from "lucide-react";
+import type { UserRecord } from "@/services/userService";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,13 +10,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 interface UserDeleteDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  user: UserRecord | null
-  onConfirm: (id: number) => Promise<boolean>
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  user: UserRecord | null;
+  onConfirm: (id: number) => Promise<boolean>;
 }
 
 export function UserDeleteDialog({
@@ -25,19 +25,19 @@ export function UserDeleteDialog({
   user,
   onConfirm,
 }: UserDeleteDialogProps) {
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleConfirm = async (id: number) => {
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
-      const success = await onConfirm(id)
+      const success = await onConfirm(id);
       if (success) {
-        onOpenChange(false)
+        onOpenChange(false);
       }
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -48,18 +48,24 @@ export function UserDeleteDialog({
             <AlertDialogTitle>Hapus User?</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus user <b>{user?.name}</b>? 
+            Apakah Anda yakin ingin menghapus user <b>{user?.name}</b>?
             <br />
-            Tindakan ini tidak dapat dibatalkan dan user tidak akan bisa login lagi.
+            Tindakan ini tidak dapat dibatalkan dan user tidak akan bisa login
+            lagi.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting} className="md:w-[50%] w-full bg-slate-900 text-white hover:text-white hover:bg-slate-800 h-12 cursor-pointer">Batal</AlertDialogCancel>
-          <AlertDialogAction 
+          <AlertDialogCancel
+            disabled={isDeleting}
+            className="md:w-[50%] w-full bg-slate-900 text-white hover:text-white hover:bg-slate-800 h-12 cursor-pointer"
+          >
+            Batal
+          </AlertDialogCancel>
+          <AlertDialogAction
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
             onClick={(e) => {
-              e.preventDefault()
-              if (user) handleConfirm(user.id)
+              e.preventDefault();
+              if (user) handleConfirm(user.id);
             }}
             disabled={isDeleting}
           >
@@ -75,5 +81,5 @@ export function UserDeleteDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

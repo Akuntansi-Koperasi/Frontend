@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
+import * as React from "react";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
-import { KATEGORI_OPTIONS } from './types'
-import type { CoaRecord } from './types'
+import { KATEGORI_OPTIONS } from "./types";
+import type { CoaRecord } from "./types";
 
 import {
   Dialog,
@@ -14,78 +14,74 @@ import {
   DialogForm,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 
 interface CoaAddDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onAdd: (payload: Omit<CoaRecord, 'id'>) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onAdd: (payload: Omit<CoaRecord, "id">) => void;
 }
 
-export function CoaAddDialog({
-  open,
-  onOpenChange,
-  onAdd,
-}: CoaAddDialogProps) {
-  const [kode, setKode] = React.useState('')
-  const [namaAkun, setNamaAkun] = React.useState('')
-  const [kategori, setKategori] = React.useState<string>('')
-  const [keterangan, setKeterangan] = React.useState('')
-  const [isLoading, setIsLoading] = React.useState(false)
+export function CoaAddDialog({ open, onOpenChange, onAdd }: CoaAddDialogProps) {
+  const [kode, setKode] = React.useState("");
+  const [namaAkun, setNamaAkun] = React.useState("");
+  const [kategori, setKategori] = React.useState<string>("");
+  const [keterangan, setKeterangan] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const isFormValid = React.useMemo(
-    () => namaAkun.trim() !== '' && kategori !== '',
+    () => namaAkun.trim() !== "" && kategori !== "",
     [namaAkun, kategori],
-  )
+  );
 
   const resetForm = React.useCallback(() => {
-    setKode('')
-    setNamaAkun('')
-    setKategori('')
-    setKeterangan('')
-  }, [])
+    setKode("");
+    setNamaAkun("");
+    setKategori("");
+    setKeterangan("");
+  }, []);
 
   const handleOpenChange = (val: boolean) => {
-    if (!val) resetForm()
-    onOpenChange(val)
-  }
+    if (!val) resetForm();
+    onOpenChange(val);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!isFormValid) {
-      toast.error('Semua field wajib harus diisi')
-      return
+      toast.error("Semua field wajib harus diisi");
+      return;
     }
 
-    const generatedKode = kode.trim() || String(Date.now()).slice(-9)
+    const generatedKode = kode.trim() || String(Date.now()).slice(-9);
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      await Promise.resolve()
+      await Promise.resolve();
       onAdd({
         kode: generatedKode,
         namaAkun: namaAkun.trim(),
-        kategori: kategori as CoaRecord['kategori'],
+        kategori: kategori as CoaRecord["kategori"],
         keterangan: keterangan.trim(),
-      })
-      toast.success('COA berhasil ditambahkan')
-      onOpenChange(false)
-      resetForm()
+      });
+      toast.success("COA berhasil ditambahkan");
+      onOpenChange(false);
+      resetForm();
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -99,7 +95,10 @@ export function CoaAddDialog({
           <DialogBody className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="kode-akun" className="text-slate-600 font-medium">
-                Kode Akun <span className="text-slate-400 font-normal">* jika dikosongkan akan tergenerate otomatis</span>
+                Kode Akun{" "}
+                <span className="text-slate-400 font-normal">
+                  * jika dikosongkan akan tergenerate otomatis
+                </span>
               </Label>
               <Input
                 id="kode-akun"
@@ -130,7 +129,10 @@ export function CoaAddDialog({
                 Kategori <span className="text-red-500">*</span>
               </Label>
               <Select value={kategori} onValueChange={setKategori}>
-                <SelectTrigger id="kategori" className="h-auto min-h-12 cursor-pointer w-full px-4 py-3">
+                <SelectTrigger
+                  id="kategori"
+                  className="h-auto min-h-12 cursor-pointer w-full px-4 py-3"
+                >
                   <SelectValue placeholder="Pilih kategori" />
                 </SelectTrigger>
                 <SelectContent>
@@ -144,7 +146,10 @@ export function CoaAddDialog({
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="keterangan" className="text-slate-600 font-medium">
+              <Label
+                htmlFor="keterangan"
+                className="text-slate-600 font-medium"
+              >
                 Keterangan
               </Label>
               <Input
@@ -180,5 +185,5 @@ export function CoaAddDialog({
         </DialogForm>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

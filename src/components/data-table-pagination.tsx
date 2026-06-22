@@ -1,20 +1,20 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 
 interface DataTablePaginationProps {
-  pageIndex: number
-  pageCount: number
-  pageSize: number
-  onPageChange: (page: number) => void
-  onPageSizeChange: (size: number) => void
-  pageSizeOptions?: Array<number>
+  pageIndex: number;
+  pageCount: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+  pageSizeOptions?: Array<number>;
 }
 
 export function DataTablePagination({
@@ -26,32 +26,32 @@ export function DataTablePagination({
   pageSizeOptions = [10, 20, 30, 40, 50],
 }: DataTablePaginationProps) {
   const getPageNumbers = () => {
-    const pages = []
-    const showMax = 5
+    const pages = [];
+    const showMax = 5;
 
     if (pageCount <= showMax) {
       for (let i = 0; i < pageCount; i++) {
-        pages.push(i)
+        pages.push(i);
       }
     } else {
-      pages.push(0)
-      if (pageIndex > 2) pages.push(-1)
+      pages.push(0);
+      if (pageIndex > 2) pages.push(-1);
 
-      let start = Math.max(1, pageIndex - 1)
-      let end = Math.min(pageCount - 2, pageIndex + 1)
+      let start = Math.max(1, pageIndex - 1);
+      let end = Math.min(pageCount - 2, pageIndex + 1);
 
-      if (pageIndex < 2) end = 3
-      if (pageIndex > pageCount - 3) start = pageCount - 4
+      if (pageIndex < 2) end = 3;
+      if (pageIndex > pageCount - 3) start = pageCount - 4;
 
       for (let i = start; i <= end; i++) {
-        pages.push(i)
+        pages.push(i);
       }
 
-      if (pageIndex < pageCount - 3) pages.push(-1)
-      pages.push(pageCount - 1)
+      if (pageIndex < pageCount - 3) pages.push(-1);
+      pages.push(pageCount - 1);
     }
-    return pages
-  }
+    return pages;
+  };
 
   return (
     <div className="flex items-center justify-center p-4 border-t">
@@ -75,10 +75,10 @@ export function DataTablePagination({
             ) : (
               <Button
                 key={idx}
-                variant={pageIndex === idx ? 'secondary' : 'ghost'}
+                variant={pageIndex === idx ? "secondary" : "ghost"}
                 size="sm"
                 className={`h-8 w-8 font-bold cursor-pointer ${
-                  pageIndex === idx ? 'text-slate-900' : 'text-muted-foreground'
+                  pageIndex === idx ? "text-slate-900" : "text-muted-foreground"
                 }`}
                 onClick={() => onPageChange(idx)}
               >
@@ -115,5 +115,5 @@ export function DataTablePagination({
         </Select>
       </div>
     </div>
-  )
+  );
 }

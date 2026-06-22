@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Loader2 } from 'lucide-react'
-import type { RoleFormErrors } from '@/services/roleService'
+import { useEffect, useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
+import type { RoleFormErrors } from "@/services/roleService";
 
-import type { RoleRecord } from './types'
+import type { RoleRecord } from "./types";
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogBody,
@@ -16,48 +16,57 @@ import {
   DialogForm,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 
 type RoleEditDialogProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  role: RoleRecord | null
-  onEdit: (payload: { id: number; name: string }) => Promise<boolean>
-  errors?: RoleFormErrors
-}
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  role: RoleRecord | null;
+  onEdit: (payload: { id: number; name: string }) => Promise<boolean>;
+  errors?: RoleFormErrors;
+};
 
-export function RoleEditDialog({ open, onOpenChange, role, onEdit, errors }: RoleEditDialogProps) {
-  const [name, setName] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+export function RoleEditDialog({
+  open,
+  onOpenChange,
+  role,
+  onEdit,
+  errors,
+}: RoleEditDialogProps) {
+  const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (open && role) {
-      setName(role.name)
+      setName(role.name);
     }
-  }, [open, role])
+  }, [open, role]);
 
-  const isFormValid = useMemo(() => name.trim() !== '' && Boolean(role), [name, role])
+  const isFormValid = useMemo(
+    () => name.trim() !== "" && Boolean(role),
+    [name, role],
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!role || !isFormValid) return
+    e.preventDefault();
+    if (!role || !isFormValid) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const success = await onEdit({ id: role.id, name: name.trim() })
-      if (success) onOpenChange(false)
+      const success = await onEdit({ id: role.id, name: name.trim() });
+      if (success) onOpenChange(false);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleOpenChange = (val: boolean) => {
-    if (!val) setName('')
-    onOpenChange(val)
-  }
+    if (!val) setName("");
+    onOpenChange(val);
+  };
 
-  const generalError = errors?.general?.[0]
-  const nameError = errors?.name?.[0]
+  const generalError = errors?.general?.[0];
+  const nameError = errors?.name?.[0];
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -70,7 +79,10 @@ export function RoleEditDialog({ open, onOpenChange, role, onEdit, errors }: Rol
 
           <DialogBody className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="edit-role-name" className="text-slate-600 font-medium">
+              <Label
+                htmlFor="edit-role-name"
+                className="text-slate-600 font-medium"
+              >
                 Nama Peran*
               </Label>
               <Input
@@ -80,9 +92,13 @@ export function RoleEditDialog({ open, onOpenChange, role, onEdit, errors }: Rol
                 placeholder="Masukkan nama peran"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
-              {nameError ? <p className="text-sm text-destructive">{nameError}</p> : null}
+              {nameError ? (
+                <p className="text-sm text-destructive">{nameError}</p>
+              ) : null}
             </div>
-            {generalError ? <p className="text-sm text-destructive">{generalError}</p> : null}
+            {generalError ? (
+              <p className="text-sm text-destructive">{generalError}</p>
+            ) : null}
           </DialogBody>
 
           <DialogFooter>
@@ -107,5 +123,5 @@ export function RoleEditDialog({ open, onOpenChange, role, onEdit, errors }: Rol
         </DialogForm>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

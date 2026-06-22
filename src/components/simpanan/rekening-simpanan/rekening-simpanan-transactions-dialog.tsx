@@ -1,4 +1,4 @@
-import { Printer } from 'lucide-react'
+import { Printer } from "lucide-react";
 
 import {
   Dialog,
@@ -8,9 +8,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -18,24 +18,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 
 interface FormattedTransaction {
-  id: number
-  tanggal: string // pre-formatted date e.g. '2026-05-17'
-  jenis: string
-  keterangan: string
-  debitDisplay: string
-  kreditDisplay: string
-  saldoDisplay: string
+  id: number;
+  tanggal: string; // pre-formatted date e.g. '2026-05-17'
+  jenis: string;
+  keterangan: string;
+  debitDisplay: string;
+  kreditDisplay: string;
+  saldoDisplay: string;
 }
 
 interface RekeningSimpananTransactionsDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  nomorRekening?: string
-  transactions: Array<FormattedTransaction>
-  finalSaldoDisplay: string
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  nomorRekening?: string;
+  transactions: Array<FormattedTransaction>;
+  finalSaldoDisplay: string;
 }
 
 export function RekeningSimpananTransactionsDialog({
@@ -47,8 +47,8 @@ export function RekeningSimpananTransactionsDialog({
 }: RekeningSimpananTransactionsDialogProps) {
   const handlePrint = () => {
     try {
-      const printWindow = window.open('', '_blank')
-      if (!printWindow) return
+      const printWindow = window.open("", "_blank");
+      if (!printWindow) return;
 
       const tableRows = transactions
         .map(
@@ -63,7 +63,7 @@ export function RekeningSimpananTransactionsDialog({
             </tr>
           `,
         )
-        .join('')
+        .join("");
 
       const html = `
         <html>
@@ -90,7 +90,7 @@ export function RekeningSimpananTransactionsDialog({
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
               <div>
                 <h1>Transaksi Rekening</h1>
-                <div class="muted">${nomorRekening ?? ''}</div>
+                <div class="muted">${nomorRekening ?? ""}</div>
               </div>
             </div>
             <div class="card">
@@ -113,25 +113,27 @@ export function RekeningSimpananTransactionsDialog({
             <div style="margin-top:18px; text-align:right; font-weight:700">Saldo Akhir: <span class="saldo">${finalSaldoDisplay}</span></div>
           </body>
         </html>
-      `
+      `;
 
-      printWindow.document.write(html)
-      printWindow.document.close()
-      printWindow.focus()
-      printWindow.print()
+      printWindow.document.write(html);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
       // do not close immediately to allow print dialog in some browsers
     } catch (err) {
-      console.error('print error', err)
+      console.error("print error", err);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[960px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-slate-900">Transaksi Rekening</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-slate-900">
+            Transaksi Rekening
+          </DialogTitle>
           <DialogDescription className="text-sm text-slate-600 mt-1">
-            {nomorRekening ?? '-'}
+            {nomorRekening ?? "-"}
           </DialogDescription>
         </DialogHeader>
 
@@ -139,31 +141,59 @@ export function RekeningSimpananTransactionsDialog({
           <Table className="w-full table-fixed">
             <TableHeader className="bg-slate-50">
               <TableRow className="hover:bg-slate-50">
-                <TableHead className="w-[110px] font-semibold text-slate-700">Tanggal</TableHead>
-                <TableHead className="w-[140px] font-semibold text-slate-700">Jenis Transaksi</TableHead>
-                <TableHead className="font-semibold text-slate-700">Keterangan</TableHead>
-                <TableHead className="w-[110px] text-right font-semibold text-slate-700">Debit</TableHead>
-                <TableHead className="w-[110px] text-right font-semibold text-slate-700">Kredit</TableHead>
-                <TableHead className="w-[110px] text-right font-semibold text-slate-700">Saldo</TableHead>
+                <TableHead className="w-[110px] font-semibold text-slate-700">
+                  Tanggal
+                </TableHead>
+                <TableHead className="w-[140px] font-semibold text-slate-700">
+                  Jenis Transaksi
+                </TableHead>
+                <TableHead className="font-semibold text-slate-700">
+                  Keterangan
+                </TableHead>
+                <TableHead className="w-[110px] text-right font-semibold text-slate-700">
+                  Debit
+                </TableHead>
+                <TableHead className="w-[110px] text-right font-semibold text-slate-700">
+                  Kredit
+                </TableHead>
+                <TableHead className="w-[110px] text-right font-semibold text-slate-700">
+                  Saldo
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {transactions.length ? (
                 transactions.map((transaction) => (
-                  <TableRow key={transaction.id} className="hover:bg-slate-50/60">
-                    <TableCell className="font-medium text-slate-700">{transaction.tanggal}</TableCell>
-                    <TableCell className="text-slate-700 whitespace-normal break-words">{transaction.jenis}</TableCell>
+                  <TableRow
+                    key={transaction.id}
+                    className="hover:bg-slate-50/60"
+                  >
+                    <TableCell className="font-medium text-slate-700">
+                      {transaction.tanggal}
+                    </TableCell>
+                    <TableCell className="text-slate-700 whitespace-normal break-words">
+                      {transaction.jenis}
+                    </TableCell>
                     <TableCell className="text-slate-700 whitespace-normal break-words">
                       {transaction.keterangan}
                     </TableCell>
-                    <TableCell className="text-right text-slate-700">{transaction.debitDisplay}</TableCell>
-                    <TableCell className="text-right text-slate-700">{transaction.kreditDisplay}</TableCell>
-                    <TableCell className="text-right font-semibold text-slate-900">{transaction.saldoDisplay}</TableCell>
+                    <TableCell className="text-right text-slate-700">
+                      {transaction.debitDisplay}
+                    </TableCell>
+                    <TableCell className="text-right text-slate-700">
+                      {transaction.kreditDisplay}
+                    </TableCell>
+                    <TableCell className="text-right font-semibold text-slate-900">
+                      {transaction.saldoDisplay}
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                  <TableCell
+                    colSpan={6}
+                    className="h-24 text-center text-muted-foreground"
+                  >
                     Tidak ada transaksi.
                   </TableCell>
                 </TableRow>
@@ -173,8 +203,12 @@ export function RekeningSimpananTransactionsDialog({
         </DialogBody>
 
         <div className="flex items-center justify-end gap-4 px-6 py-4 border-t border-slate-200">
-          <span className="text-lg font-semibold text-slate-700">Saldo Akhir</span>
-          <span className="text-lg font-bold text-[#4F46E5]">{finalSaldoDisplay}</span>
+          <span className="text-lg font-semibold text-slate-700">
+            Saldo Akhir
+          </span>
+          <span className="text-lg font-bold text-[#4F46E5]">
+            {finalSaldoDisplay}
+          </span>
         </div>
 
         <DialogFooter>
@@ -197,5 +231,5 @@ export function RekeningSimpananTransactionsDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

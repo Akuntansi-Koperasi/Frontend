@@ -1,53 +1,53 @@
-import { useState } from 'react'
-import { FileSpreadsheet, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import type { DepositParams} from '@/services/deprecated/depositService';
-import { Button } from '@/components/ui/button'
-import { exportDepositExcel } from '@/services/deprecated/depositService'
+import { useState } from "react";
+import { FileSpreadsheet, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import type { DepositParams } from "@/services/deprecated/depositService";
+import { Button } from "@/components/ui/button";
+import { exportDepositExcel } from "@/services/deprecated/depositService";
 
 interface SetoranHeaderProps {
-  currentFilters: DepositParams
+  currentFilters: DepositParams;
 }
 
 export function SetoranHeader({ currentFilters }: SetoranHeaderProps) {
-  const [isExporting, setIsExporting] = useState(false)
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async () => {
-    setIsExporting(true)
+    setIsExporting(true);
     try {
-      const response = await exportDepositExcel(currentFilters)
+      const response = await exportDepositExcel(currentFilters);
 
-      let filename = `Laporan_Setoran_${new Date().toISOString().split('T')[0]}.xlsx`
+      let filename = `Laporan_Setoran_${new Date().toISOString().split("T")[0]}.xlsx`;
 
-      const disposition = response.headers['content-disposition']
-      if (disposition && disposition.indexOf('attachment') !== -1) {
-        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
-        const matches = filenameRegex.exec(disposition)
+      const disposition = response.headers["content-disposition"];
+      if (disposition && disposition.indexOf("attachment") !== -1) {
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(disposition);
         if (matches != null && matches[1]) {
-          filename = matches[1].replace(/['"]/g, '')
+          filename = matches[1].replace(/['"]/g, "");
         }
       }
 
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-      const link = document.createElement('a')
-      link.href = url
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
 
-      link.setAttribute('download', filename)
+      link.setAttribute("download", filename);
 
-      document.body.appendChild(link)
-      link.click()
+      document.body.appendChild(link);
+      link.click();
 
-      link.parentNode?.removeChild(link)
-      window.URL.revokeObjectURL(url)
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
 
-      toast.success('Export Excel berhasil diunduh')
+      toast.success("Export Excel berhasil diunduh");
     } catch (error) {
-      console.error('Export failed', error)
-      toast.error('Gagal mengunduh file Excel')
+      console.error("Export failed", error);
+      toast.error("Gagal mengunduh file Excel");
     } finally {
-      setIsExporting(false)
+      setIsExporting(false);
     }
-  }
+  };
 
   return (
     <div className="flex md:items-center items-start justify-between pt-4 flex-col sm:flex-row gap-4">
@@ -67,8 +67,8 @@ export function SetoranHeader({ currentFilters }: SetoranHeaderProps) {
         ) : (
           <FileSpreadsheet className="h-4 w-4" />
         )}
-        {isExporting ? 'Mengunduh...' : 'Export Excel'}
+        {isExporting ? "Mengunduh..." : "Export Excel"}
       </Button>
     </div>
-  )
+  );
 }

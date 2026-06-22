@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
+import * as React from "react";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
-import type { CoaRecord } from './types'
+import type { CoaRecord } from "./types";
 
 import {
   Dialog,
@@ -13,17 +13,17 @@ import {
   DialogForm,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface CoaEditDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  coa?: CoaRecord
-  onEdit: (payload: CoaRecord) => void
-  isEditing?: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  coa?: CoaRecord;
+  onEdit: (payload: CoaRecord) => void;
+  isEditing?: boolean;
 }
 
 export function CoaEditDialog({
@@ -33,70 +33,72 @@ export function CoaEditDialog({
   onEdit,
   isEditing = false,
 }: CoaEditDialogProps) {
-  const [kode, setKode] = React.useState('')
-  const [namaAkun, setNamaAkun] = React.useState('')
-  const [kategori, setKategori] = React.useState<string>('')
-  const [keterangan, setKeterangan] = React.useState('')
+  const [kode, setKode] = React.useState("");
+  const [namaAkun, setNamaAkun] = React.useState("");
+  const [kategori, setKategori] = React.useState<string>("");
+  const [keterangan, setKeterangan] = React.useState("");
 
   const isFormValid = React.useMemo(
-    () => namaAkun.trim() !== '' && kategori !== '' && Boolean(coa),
+    () => namaAkun.trim() !== "" && kategori !== "" && Boolean(coa),
     [namaAkun, kategori, coa],
-  )
+  );
 
   React.useEffect(() => {
     if (coa && open) {
-      setKode(coa.kode)
-      setNamaAkun(coa.namaAkun)
-      setKategori(coa.kategori)
-      setKeterangan(coa.keterangan)
+      setKode(coa.kode);
+      setNamaAkun(coa.namaAkun);
+      setKategori(coa.kategori);
+      setKeterangan(coa.keterangan);
     }
-  }, [coa, open])
+  }, [coa, open]);
 
   const resetForm = React.useCallback(() => {
-    setKode('')
-    setNamaAkun('')
-    setKategori('')
-    setKeterangan('')
-  }, [])
+    setKode("");
+    setNamaAkun("");
+    setKategori("");
+    setKeterangan("");
+  }, []);
 
   const handleOpenChange = (val: boolean) => {
-    if (!val) resetForm()
-    onOpenChange(val)
-  }
+    if (!val) resetForm();
+    onOpenChange(val);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!coa) return
+    if (!coa) return;
 
     if (!isFormValid) {
-      toast.error('Semua field wajib harus diisi')
-      return
+      toast.error("Semua field wajib harus diisi");
+      return;
     }
 
     try {
-      await Promise.resolve()
+      await Promise.resolve();
       onEdit({
         ...coa,
         kode: kode.trim() || coa.kode,
         namaAkun: namaAkun.trim(),
-        kategori: kategori as CoaRecord['kategori'],
+        kategori: kategori as CoaRecord["kategori"],
         keterangan: keterangan.trim(),
-      })
-      toast.success('COA berhasil diperbarui')
-      onOpenChange(false)
-      resetForm()
+      });
+      toast.success("COA berhasil diperbarui");
+      onOpenChange(false);
+      resetForm();
     } catch {
-      toast.error('Gagal memperbarui COA')
+      toast.error("Gagal memperbarui COA");
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[480px]">
         <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Edit Data COA</DialogTitle>
+            <DialogTitle className="text-2xl font-bold">
+              Edit Data COA
+            </DialogTitle>
             <DialogDescription>Silakan tambah data COA</DialogDescription>
           </DialogHeader>
 
@@ -104,12 +106,15 @@ export function CoaEditDialog({
             <div className="grid gap-2">
               <Label className="text-slate-600 font-medium">Kode Akun</Label>
               <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
-                <p className="font-medium text-slate-900">{coa?.kode ?? '-'}</p>
+                <p className="font-medium text-slate-900">{coa?.kode ?? "-"}</p>
               </div>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="nama-akun-edit" className="text-slate-600 font-medium">
+              <Label
+                htmlFor="nama-akun-edit"
+                className="text-slate-600 font-medium"
+              >
                 Nama Akun <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -124,12 +129,17 @@ export function CoaEditDialog({
             <div className="grid gap-2">
               <Label className="text-slate-600 font-medium">Kategori</Label>
               <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
-                <p className="font-medium text-slate-900">{coa?.kategori ?? '-'}</p>
+                <p className="font-medium text-slate-900">
+                  {coa?.kategori ?? "-"}
+                </p>
               </div>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="keterangan-edit" className="text-slate-600 font-medium">
+              <Label
+                htmlFor="keterangan-edit"
+                className="text-slate-600 font-medium"
+              >
                 Keterangan
               </Label>
               <Input
@@ -165,5 +175,5 @@ export function CoaEditDialog({
         </DialogForm>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

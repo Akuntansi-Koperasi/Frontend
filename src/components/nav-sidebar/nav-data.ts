@@ -9,141 +9,141 @@ import {
   Settings,
   Store,
   Wallet,
-} from 'lucide-react'
+} from "lucide-react";
 
 export const navItems = [
   {
-    title: 'Dashboard',
-    url: '/dashboard',
+    title: "Dashboard",
+    url: "/dashboard",
     icon: House,
   },
   {
-    title: 'Simpan Pinjam',
+    title: "Simpan Pinjam",
     icon: Coins,
     items: [
       {
-        title: 'Transaksi Anggota',
-        url: '/simpan-pinjam/transaksi-anggota',
+        title: "Transaksi Anggota",
+        url: "/simpan-pinjam/transaksi-anggota",
       },
       {
-        title: 'Laporan Transaksi',
-        url: '/simpan-pinjam/laporan-transaksi',
+        title: "Laporan Transaksi",
+        url: "/simpan-pinjam/laporan-transaksi",
       },
     ],
   },
   {
-    title: 'Simpanan',
+    title: "Simpanan",
     icon: Wallet,
     items: [
       {
-        title: 'Produk Simpanan',
-        url: '/simpanan/produk-simpanan',
-        permission_class: 'produksimpanan',
+        title: "Produk Simpanan",
+        url: "/simpanan/produk-simpanan",
+        permission_class: "produksimpanan",
       },
       {
-        title: 'Rekening Simpanan',
-        url: '/simpanan/rekening-simpanan',
+        title: "Rekening Simpanan",
+        url: "/simpanan/rekening-simpanan",
       },
       {
-        title: 'Tagihan',
-        url: '/simpanan/tagihan',
+        title: "Tagihan",
+        url: "/simpanan/tagihan",
       },
     ],
   },
   {
-    title: 'Pinjaman',
+    title: "Pinjaman",
     icon: HandCoins,
     items: [
       {
-        title: 'Produk Pinjaman',
-        url: '/pinjaman/produk-pinjaman',
-        permission_class: 'produkpinjaman',
+        title: "Produk Pinjaman",
+        url: "/pinjaman/produk-pinjaman",
+        permission_class: "produkpinjaman",
       },
       {
-        title: 'Pengajuan Pinjaman',
-        url: '/pinjaman/pengajuan-pinjaman',
+        title: "Pengajuan Pinjaman",
+        url: "/pinjaman/pengajuan-pinjaman",
       },
       {
-        title: 'Tagihan',
-        url: '/pinjaman/tagihan',
+        title: "Tagihan",
+        url: "/pinjaman/tagihan",
       },
     ],
   },
   {
-    title: 'Gerai / Retail',
-    url: '/gerai-retail',
+    title: "Gerai / Retail",
+    url: "/gerai-retail",
     icon: School,
   },
   {
-    title: 'Laporan Retail',
-    url: '/laporan-retail',
+    title: "Laporan Retail",
+    url: "/laporan-retail",
     icon: FileText,
   },
   {
-    title: 'Akuntansi',
+    title: "Akuntansi",
     icon: Banknote,
     items: [
       {
-        title: 'Buku Besar',
-        url: '/akuntansi/buku-besar',
+        title: "Buku Besar",
+        url: "/akuntansi/buku-besar",
       },
       {
-        title: 'Tutup Buku',
-        url: '/akuntansi/tutup-buku',
+        title: "Tutup Buku",
+        url: "/akuntansi/tutup-buku",
       },
       {
-        title: 'Transaksi Umum',
-        url: '/akuntansi/transaksi-umum',
+        title: "Transaksi Umum",
+        url: "/akuntansi/transaksi-umum",
       },
       {
-        title: 'COA',
-        url: '/akuntansi/coa',
+        title: "COA",
+        url: "/akuntansi/coa",
       },
     ],
   },
   {
-    title: 'Laporan Akuntansi',
-    url: '/laporan-akuntansi',
+    title: "Laporan Akuntansi",
+    url: "/laporan-akuntansi",
     icon: FileMinus,
   },
   {
-    title: 'Koperasi',
+    title: "Koperasi",
     icon: Store,
     items: [
       {
-        title: 'Anggota',
-        url: '/koperasi/anggota',
-        permission_class: 'anggota',
+        title: "Anggota",
+        url: "/koperasi/anggota",
+        permission_class: "anggota",
       },
       {
-        title: 'Pengurus Koperasi',
-        url: '/koperasi/pengurus',
-        permission_class: 'pengurus',
+        title: "Pengurus Koperasi",
+        url: "/koperasi/pengurus",
+        permission_class: "pengurus",
       },
       {
-        title: 'Pengaturan Jabatan',
-        url: '/koperasi/jabatan',
-        permission_class: 'jabatan',
-      },
-    ]
-  },
-  {
-    title: 'Pengaturan',
-    icon: Settings,
-    items: [
-      {
-        title: 'Pengguna',
-        url: '/settings/users',
-        permission_class: 'pengguna',
-      },
-      {
-        title: 'Peran',
-        url: '/settings/roles',
-      },
-      {
-        title: 'Migrasi',
-        url: '/settings/migration',
+        title: "Pengaturan Jabatan",
+        url: "/koperasi/jabatan",
+        permission_class: "jabatan",
       },
     ],
   },
-]
+  {
+    title: "Pengaturan",
+    icon: Settings,
+    items: [
+      {
+        title: "Pengguna",
+        url: "/settings/users",
+        permission_class: "pengguna",
+      },
+      {
+        title: "Peran",
+        url: "/settings/roles",
+      },
+      {
+        title: "Migrasi",
+        url: "/settings/migration",
+      },
+    ],
+  },
+];

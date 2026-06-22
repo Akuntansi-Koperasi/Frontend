@@ -1,5 +1,5 @@
-import { AlertTriangle, Loader2 } from 'lucide-react'
-import type { TokoRecord } from '@/services/deprecated/tokoService'
+import { AlertTriangle, Loader2 } from "lucide-react";
+import type { TokoRecord } from "@/services/deprecated/tokoService";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,14 +9,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from "@/components/ui/alert-dialog";
 
 interface TokoDeleteDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  toko: TokoRecord | null
-  onConfirm: (id: number) => void
-  isDeleting: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  toko: TokoRecord | null;
+  onConfirm: (id: number) => void;
+  isDeleting: boolean;
 }
 
 export function TokoDeleteDialog({
@@ -27,11 +27,11 @@ export function TokoDeleteDialog({
   isDeleting,
 }: TokoDeleteDialogProps) {
   const handleConfirm = (e: React.MouseEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (toko) {
-      onConfirm(toko.id)
+      onConfirm(toko.id);
     }
-  }
+  };
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -44,7 +44,8 @@ export function TokoDeleteDialog({
           <AlertDialogDescription>
             Apakah Anda yakin ingin menghapus <b>{toko?.name}</b>?
             <br />
-            Data yang dihapus tidak dapat dikembalikan dan presensi di lokasi ini tidak akan valid lagi.
+            Data yang dihapus tidak dapat dikembalikan dan presensi di lokasi
+            ini tidak akan valid lagi.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -66,11 +67,11 @@ export function TokoDeleteDialog({
                 Menghapus...
               </>
             ) : (
-              'Ya, Hapus'
+              "Ya, Hapus"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

@@ -1,20 +1,29 @@
-import * as React from "react"
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
-import { Pencil, Power, Trash2, UserMinus } from "lucide-react"
+import * as React from "react";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { Pencil, Power, Trash2, UserMinus } from "lucide-react";
 
-import { AnggotaActivateAccessDialog } from "./anggota-activate-access-dialog"
-import { AnggotaDeleteDialog } from "./anggota-delete-dialog"
-import { AnggotaEditDialog } from "./anggota-edit-dialog"
-import { AnggotaKeluarkanDialog } from "./anggota-keluarkan-dialog"
-import type { ColumnDef, SortingState } from "@tanstack/react-table"
-import type { AnggotaFormErrors, AnggotaRecord, AnggotaUpsertPayload, RoleOption } from "./types"
+import { AnggotaActivateAccessDialog } from "./anggota-activate-access-dialog";
+import { AnggotaDeleteDialog } from "./anggota-delete-dialog";
+import { AnggotaEditDialog } from "./anggota-edit-dialog";
+import { AnggotaKeluarkanDialog } from "./anggota-keluarkan-dialog";
+import type { ColumnDef, SortingState } from "@tanstack/react-table";
+import type {
+  AnggotaFormErrors,
+  AnggotaRecord,
+  AnggotaUpsertPayload,
+  RoleOption,
+} from "./types";
 
-import { DataTablePagination } from "@/components/data-table-pagination"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Toaster } from "@/components/ui/sonner"
+import { DataTablePagination } from "@/components/data-table-pagination";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Toaster } from "@/components/ui/sonner";
 import {
   Table,
   TableBody,
@@ -22,48 +31,64 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
 interface AnggotaTableProps {
-  data: Array<AnggotaRecord>
-  isLoading?: boolean
+  data: Array<AnggotaRecord>;
+  isLoading?: boolean;
   pagination: {
-    pageIndex: number
-    pageSize: number
-    pageCount: number
-    total: number
-  }
-  canManage: boolean
-  canDelete: boolean
-  canActivateAccess: boolean
-  roleOptions: Array<RoleOption>
-  onPageChange: (newPageIndex: number) => void
-  onPageSizeChange: (newPageSize: number) => void
-  onUpdate: (payload: AnggotaUpsertPayload & { id: number }) => Promise<boolean>
-  onDelete: (id: number) => Promise<boolean>
-  onActivateAccess: (payload: { id: number; roleId: number }) => Promise<boolean>
-  onKeluarkan: (payload: { id: number; tanggal_keluar: string }) => Promise<boolean>
-  editErrors?: AnggotaFormErrors
+    pageIndex: number;
+    pageSize: number;
+    pageCount: number;
+    total: number;
+  };
+  canManage: boolean;
+  canDelete: boolean;
+  canActivateAccess: boolean;
+  roleOptions: Array<RoleOption>;
+  onPageChange: (newPageIndex: number) => void;
+  onPageSizeChange: (newPageSize: number) => void;
+  onUpdate: (
+    payload: AnggotaUpsertPayload & { id: number },
+  ) => Promise<boolean>;
+  onDelete: (id: number) => Promise<boolean>;
+  onActivateAccess: (payload: {
+    id: number;
+    roleId: number;
+  }) => Promise<boolean>;
+  onKeluarkan: (payload: {
+    id: number;
+    tanggal_keluar: string;
+  }) => Promise<boolean>;
+  editErrors?: AnggotaFormErrors;
 }
 
 function formatStatusLabel(status: AnggotaRecord["status"]) {
-  if (status === "tetap") return "Tetap"
-  if (status === "tidak tetap") return "Tidak Tetap"
-  return "Keluar"
+  if (status === "tetap") return "Tetap";
+  if (status === "tidak tetap") return "Tidak Tetap";
+  return "Keluar";
 }
 
 function StatusBadge({ status }: { status: AnggotaRecord["status"] }) {
-  const label = formatStatusLabel(status)
-  const variant = status === "tetap" ? "green" : status === "tidak tetap" ? "secondary" : "destructive"
+  const label = formatStatusLabel(status);
+  const variant =
+    status === "tetap"
+      ? "green"
+      : status === "tidak tetap"
+        ? "secondary"
+        : "destructive";
   return (
-    <Badge variant={variant} className="cursor-default rounded-full h-8 px-3 font-bold">
+    <Badge
+      variant={variant}
+      className="cursor-default rounded-full h-8 px-3 font-bold"
+    >
       {label}
     </Badge>
-  )
+  );
 }
 
 function AksesBadge({ akses }: { akses: string | null }) {
-  const aktif = akses === "Aktif"
+  const aktif = akses === "Aktif";
   return (
     <Badge
       variant={aktif ? "green" : "destructive"}
@@ -71,7 +96,7 @@ function AksesBadge({ akses }: { akses: string | null }) {
     >
       {akses ?? "Tidak Aktif"}
     </Badge>
-  )
+  );
 }
 
 export function AnggotaTable({
@@ -90,12 +115,16 @@ export function AnggotaTable({
   onKeluarkan,
   editErrors,
 }: AnggotaTableProps) {
-  const [sorting] = React.useState<SortingState>([])
+  const [sorting] = React.useState<SortingState>([]);
 
-  const [anggotaToEdit, setAnggotaToEdit] = React.useState<AnggotaRecord | null>(null)
-  const [anggotaToDelete, setAnggotaToDelete] = React.useState<AnggotaRecord | null>(null)
-  const [anggotaToActivate, setAnggotaToActivate] = React.useState<AnggotaRecord | null>(null)
-  const [anggotaToKeluarkan, setAnggotaToKeluarkan] = React.useState<AnggotaRecord | null>(null)
+  const [anggotaToEdit, setAnggotaToEdit] =
+    React.useState<AnggotaRecord | null>(null);
+  const [anggotaToDelete, setAnggotaToDelete] =
+    React.useState<AnggotaRecord | null>(null);
+  const [anggotaToActivate, setAnggotaToActivate] =
+    React.useState<AnggotaRecord | null>(null);
+  const [anggotaToKeluarkan, setAnggotaToKeluarkan] =
+    React.useState<AnggotaRecord | null>(null);
 
   const columns = React.useMemo<Array<ColumnDef<AnggotaRecord>>>(
     () => [
@@ -103,8 +132,11 @@ export function AnggotaTable({
         id: "index",
         header: "No.",
         cell: ({ row }) => {
-          const index = row.index + 1 + pagination.pageIndex * pagination.pageSize
-          return <span className="text-muted-foreground font-medium">{index}.</span>
+          const index =
+            row.index + 1 + pagination.pageIndex * pagination.pageSize;
+          return (
+            <span className="text-muted-foreground font-medium">{index}.</span>
+          );
         },
       },
       {
@@ -119,8 +151,12 @@ export function AnggotaTable({
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col text-left">
-              <span className="font-semibold text-slate-900 text-sm">{row.original.nama}</span>
-              <span className="text-xs text-muted-foreground">{row.original.email}</span>
+              <span className="font-semibold text-slate-900 text-sm">
+                {row.original.nama}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {row.original.email}
+              </span>
             </div>
           </div>
         ),
@@ -157,7 +193,7 @@ export function AnggotaTable({
       },
     ],
     [pagination.pageIndex, pagination.pageSize],
-  )
+  );
 
   if (canManage || canDelete || canActivateAccess) {
     columns.push({
@@ -214,7 +250,7 @@ export function AnggotaTable({
           ) : null}
         </div>
       ),
-    })
+    });
   }
 
   const table = useReactTable({
@@ -224,10 +260,10 @@ export function AnggotaTable({
     state: { sorting },
     manualPagination: true,
     pageCount: pagination.pageCount,
-  })
+  });
 
-  const hasRows = table.getRowModel().rows.length > 0
-  const isInitialLoading = Boolean(isLoading) && !hasRows
+  const hasRows = table.getRowModel().rows.length > 0;
+  const isInitialLoading = Boolean(isLoading) && !hasRows;
 
   return (
     <>
@@ -238,16 +274,19 @@ export function AnggotaTable({
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="hover:bg-transparent">
                   {headerGroup.headers.map((header, index) => {
-                    let alignClass = "text-center"
-                    if (index === 1) alignClass = "text-left"
+                    let alignClass = "text-center";
+                    if (index === 1) alignClass = "text-left";
                     return (
                       <TableHead
                         key={header.id}
                         className={`font-semibold text-slate-900 ${alignClass}`}
                       >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                       </TableHead>
-                    )
+                    );
                   })}
                 </TableRow>
               ))}
@@ -255,7 +294,10 @@ export function AnggotaTable({
             <TableBody>
               {isInitialLoading ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center text-muted-foreground"
+                  >
                     Memuat data anggota...
                   </TableCell>
                 </TableRow>
@@ -263,19 +305,28 @@ export function AnggotaTable({
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {
-                      let alignClass = "text-center"
-                      if (index === 1) alignClass = "text-left"
+                      let alignClass = "text-center";
+                      if (index === 1) alignClass = "text-left";
                       return (
-                        <TableCell key={cell.id} className={`py-3 ${alignClass}`}> 
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        <TableCell
+                          key={cell.id}
+                          className={`py-3 ${alignClass}`}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
                         </TableCell>
-                      )
+                      );
                     })}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
                     Tidak ada anggota ditemukan.
                   </TableCell>
                 </TableRow>
@@ -298,7 +349,7 @@ export function AnggotaTable({
         onOpenChange={(isOpen) => !isOpen && setAnggotaToEdit(null)}
         anggota={anggotaToEdit}
         onSave={(payload) => {
-          return onUpdate(payload)
+          return onUpdate(payload);
         }}
         errors={editErrors}
       />
@@ -327,5 +378,5 @@ export function AnggotaTable({
 
       <Toaster position="top-right" richColors closeButton theme="light" />
     </>
-  )
+  );
 }

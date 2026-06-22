@@ -1,16 +1,14 @@
-import * as React from "react"
+import * as React from "react";
 import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, Calendar, Clock } from "lucide-react"
-import type {
-  ColumnDef,
-  SortingState} from "@tanstack/react-table";
+} from "@tanstack/react-table";
+import { ArrowUpDown, Calendar, Clock } from "lucide-react";
+import type { ColumnDef, SortingState } from "@tanstack/react-table";
 
-import type { DashboardStats } from "@/services/dashboardService"
+import type { DashboardStats } from "@/services/dashboardService";
 import {
   Table,
   TableBody,
@@ -18,13 +16,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
-type Activity = DashboardStats['pulang_laporan_setoran'][0]
+type Activity = DashboardStats["pulang_laporan_setoran"][0];
 
 const formatRp = (val: number) => {
   return new Intl.NumberFormat("id-ID", {
@@ -32,8 +30,8 @@ const formatRp = (val: number) => {
     currency: "IDR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(val)
-}
+  }).format(val);
+};
 
 export const columns: Array<ColumnDef<Activity>> = [
   {
@@ -48,10 +46,10 @@ export const columns: Array<ColumnDef<Activity>> = [
           Karyawan
           <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
-      const user = row.original.user
+      const user = row.original.user;
       return (
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 border border-slate-200">
@@ -61,11 +59,15 @@ export const columns: Array<ColumnDef<Activity>> = [
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col text-left">
-            <span className="font-semibold text-slate-900 text-sm">{user.name}</span>
-            <span className="text-xs text-muted-foreground">@{user.username}</span>
+            <span className="font-semibold text-slate-900 text-sm">
+              {user.name}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              @{user.username}
+            </span>
           </div>
         </div>
-      )
+      );
     },
   },
   {
@@ -92,7 +94,10 @@ export const columns: Array<ColumnDef<Activity>> = [
     accessorKey: "pemasukan",
     header: "Jumlah Pemasukan",
     cell: ({ row }) => (
-      <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-100 font-bold px-3 py-1">
+      <Badge
+        variant="outline"
+        className="bg-emerald-50 text-emerald-600 border-emerald-100 font-bold px-3 py-1"
+      >
         {formatRp(row.original.pemasukan)}
       </Badge>
     ),
@@ -101,7 +106,10 @@ export const columns: Array<ColumnDef<Activity>> = [
     accessorKey: "pengeluaran",
     header: "Jumlah Pengeluaran",
     cell: ({ row }) => (
-      <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-100 font-bold px-3 py-1">
+      <Badge
+        variant="outline"
+        className="bg-rose-50 text-rose-600 border-rose-100 font-bold px-3 py-1"
+      >
         {formatRp(row.original.pengeluaran)}
       </Badge>
     ),
@@ -110,15 +118,22 @@ export const columns: Array<ColumnDef<Activity>> = [
     accessorKey: "deposit",
     header: "Setoran Koperasi",
     cell: ({ row }) => (
-      <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-100 font-bold px-3 py-1">
+      <Badge
+        variant="outline"
+        className="bg-blue-50 text-blue-600 border-blue-100 font-bold px-3 py-1"
+      >
         {formatRp(row.original.deposit)}
       </Badge>
     ),
   },
-]
+];
 
-export function DashboardTable({ activities }: { activities: Array<Activity> }) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+export function DashboardTable({
+  activities,
+}: {
+  activities: Array<Activity>;
+}) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const table = useReactTable({
     data: activities,
@@ -130,16 +145,18 @@ export function DashboardTable({ activities }: { activities: Array<Activity> }) 
       sorting,
     },
     initialState: {
-        pagination: {
-            pageSize: 8
-        }
-    }
-  })
+      pagination: {
+        pageSize: 8,
+      },
+    },
+  });
 
   return (
     <Card className="shadow-lg my-0 pt-4 gap-0 border-3 border-slate-200">
       <CardHeader className="border-b border-slate-100 py-0 pb-4">
-        <CardTitle className="text-2xl font-bold">Aktivitas Terkini (Pulang & Setoran)</CardTitle>
+        <CardTitle className="text-2xl font-bold">
+          Aktivitas Terkini (Pulang & Setoran)
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <Table>
@@ -148,18 +165,18 @@ export function DashboardTable({ activities }: { activities: Array<Activity> }) 
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead 
-                      key={header.id} 
+                    <TableHead
+                      key={header.id}
                       className="font-bold text-slate-900 text-center first:text-left first:pl-6"
                     >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -173,18 +190,24 @@ export function DashboardTable({ activities }: { activities: Array<Activity> }) 
                   className="hover:bg-slate-50 border-b border-slate-100"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell 
-                      key={cell.id} 
+                    <TableCell
+                      key={cell.id}
                       className="py-3 text-center first:text-left first:pl-6"
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   Belum ada aktivitas terkini.
                 </TableCell>
               </TableRow>
@@ -193,5 +216,5 @@ export function DashboardTable({ activities }: { activities: Array<Activity> }) 
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,84 +1,88 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { Calendar, Filter, Search } from 'lucide-react'
-import type { CashflowParams } from '@/services/deprecated/cashflowService'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { Calendar, Filter, Search } from "lucide-react";
+import type { CashflowParams } from "@/services/deprecated/cashflowService";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 export function KeuanganFilters({
   currentFilters,
 }: {
-  currentFilters: CashflowParams
+  currentFilters: CashflowParams;
 }) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const getToday = () => {
-    const date = new Date()
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
-  }
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   const getFirstDayOfMonth = () => {
-    const date = new Date()
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    return `${year}-${month}-01`
-  }
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    return `${year}-${month}-01`;
+  };
 
   const [filters, setFilters] = useState<CashflowParams>(() => ({
     ...currentFilters,
     start_date: currentFilters.start_date || getFirstDayOfMonth(),
     end_date: currentFilters.end_date || getToday(),
-  }))
+  }));
 
   useEffect(() => {
-    const defaultStart = getFirstDayOfMonth()
-    const defaultEnd = getToday()
+    const defaultStart = getFirstDayOfMonth();
+    const defaultEnd = getToday();
 
-    const hasStart = !!currentFilters.start_date
-    const hasEnd = !!currentFilters.end_date
+    const hasStart = !!currentFilters.start_date;
+    const hasEnd = !!currentFilters.end_date;
 
     if (!hasStart || !hasEnd) {
       navigate({
-        to: '/keuangan' as any,
+        to: "/keuangan" as any,
         search: ((prev: any) => ({
           ...prev,
           start_date: hasStart ? currentFilters.start_date : defaultStart,
           end_date: hasEnd ? currentFilters.end_date : defaultEnd,
         })) as any,
         replace: true,
-      })
+      });
     } else {
-      setFilters(currentFilters)
+      setFilters(currentFilters);
     }
-  }, [currentFilters, navigate])
+  }, [currentFilters, navigate]);
 
   const applyFilter = (key: keyof CashflowParams, value: any) => {
-    const newFilters = { ...filters, [key]: value }
-    setFilters(newFilters)
+    const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
 
     navigate({
-      to: '/keuangan' as any,
-      search: ({ ...newFilters, page: 1, per_page: newFilters.per_page ?? 10 } as any) as any,
+      to: "/keuangan" as any,
+      search: {
+        ...newFilters,
+        page: 1,
+        per_page: newFilters.per_page ?? 10,
+      } as any as any,
       replace: true,
-    })
-  }
+    });
+  };
 
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      applyFilter('search', filters.search)
+    if (e.key === "Enter") {
+      applyFilter("search", filters.search);
     }
-  }
+  };
 
   return (
     <Card className="shadow-lg border-3 border-slate-200">
@@ -90,8 +94,8 @@ export function KeuanganFilters({
             <Input
               type="date"
               className="pl-9"
-              value={filters.start_date || ''}
-              onChange={(e) => applyFilter('start_date', e.target.value)}
+              value={filters.start_date || ""}
+              onChange={(e) => applyFilter("start_date", e.target.value)}
             />
           </div>
         </div>
@@ -105,8 +109,8 @@ export function KeuanganFilters({
             <Input
               type="date"
               className="pl-9"
-              value={filters.end_date || ''}
-              onChange={(e) => applyFilter('end_date', e.target.value)}
+              value={filters.end_date || ""}
+              onChange={(e) => applyFilter("end_date", e.target.value)}
             />
           </div>
         </div>
@@ -116,9 +120,9 @@ export function KeuanganFilters({
             Filter Tipe
           </Label>
           <Select
-            value={filters.type || 'all'}
+            value={filters.type || "all"}
             onValueChange={(val) =>
-              applyFilter('type', val as CashflowParams['type'])
+              applyFilter("type", val as CashflowParams["type"])
             }
           >
             <SelectTrigger className="pl-9 relative w-full">
@@ -142,16 +146,16 @@ export function KeuanganFilters({
             <Input
               placeholder="Cari transaksi..."
               className="pl-9"
-              value={filters.search || ''}
+              value={filters.search || ""}
               onChange={(e) =>
                 setFilters({ ...filters, search: e.target.value })
               }
-              onBlur={() => applyFilter('search', filters.search)}
+              onBlur={() => applyFilter("search", filters.search)}
               onKeyDown={handleSearchKeyDown}
             />
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

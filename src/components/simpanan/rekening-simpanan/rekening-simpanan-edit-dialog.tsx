@@ -1,8 +1,12 @@
-import * as React from 'react'
-import { Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
+import * as React from "react";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
-import type { AnggotaOption, ProdukSimpananOption, RekeningSimpananRecord } from './types'
+import type {
+  AnggotaOption,
+  ProdukSimpananOption,
+  RekeningSimpananRecord,
+} from "./types";
 
 import {
   Dialog,
@@ -13,19 +17,19 @@ import {
   DialogForm,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface RekeningSimpananEditDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  rekening?: RekeningSimpananRecord
-  onEdit: (payload: RekeningSimpananRecord) => void
-  isEditing?: boolean
-  anggotaOptions: Array<AnggotaOption>
-  produkOptions: Array<ProdukSimpananOption>
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  rekening?: RekeningSimpananRecord;
+  onEdit: (payload: RekeningSimpananRecord) => void;
+  isEditing?: boolean;
+  anggotaOptions: Array<AnggotaOption>;
+  produkOptions: Array<ProdukSimpananOption>;
 }
 
 export function RekeningSimpananEditDialog({
@@ -37,63 +41,68 @@ export function RekeningSimpananEditDialog({
   anggotaOptions,
   produkOptions,
 }: RekeningSimpananEditDialogProps) {
-  const [nominal, setNominal] = React.useState('')
-  const [bungaTahunan, setBungaTahunan] = React.useState('')
+  const [nominal, setNominal] = React.useState("");
+  const [bungaTahunan, setBungaTahunan] = React.useState("");
 
   const isFormValid = React.useMemo(
-    () => nominal.trim() !== '' && bungaTahunan.trim() !== '' && Boolean(rekening),
+    () =>
+      nominal.trim() !== "" && bungaTahunan.trim() !== "" && Boolean(rekening),
     [bungaTahunan, nominal, rekening],
-  )
+  );
 
   React.useEffect(() => {
     if (rekening && open) {
-      setNominal(rekening.nominal.toString())
-      setBungaTahunan(rekening.bungaTahunan?.toString() ?? '')
+      setNominal(rekening.nominal.toString());
+      setBungaTahunan(rekening.bungaTahunan?.toString() ?? "");
     }
-  }, [rekening, open])
+  }, [rekening, open]);
 
   const resetForm = React.useCallback(() => {
-    setNominal('')
-    setBungaTahunan('')
-  }, [])
+    setNominal("");
+    setBungaTahunan("");
+  }, []);
 
   const handleOpenChange = (val: boolean) => {
-    if (!val) resetForm()
-    onOpenChange(val)
-  }
+    if (!val) resetForm();
+    onOpenChange(val);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!rekening) return
+    if (!rekening) return;
 
     if (!isFormValid) {
-      toast.error('Semua field wajib harus diisi')
-      return
+      toast.error("Semua field wajib harus diisi");
+      return;
     }
 
     try {
-      await Promise.resolve()
+      await Promise.resolve();
       onEdit({
         ...rekening,
         nominal: parseInt(nominal, 10),
         bungaTahunan: parseFloat(bungaTahunan),
-      })
-      toast.success('Rekening simpanan berhasil diperbarui')
-      onOpenChange(false)
-      resetForm()
+      });
+      toast.success("Rekening simpanan berhasil diperbarui");
+      onOpenChange(false);
+      resetForm();
     } catch {
-      toast.error('Gagal memperbarui rekening simpanan')
+      toast.error("Gagal memperbarui rekening simpanan");
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[480px]">
         <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Edit Rekening Simpanan</DialogTitle>
-            <DialogDescription>Silakan Edit data rekening simpanan</DialogDescription>
+            <DialogTitle className="text-2xl font-bold">
+              Edit Rekening Simpanan
+            </DialogTitle>
+            <DialogDescription>
+              Silakan Edit data rekening simpanan
+            </DialogDescription>
           </DialogHeader>
 
           <DialogBody className="grid gap-4 py-4">
@@ -101,34 +110,52 @@ export function RekeningSimpananEditDialog({
               <Label className="text-slate-600 font-medium">Anggota</Label>
               <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
                 <p className="font-medium text-slate-900">
-                  {rekening ? anggotaOptions.find((a) => a.id === rekening.anggotaId)?.nama ?? '-' : '-'}
+                  {rekening
+                    ? (anggotaOptions.find((a) => a.id === rekening.anggotaId)
+                        ?.nama ?? "-")
+                    : "-"}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {rekening ? anggotaOptions.find((a) => a.id === rekening.anggotaId)?.email ?? '' : ''}
+                  {rekening
+                    ? (anggotaOptions.find((a) => a.id === rekening.anggotaId)
+                        ?.email ?? "")
+                    : ""}
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label className="text-slate-600 font-medium">Produk Simpanan</Label>
+                <Label className="text-slate-600 font-medium">
+                  Produk Simpanan
+                </Label>
                 <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 h-full">
                   <p className="font-medium text-slate-900">
-                    {rekening ? produkOptions.find((p) => p.id === rekening.produkId)?.nama ?? '-' : '-'}
+                    {rekening
+                      ? (produkOptions.find((p) => p.id === rekening.produkId)
+                          ?.nama ?? "-")
+                      : "-"}
                   </p>
                 </div>
               </div>
 
               <div className="grid gap-2">
-                <Label className="text-slate-600 font-medium">Nomor Rekening</Label>
+                <Label className="text-slate-600 font-medium">
+                  Nomor Rekening
+                </Label>
                 <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 h-full">
-                  <p className="font-medium text-slate-900">{rekening?.nomorRekening ?? '-'}</p>
+                  <p className="font-medium text-slate-900">
+                    {rekening?.nomorRekening ?? "-"}
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="nominal-edit" className="text-slate-600 font-medium">
+              <Label
+                htmlFor="nominal-edit"
+                className="text-slate-600 font-medium"
+              >
                 Nominal/Jumlah (Rp)
               </Label>
               <Input
@@ -141,7 +168,10 @@ export function RekeningSimpananEditDialog({
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="bunga-edit" className="text-slate-600 font-medium">
+              <Label
+                htmlFor="bunga-edit"
+                className="text-slate-600 font-medium"
+              >
                 Suku Bunga Tahunan (%) *
               </Label>
               <Input
@@ -177,5 +207,5 @@ export function RekeningSimpananEditDialog({
         </DialogForm>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

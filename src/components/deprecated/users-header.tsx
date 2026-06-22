@@ -7,7 +7,6 @@ export function UsersHeader() {
           Kelola akun akses anggota
         </p>
       </div>
-      
     </div>
-  )
+  );
 }

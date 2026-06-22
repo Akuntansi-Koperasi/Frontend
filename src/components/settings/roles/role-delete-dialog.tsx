@@ -1,6 +1,6 @@
-import { AlertTriangle, Loader2 } from 'lucide-react'
+import { AlertTriangle, Loader2 } from "lucide-react";
 
-import type { RoleRecord } from './types'
+import type { RoleRecord } from "./types";
 
 import {
   AlertDialog,
@@ -11,14 +11,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from "@/components/ui/alert-dialog";
 
 interface RoleDeleteDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  role: RoleRecord | null
-  onConfirm: (id: number) => void
-  isDeleting: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  role: RoleRecord | null;
+  onConfirm: (id: number) => void;
+  isDeleting: boolean;
 }
 
 export function RoleDeleteDialog({
@@ -37,7 +37,7 @@ export function RoleDeleteDialog({
             <AlertDialogTitle>Hapus data peran ini?</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus data ini? Tindakan ini menyebabkan{' '}
+            Apakah Anda yakin ingin menghapus data ini? Tindakan ini menyebabkan{" "}
             <span className="text-rose-600 font-semibold">
               semua akun yang menggunakan peran ini tidak bisa diakses
             </span>
@@ -54,8 +54,8 @@ export function RoleDeleteDialog({
           <AlertDialogAction
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
             onClick={(e) => {
-              e.preventDefault()
-              if (role) onConfirm(role.id)
+              e.preventDefault();
+              if (role) onConfirm(role.id);
             }}
             disabled={isDeleting}
           >
@@ -65,11 +65,11 @@ export function RoleDeleteDialog({
                 Menghapus...
               </>
             ) : (
-              'Ya, Hapus'
+              "Ya, Hapus"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

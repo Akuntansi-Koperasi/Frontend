@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { AlertCircle, Loader2, MapPin } from 'lucide-react'
-import { toast } from 'sonner'
-import { MapPicker } from './map-picker'
-import type { TokoRecord } from '@/services/deprecated/tokoService'
-import { Button } from '@/components/ui/button'
+import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AlertCircle, Loader2, MapPin } from "lucide-react";
+import { toast } from "sonner";
+import { MapPicker } from "./map-picker";
+import type { TokoRecord } from "@/services/deprecated/tokoService";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,15 +12,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { getAddressFromCoordinates, updateToko } from '@/services/deprecated/tokoService'
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  getAddressFromCoordinates,
+  updateToko,
+} from "@/services/deprecated/tokoService";
 
 interface TokoEditDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  toko: TokoRecord | null
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  toko: TokoRecord | null;
 }
 
 export function TokoEditDialog({
@@ -28,74 +31,74 @@ export function TokoEditDialog({
   onOpenChange,
   toko,
 }: TokoEditDialogProps) {
-  const queryClient = useQueryClient()
-  const [coords, setCoords] = useState({ lat: -6.2, lng: 106.816666 })
-  const [name, setName] = useState('')
-  const [address, setAddress] = useState('')
-  const [maxDistance, setMaxDistance] = useState(50)
-  const [isLoadingAddress, setIsLoadingAddress] = useState(false)
-  const [error, setError] = useState('')
-  const [noAddressFound, setNoAddressFound] = useState('')
+  const queryClient = useQueryClient();
+  const [coords, setCoords] = useState({ lat: -6.2, lng: 106.816666 });
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [maxDistance, setMaxDistance] = useState(50);
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
+  const [error, setError] = useState("");
+  const [noAddressFound, setNoAddressFound] = useState("");
 
   useEffect(() => {
     if (toko) {
-      setName(toko.name)
-      setAddress(toko.address)
-      setMaxDistance(toko.max_distance)
+      setName(toko.name);
+      setAddress(toko.address);
+      setMaxDistance(toko.max_distance);
       setCoords({
         lat: parseFloat(toko.latitude),
         lng: parseFloat(toko.longitude),
-      })
-      setError('')
-      setNoAddressFound('')
+      });
+      setError("");
+      setNoAddressFound("");
     }
-  }, [toko])
+  }, [toko]);
 
   const mutation = useMutation({
     mutationFn: (data: any) => updateToko(toko!.id, data),
     onSuccess: () => {
-      toast.success('Toko berhasil diperbarui')
-      queryClient.invalidateQueries({ queryKey: ['toko'] })
-      onOpenChange(false)
-      setError('')
-      setNoAddressFound('')
+      toast.success("Toko berhasil diperbarui");
+      queryClient.invalidateQueries({ queryKey: ["toko"] });
+      onOpenChange(false);
+      setError("");
+      setNoAddressFound("");
     },
     onError: (err: any) => {
       const errorMessage =
-        err?.response?.data?.message || 'Gagal memperbarui toko'
-      
-      setError(errorMessage)
-      toast.error(errorMessage)
+        err?.response?.data?.message || "Gagal memperbarui toko";
+
+      setError(errorMessage);
+      toast.error(errorMessage);
     },
-  })
+  });
 
   const handleLocationSelect = async (lat: number, lng: number) => {
-    setNoAddressFound('')
-    setError('')
-    
-    setCoords({ lat, lng })
-    setIsLoadingAddress(true)
-    
+    setNoAddressFound("");
+    setError("");
+
+    setCoords({ lat, lng });
+    setIsLoadingAddress(true);
+
     try {
-      const fetchedAddress = await getAddressFromCoordinates(lat, lng)
+      const fetchedAddress = await getAddressFromCoordinates(lat, lng);
       if (fetchedAddress) {
-        setAddress(fetchedAddress)
+        setAddress(fetchedAddress);
       } else {
-        setNoAddressFound('Alamat tidak ditemukan untuk koordinat ini.')
+        setNoAddressFound("Alamat tidak ditemukan untuk koordinat ini.");
       }
     } catch (err) {
-      setNoAddressFound('Gagal mengambil detail alamat otomatis.')
-      toast.error('Gagal mengambil alamat dari peta')
+      setNoAddressFound("Gagal mengambil detail alamat otomatis.");
+      toast.error("Gagal mengambil alamat dari peta");
     } finally {
-      setIsLoadingAddress(false)
+      setIsLoadingAddress(false);
     }
-  }
+  };
 
   const handleSubmit = () => {
-    if (!toko) return
+    if (!toko) return;
     if (!name || !address) {
-      toast.error('Nama toko dan alamat harus diisi')
-      return
+      toast.error("Nama toko dan alamat harus diisi");
+      return;
     }
 
     mutation.mutate({
@@ -104,10 +107,11 @@ export function TokoEditDialog({
       latitude: coords.lat,
       longitude: coords.lng,
       max_distance: maxDistance,
-    })
-  }
+    });
+  };
 
-  const isFormValid = name.trim() !== '' && address.trim() !== '' && maxDistance > 0
+  const isFormValid =
+    name.trim() !== "" && address.trim() !== "" && maxDistance > 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -117,7 +121,7 @@ export function TokoEditDialog({
           <DialogDescription className="text-md">
             Ubah detail lokasi toko
           </DialogDescription>
-          
+
           {error && (
             <div className="flex items-center gap-2 p-3 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md animate-in fade-in slide-in-from-top-1">
               <AlertCircle className="h-4 w-4" />
@@ -135,8 +139,8 @@ export function TokoEditDialog({
               id="edit-name"
               value={name}
               onChange={(e) => {
-                setName(e.target.value)
-                setError('')
+                setName(e.target.value);
+                setError("");
               }}
               className="bg-slate-50"
             />
@@ -193,10 +197,10 @@ export function TokoEditDialog({
               <Input
                 value={address}
                 onChange={(e) => {
-                  setAddress(e.target.value)
-                  setNoAddressFound('')
+                  setAddress(e.target.value);
+                  setNoAddressFound("");
                 }}
-                className={`bg-white ${noAddressFound ? 'border-red-300 focus-visible:ring-red-200' : ''}`}
+                className={`bg-white ${noAddressFound ? "border-red-300 focus-visible:ring-red-200" : ""}`}
               />
             </div>
 
@@ -232,10 +236,10 @@ export function TokoEditDialog({
             {mutation.isPending && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            {mutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
+            {mutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

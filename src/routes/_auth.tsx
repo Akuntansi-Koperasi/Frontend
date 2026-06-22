@@ -1,23 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 import {
   Outlet,
   createFileRoute,
   useLocation,
   useRouter,
-} from '@tanstack/react-router'
-import { AppSidebar } from '@/components/nav-sidebar/app-sidebar'
+} from "@tanstack/react-router";
+import { AppSidebar } from "@/components/nav-sidebar/app-sidebar";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from '@/components/ui/sidebar'
-import { navItems } from '@/components/nav-sidebar/nav-data'
-import { SearchBar } from '@/components/nav-sidebar/search-bar'
-import { UserNav } from '@/components/nav-sidebar/user-nav'
-import Notifications from '@/components/nav-sidebar/notifications'
-import { isAuthenticated } from '@/services/authService'
+} from "@/components/ui/sidebar";
+import { navItems } from "@/components/nav-sidebar/nav-data";
+import { SearchBar } from "@/components/nav-sidebar/search-bar";
+import { UserNav } from "@/components/nav-sidebar/user-nav";
+import Notifications from "@/components/nav-sidebar/notifications";
+import { isAuthenticated } from "@/services/authService";
 
-export const Route = createFileRoute('/_auth')({
+export const Route = createFileRoute("/_auth")({
   // Tidak dipakai karena menyebabkan flicker
   // beforeLoad: ({ location }) => {
   //   if (!isAuthenticated()) {
@@ -30,35 +30,35 @@ export const Route = createFileRoute('/_auth')({
   //   }
   // },
   component: AuthLayout,
-})
+});
 
 function AuthLayout() {
-  const router = useRouter()
+  const router = useRouter();
   const pathname = useLocation({
     select: (location) => location.pathname,
-  })
+  });
 
   // Autentikasi dan authorisasi dengan client-side
-  const [isAuthorized, setIsAuthorized] = useState(false)
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated()) {
-      setIsAuthorized(true)
+      setIsAuthorized(true);
     } else {
-      router.navigate({ to: '/login', replace: true })
+      router.navigate({ to: "/login", replace: true });
     }
-  }, [router])
+  }, [router]);
 
   if (!isAuthorized) {
-    return null
+    return null;
   }
 
   return (
     <SidebarProvider
       style={
         {
-          '--sidebar-width': '18rem',
-          '--sidebar-width-icon': '5rem',
+          "--sidebar-width": "18rem",
+          "--sidebar-width-icon": "5rem",
         } as React.CSSProperties
       }
     >
@@ -82,5 +82,5 @@ function AuthLayout() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

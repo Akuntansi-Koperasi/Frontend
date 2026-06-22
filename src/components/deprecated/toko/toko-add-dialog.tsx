@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { AlertCircle, Loader2, MapPin, Plus } from 'lucide-react'
-import { toast } from 'sonner'
-import { MapPicker } from './map-picker'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AlertCircle, Loader2, MapPin, Plus } from "lucide-react";
+import { toast } from "sonner";
+import { MapPicker } from "./map-picker";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,69 +12,73 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { createToko, getAddressFromCoordinates } from '@/services/deprecated/tokoService'
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  createToko,
+  getAddressFromCoordinates,
+} from "@/services/deprecated/tokoService";
 
 export function TokoAddDialog() {
-  const [open, setOpen] = useState(false)
-  const queryClient = useQueryClient()
-  const [coords, setCoords] = useState({ lat: -7.7956, lng: 110.3695 })
-  const [name, setName] = useState('')
-  const [address, setAddress] = useState('')
-  const [maxDistance, setMaxDistance] = useState(50)
-  const [isLoadingAddress, setIsLoadingAddress] = useState(false)
-  const [error, setError] = useState('')
-  const [noAddressFound, setNoAddressFound] = useState('')
+  const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const [coords, setCoords] = useState({ lat: -7.7956, lng: 110.3695 });
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [maxDistance, setMaxDistance] = useState(50);
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
+  const [error, setError] = useState("");
+  const [noAddressFound, setNoAddressFound] = useState("");
 
   const mutation = useMutation({
     mutationFn: createToko,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['toko'] })
-      setOpen(false)
-      setName('')
-      setAddress('')
-      setError('')
-      setNoAddressFound('')
-      setMaxDistance(50)
-      toast.success('Toko berhasil ditambahkan')
+      queryClient.invalidateQueries({ queryKey: ["toko"] });
+      setOpen(false);
+      setName("");
+      setAddress("");
+      setError("");
+      setNoAddressFound("");
+      setMaxDistance(50);
+      toast.success("Toko berhasil ditambahkan");
     },
     onError: (err: any) => {
       const errorMessage =
-        err?.response?.data?.message || 'Terjadi kesalahan saat menambahkan toko'
-      
-      setError(errorMessage)
-      toast.error(errorMessage)
+        err?.response?.data?.message ||
+        "Terjadi kesalahan saat menambahkan toko";
+
+      setError(errorMessage);
+      toast.error(errorMessage);
     },
-  })
+  });
 
   const handleLocationSelect = async (lat: number, lng: number) => {
-    setNoAddressFound('')
-    setError('')
-    
-    setCoords({ lat, lng })
-    setIsLoadingAddress(true)
-    
+    setNoAddressFound("");
+    setError("");
+
+    setCoords({ lat, lng });
+    setIsLoadingAddress(true);
+
     try {
-      const fetchedAddress = await getAddressFromCoordinates(lat, lng)
+      const fetchedAddress = await getAddressFromCoordinates(lat, lng);
       if (fetchedAddress) {
-        setAddress(fetchedAddress)
+        setAddress(fetchedAddress);
       } else {
-        setNoAddressFound('Alamat tidak ditemukan untuk koordinat ini.')
+        setNoAddressFound("Alamat tidak ditemukan untuk koordinat ini.");
       }
     } catch (err) {
-      setNoAddressFound('Gagal mengambil detail alamat otomatis.')
-      toast.error('Gagal mengambil alamat dari peta')
+      setNoAddressFound("Gagal mengambil detail alamat otomatis.");
+      toast.error("Gagal mengambil alamat dari peta");
     } finally {
-      setIsLoadingAddress(false)
+      setIsLoadingAddress(false);
     }
-  }
+  };
 
   const handleSubmit = () => {
     if (!name || !address) {
-      toast.error('Nama toko dan alamat harus diisi')
-      return
+      toast.error("Nama toko dan alamat harus diisi");
+      return;
     }
 
     mutation.mutate({
@@ -83,10 +87,11 @@ export function TokoAddDialog() {
       latitude: coords.lat,
       longitude: coords.lng,
       max_distance: maxDistance,
-    })
-  }
+    });
+  };
 
-  const isFormValid = name.trim() !== '' && address.trim() !== '' && maxDistance > 0
+  const isFormValid =
+    name.trim() !== "" && address.trim() !== "" && maxDistance > 0;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -105,7 +110,7 @@ export function TokoAddDialog() {
             Silakan masukkan data toko baru. Pin lokasi di peta untuk mengisi
             alamat otomatis.
           </DialogDescription>
-          
+
           {error && (
             <div className="flex items-center gap-2 p-3 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md animate-in fade-in slide-in-from-top-1">
               <AlertCircle className="h-4 w-4" />
@@ -125,8 +130,8 @@ export function TokoAddDialog() {
               className="bg-slate-50"
               value={name}
               onChange={(e) => {
-                setName(e.target.value)
-                setError('')
+                setName(e.target.value);
+                setError("");
               }}
             />
           </div>
@@ -181,11 +186,11 @@ export function TokoAddDialog() {
               </div>
               <Input
                 placeholder="Jl. Jendral Sudirman..."
-                className={`bg-white ${noAddressFound ? 'border-red-300 focus-visible:ring-red-200' : ''}`}
+                className={`bg-white ${noAddressFound ? "border-red-300 focus-visible:ring-red-200" : ""}`}
                 value={address}
                 onChange={(e) => {
-                  setAddress(e.target.value)
-                  setNoAddressFound('')
+                  setAddress(e.target.value);
+                  setNoAddressFound("");
                 }}
               />
             </div>
@@ -225,10 +230,10 @@ export function TokoAddDialog() {
             {mutation.isPending && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            {mutation.isPending ? 'Menyimpan...' : 'Tambah Toko'}
+            {mutation.isPending ? "Menyimpan..." : "Tambah Toko"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

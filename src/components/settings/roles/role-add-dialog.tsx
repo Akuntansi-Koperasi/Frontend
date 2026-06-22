@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react'
-import { Loader2 } from 'lucide-react'
-import type { RoleFormErrors } from '@/services/roleService'
+import { useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
+import type { RoleFormErrors } from "@/services/roleService";
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogBody,
@@ -14,54 +14,63 @@ import {
   DialogForm,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 
 type RoleAddDialogProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onAdd: (payload: { name: string }) => Promise<boolean>
-  errors?: RoleFormErrors
-}
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onAdd: (payload: { name: string }) => Promise<boolean>;
+  errors?: RoleFormErrors;
+};
 
-export function RoleAddDialog({ open, onOpenChange, onAdd, errors }: RoleAddDialogProps) {
-  const [name, setName] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+export function RoleAddDialog({
+  open,
+  onOpenChange,
+  onAdd,
+  errors,
+}: RoleAddDialogProps) {
+  const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const isFormValid = useMemo(() => name.trim() !== '', [name])
+  const isFormValid = useMemo(() => name.trim() !== "", [name]);
 
-  const resetForm = () => setName('')
+  const resetForm = () => setName("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!isFormValid) return
+    e.preventDefault();
+    if (!isFormValid) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const success = await onAdd({ name: name.trim() })
+      const success = await onAdd({ name: name.trim() });
       if (success) {
-        onOpenChange(false)
-        resetForm()
+        onOpenChange(false);
+        resetForm();
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleOpenChange = (val: boolean) => {
-    if (!val) resetForm()
-    onOpenChange(val)
-  }
+    if (!val) resetForm();
+    onOpenChange(val);
+  };
 
-  const generalError = errors?.general?.[0]
-  const nameError = errors?.name?.[0]
+  const generalError = errors?.general?.[0];
+  const nameError = errors?.name?.[0];
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[480px]">
         <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Tambah Peran</DialogTitle>
-            <DialogDescription>Silakan masukkan nama peran baru</DialogDescription>
+            <DialogTitle className="text-2xl font-bold">
+              Tambah Peran
+            </DialogTitle>
+            <DialogDescription>
+              Silakan masukkan nama peran baru
+            </DialogDescription>
           </DialogHeader>
 
           <DialogBody className="grid gap-4 py-4">
@@ -76,9 +85,13 @@ export function RoleAddDialog({ open, onOpenChange, onAdd, errors }: RoleAddDial
                 placeholder="Masukkan nama peran"
                 className="h-auto min-h-12 w-full px-4 py-3"
               />
-              {nameError ? <p className="text-sm text-destructive">{nameError}</p> : null}
+              {nameError ? (
+                <p className="text-sm text-destructive">{nameError}</p>
+              ) : null}
             </div>
-            {generalError ? <p className="text-sm text-destructive">{generalError}</p> : null}
+            {generalError ? (
+              <p className="text-sm text-destructive">{generalError}</p>
+            ) : null}
           </DialogBody>
 
           <DialogFooter>
@@ -103,5 +116,5 @@ export function RoleAddDialog({ open, onOpenChange, onAdd, errors }: RoleAddDial
         </DialogForm>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { AlertTriangle, Loader2 } from 'lucide-react'
-import type { RekeningSimpananRecord } from './types'
+import { AlertTriangle, Loader2 } from "lucide-react";
+import type { RekeningSimpananRecord } from "./types";
 
 import {
   AlertDialog,
@@ -10,14 +10,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from "@/components/ui/alert-dialog";
 
 interface RekeningSimpananDeleteDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  rekening?: RekeningSimpananRecord
-  onConfirm: (id: number) => void
-  isDeleting?: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  rekening?: RekeningSimpananRecord;
+  onConfirm: (id: number) => void;
+  isDeleting?: boolean;
 }
 
 export function RekeningSimpananDeleteDialog({
@@ -36,7 +36,8 @@ export function RekeningSimpananDeleteDialog({
             <AlertDialogTitle>Hapus Data Rekening Simpanan?</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat
+            dibatalkan.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -50,8 +51,8 @@ export function RekeningSimpananDeleteDialog({
           <AlertDialogAction
             disabled={isDeleting}
             onClick={(e) => {
-              e.preventDefault()
-              if (rekening !== undefined) onConfirm(rekening.id)
+              e.preventDefault();
+              if (rekening !== undefined) onConfirm(rekening.id);
             }}
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
           >
@@ -61,11 +62,11 @@ export function RekeningSimpananDeleteDialog({
                 Menghapus...
               </>
             ) : (
-              'Ya, Hapus'
+              "Ya, Hapus"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

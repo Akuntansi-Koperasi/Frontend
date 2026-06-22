@@ -1,87 +1,87 @@
-import * as React from 'react'
-import { useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
-import { AlertCircle, Loader2 } from 'lucide-react'
-import { GoogleLogin } from '@react-oauth/google'
-import { toast } from 'sonner'
-import { login, loginWithGoogle, } from '@/services/authService'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import * as React from "react";
+import { useState } from "react";
+import { useRouter } from "@tanstack/react-router";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { GoogleLogin } from "@react-oauth/google";
+import { toast } from "sonner";
+import { login, loginWithGoogle } from "@/services/authService";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Field,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<'div'>) {
-  const router = useRouter()
+}: React.ComponentProps<"div">) {
+  const router = useRouter();
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleAuthSuccess = () => {
-    router.navigate({ to: '/dashboard' })
-  }
+    router.navigate({ to: "/dashboard" });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError('')
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     try {
-      await login(email, password)
-      handleAuthSuccess()
+      await login(email, password);
+      handleAuthSuccess();
     } catch (err: any) {
       const msg =
-        err.response?.data?.message || 'Login gagal. Cek email/password.'
-      setError(msg)
+        err.response?.data?.message || "Login gagal. Cek email/password.";
+      setError(msg);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
-    const idToken = credentialResponse.credential
+    const idToken = credentialResponse.credential;
 
     if (!idToken) {
-      setError('Gagal menerima token dari Google')
-      return
+      setError("Gagal menerima token dari Google");
+      return;
     }
 
-    setIsLoading(true)
-    setError('')
+    setIsLoading(true);
+    setError("");
 
     try {
-      await loginWithGoogle(idToken)
-      handleAuthSuccess()
+      await loginWithGoogle(idToken);
+      handleAuthSuccess();
     } catch (err: any) {
       if (err.response) {
-        const msg = err.response.data?.message || 'Login Google gagal.'
-        setError(msg)
+        const msg = err.response.data?.message || "Login Google gagal.";
+        setError(msg);
       } else {
-        setError('Gagal menghubungi server.')
+        setError("Gagal menghubungi server.");
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <div className="relative h-40 w-full mb-4">
@@ -98,9 +98,7 @@ export function LoginForm({
               />
             </div>
           </div>
-          <CardTitle className="text-2xl">
-            Akuntansi Koperasi.
-          </CardTitle>
+          <CardTitle className="text-2xl">Akuntansi Koperasi.</CardTitle>
           <CardDescription className="text-sm">
             Silakan masukkan kredensial Anda untuk mengakses dashboard
           </CardDescription>
@@ -173,8 +171,8 @@ export function LoginForm({
                     <GoogleLogin
                       onSuccess={handleGoogleSuccess}
                       onError={() => {
-                        setError('Gagal inisialisasi Google Login')
-                        toast.error('Google Login Failed')
+                        setError("Gagal inisialisasi Google Login");
+                        toast.error("Google Login Failed");
                       }}
                       useOneTap={false}
                       width="500"
@@ -194,7 +192,7 @@ export function LoginForm({
                       Memuat...
                     </>
                   ) : (
-                    'Masuk'
+                    "Masuk"
                   )}
                 </Button>
               </Field>
@@ -203,5 +201,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

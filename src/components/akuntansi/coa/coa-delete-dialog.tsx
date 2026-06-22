@@ -1,5 +1,5 @@
-import { AlertTriangle, Loader2 } from 'lucide-react'
-import type { CoaRecord } from './types'
+import { AlertTriangle, Loader2 } from "lucide-react";
+import type { CoaRecord } from "./types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,14 +9,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from "@/components/ui/alert-dialog";
 
 interface CoaDeleteDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  coa?: CoaRecord
-  onConfirm: (id: number) => void
-  isDeleting?: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  coa?: CoaRecord;
+  onConfirm: (id: number) => void;
+  isDeleting?: boolean;
 }
 
 export function CoaDeleteDialog({
@@ -35,7 +35,8 @@ export function CoaDeleteDialog({
             <AlertDialogTitle>Hapus Data COA?</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus data ini? (COA yang sudah digunakan di transaksi tidak bisa dihapus).
+            Apakah Anda yakin ingin menghapus data ini? (COA yang sudah
+            digunakan di transaksi tidak bisa dihapus).
             <br />
             Tindakan ini tidak dapat dibatalkan.
           </AlertDialogDescription>
@@ -51,8 +52,8 @@ export function CoaDeleteDialog({
           <AlertDialogAction
             disabled={isDeleting}
             onClick={(e) => {
-              e.preventDefault()
-              if (coa !== undefined) onConfirm(coa.id)
+              e.preventDefault();
+              if (coa !== undefined) onConfirm(coa.id);
             }}
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
           >
@@ -62,11 +63,11 @@ export function CoaDeleteDialog({
                 Menghapus...
               </>
             ) : (
-              'Ya, Hapus'
+              "Ya, Hapus"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

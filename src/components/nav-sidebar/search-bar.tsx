@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
-import { Search } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
+import { useEffect, useRef, useState } from "react";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
-interface SearchBarProps extends React.ComponentProps<'input'> {
-  className?: string
+interface SearchBarProps extends React.ComponentProps<"input"> {
+  className?: string;
 }
 
 export function SearchBar({ className, ...props }: SearchBarProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -17,15 +17,15 @@ export function SearchBar({ className, ...props }: SearchBarProps) {
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div ref={containerRef} className={cn('relative w-full', className)}>
+    <div ref={containerRef} className={cn("relative w-full", className)}>
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground z-10" />
       <Input
         type="search"
@@ -43,5 +43,5 @@ export function SearchBar({ className, ...props }: SearchBarProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

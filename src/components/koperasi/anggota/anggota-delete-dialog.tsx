@@ -1,6 +1,6 @@
-import { useState } from "react"
-import { AlertTriangle, Loader2 } from "lucide-react"
-import type { AnggotaRecord } from "./types"
+import { useState } from "react";
+import { AlertTriangle, Loader2 } from "lucide-react";
+import type { AnggotaRecord } from "./types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,13 +10,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 interface AnggotaDeleteDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  anggota: AnggotaRecord | null
-  onConfirm: (id: number) => Promise<boolean>
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  anggota: AnggotaRecord | null;
+  onConfirm: (id: number) => Promise<boolean>;
 }
 
 export function AnggotaDeleteDialog({
@@ -25,19 +25,19 @@ export function AnggotaDeleteDialog({
   anggota,
   onConfirm,
 }: AnggotaDeleteDialogProps) {
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleConfirm = async (id: number) => {
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
-      const success = await onConfirm(id)
+      const success = await onConfirm(id);
       if (success) {
-        onOpenChange(false)
+        onOpenChange(false);
       }
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -48,7 +48,8 @@ export function AnggotaDeleteDialog({
             <AlertDialogTitle>Hapus data anggota?</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus data anggota <b>{anggota?.nama}</b>?
+            Apakah Anda yakin ingin menghapus data anggota{" "}
+            <b>{anggota?.nama}</b>?
             <br />
             Tindakan ini tidak dapat dibatalkan.
           </AlertDialogDescription>
@@ -63,8 +64,8 @@ export function AnggotaDeleteDialog({
           <AlertDialogAction
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
             onClick={(e) => {
-              e.preventDefault()
-              if (anggota) handleConfirm(anggota.id)
+              e.preventDefault();
+              if (anggota) handleConfirm(anggota.id);
             }}
             disabled={isDeleting}
           >
@@ -80,5 +81,5 @@ export function AnggotaDeleteDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

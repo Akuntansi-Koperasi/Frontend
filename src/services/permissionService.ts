@@ -1,21 +1,21 @@
 export type PermissionAccess = {
-  canView: boolean
-  canManage: boolean
-  canDelete: boolean
-}
+  canView: boolean;
+  canManage: boolean;
+  canDelete: boolean;
+};
 
 function readStoredPermissions(): Array<string> {
   try {
-    if (typeof window === 'undefined') return []
-    const stored = localStorage.getItem('permissions')
-    return stored ? (JSON.parse(stored) as Array<string>) : []
+    if (typeof window === "undefined") return [];
+    const stored = localStorage.getItem("permissions");
+    return stored ? (JSON.parse(stored) as Array<string>) : [];
   } catch {
-    return []
+    return [];
   }
 }
 
 export function getPermissionAccess(prefix: string): PermissionAccess {
-  const permissions = readStoredPermissions()
+  const permissions = readStoredPermissions();
 
   return {
     canView:
@@ -26,5 +26,5 @@ export function getPermissionAccess(prefix: string): PermissionAccess {
       permissions.includes(`${prefix}.modifikasi`) ||
       permissions.includes(`${prefix}.admin`),
     canDelete: permissions.includes(`${prefix}.admin`),
-  }
+  };
 }

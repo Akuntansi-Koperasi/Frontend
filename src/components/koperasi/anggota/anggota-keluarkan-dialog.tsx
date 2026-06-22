@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react"
-import { Loader2 } from "lucide-react"
-import type { AnggotaRecord } from "./types"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useEffect, useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
+import type { AnggotaRecord } from "./types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogBody,
@@ -13,14 +13,17 @@ import {
   DialogForm,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 type AnggotaKeluarkanDialogProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  anggota: AnggotaRecord | null
-  onConfirm: (payload: { id: number; tanggal_keluar: string }) => Promise<boolean>
-}
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  anggota: AnggotaRecord | null;
+  onConfirm: (payload: {
+    id: number;
+    tanggal_keluar: string;
+  }) => Promise<boolean>;
+};
 
 export function AnggotaKeluarkanDialog({
   open,
@@ -28,46 +31,51 @@ export function AnggotaKeluarkanDialog({
   anggota,
   onConfirm,
 }: AnggotaKeluarkanDialogProps) {
-  const [tanggalKeluar, setTanggalKeluar] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [tanggalKeluar, setTanggalKeluar] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setTanggalKeluar(anggota?.tanggal_keluar ?? "")
+      setTanggalKeluar(anggota?.tanggal_keluar ?? "");
     }
-  }, [open, anggota])
+  }, [open, anggota]);
 
   const isFormValid = useMemo(
     () => Boolean(anggota) && tanggalKeluar.trim() !== "",
     [anggota, tanggalKeluar],
-  )
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!anggota || tanggalKeluar.trim() === "") return
+    e.preventDefault();
+    if (!anggota || tanggalKeluar.trim() === "") return;
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const success = await onConfirm({ id: anggota.id, tanggal_keluar: tanggalKeluar })
+      const success = await onConfirm({
+        id: anggota.id,
+        tanggal_keluar: tanggalKeluar,
+      });
       if (success) {
-        onOpenChange(false)
+        onOpenChange(false);
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleOpenChange = (val: boolean) => {
-    if (!val) setTanggalKeluar("")
-    onOpenChange(val)
-  }
+    if (!val) setTanggalKeluar("");
+    onOpenChange(val);
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[480px]">
         <DialogForm onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Keluarkan Anggota Ini</DialogTitle>
+            <DialogTitle className="text-2xl font-bold">
+              Keluarkan Anggota Ini
+            </DialogTitle>
             <DialogDescription>
               Apakah Anda yakin ingin mengeluarkan anggota ini?
               {anggota ? (
@@ -81,7 +89,9 @@ export function AnggotaKeluarkanDialog({
 
           <DialogBody className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label className="text-slate-600 font-medium">Tanggal Keluar*</Label>
+              <Label className="text-slate-600 font-medium">
+                Tanggal Keluar*
+              </Label>
               <Input
                 type="date"
                 value={tanggalKeluar}
@@ -113,5 +123,5 @@ export function AnggotaKeluarkanDialog({
         </DialogForm>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

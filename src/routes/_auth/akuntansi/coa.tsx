@@ -1,115 +1,120 @@
-import * as React from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { BookOpen, HelpCircle, Plus } from 'lucide-react'
-import { z } from 'zod'
+import * as React from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { BookOpen, HelpCircle, Plus } from "lucide-react";
+import { z } from "zod";
 
-import type { CoaRecord } from '@/components/akuntansi/coa/types'
-import { MOCK_COA } from '@/components/akuntansi/coa/types'
-import { CoaTable } from '@/components/akuntansi/coa/coa-table'
-import { SearchBar } from '@/components/shared/search-bar'
-import { Button } from '@/components/ui/button'
+import type { CoaRecord } from "@/components/akuntansi/coa/types";
+import { MOCK_COA } from "@/components/akuntansi/coa/types";
+import { CoaTable } from "@/components/akuntansi/coa/coa-table";
+import { SearchBar } from "@/components/shared/search-bar";
+import { Button } from "@/components/ui/button";
 
 const coaSearchSchema = z.object({
   page: z.number().int().positive().catch(1),
   per_page: z.number().int().positive().catch(10),
   search: z.string().optional(),
-})
+});
 
-export const Route = createFileRoute('/_auth/akuntansi/coa')({
+export const Route = createFileRoute("/_auth/akuntansi/coa")({
   validateSearch: coaSearchSchema,
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  const navigate = useNavigate()
-  const search = Route.useSearch()
+  const navigate = useNavigate();
+  const search = Route.useSearch();
 
-  const [data, setData] = React.useState<Array<CoaRecord>>(MOCK_COA)
-  const [addOpen, setAddOpen] = React.useState(false)
+  const [data, setData] = React.useState<Array<CoaRecord>>(MOCK_COA);
+  const [addOpen, setAddOpen] = React.useState(false);
 
-  const page = search.page || 1
-  const perPage = search.per_page || 10
-  const searchQuery = (search.search ?? '').trim().toLowerCase()
+  const page = search.page || 1;
+  const perPage = search.per_page || 10;
+  const searchQuery = (search.search ?? "").trim().toLowerCase();
 
   const filteredData = React.useMemo(() => {
-    if (!searchQuery) return data
+    if (!searchQuery) return data;
 
     return data.filter((item) => {
-      const kode = item.kode.toLowerCase()
-      const nama = item.namaAkun.toLowerCase()
-      const kategori = item.kategori.toLowerCase()
-      const keterangan = item.keterangan.toLowerCase()
+      const kode = item.kode.toLowerCase();
+      const nama = item.namaAkun.toLowerCase();
+      const kategori = item.kategori.toLowerCase();
+      const keterangan = item.keterangan.toLowerCase();
 
       return (
         kode.includes(searchQuery) ||
         nama.includes(searchQuery) ||
         kategori.includes(searchQuery) ||
         keterangan.includes(searchQuery)
-      )
-    })
-  }, [data, searchQuery])
+      );
+    });
+  }, [data, searchQuery]);
 
-  const pageCount = Math.max(1, Math.ceil(filteredData.length / perPage))
-  const safePage = Math.min(Math.max(page, 1), pageCount)
-  const pageIndex = safePage - 1
-  const paginatedData = filteredData.slice(pageIndex * perPage, pageIndex * perPage + perPage)
+  const pageCount = Math.max(1, Math.ceil(filteredData.length / perPage));
+  const safePage = Math.min(Math.max(page, 1), pageCount);
+  const pageIndex = safePage - 1;
+  const paginatedData = filteredData.slice(
+    pageIndex * perPage,
+    pageIndex * perPage + perPage,
+  );
   const pagination = {
     pageIndex,
     pageSize: perPage,
     pageCount,
     total: filteredData.length,
-  }
+  };
 
   React.useEffect(() => {
     if (safePage !== page) {
       navigate({
-        to: '/akuntansi/coa',
+        to: "/akuntansi/coa",
         search: (prev: any) => ({ ...prev, page: safePage }),
         replace: true,
-      })
+      });
     }
-  }, [navigate, page, safePage])
+  }, [navigate, page, safePage]);
 
   const handlePageChange = (newPageIndex: number) => {
     navigate({
-      to: '/akuntansi/coa',
+      to: "/akuntansi/coa",
       search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
       replace: true,
-    })
-  }
+    });
+  };
 
   const handlePageSizeChange = (newPageSize: number) => {
     navigate({
-      to: '/akuntansi/coa',
+      to: "/akuntansi/coa",
       search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
       replace: true,
-    })
-  }
+    });
+  };
 
   const handleSearchChange = (value: string) => {
     navigate({
-      to: '/akuntansi/coa',
+      to: "/akuntansi/coa",
       search: (prev: any) => ({
         ...prev,
-        search: value === '' ? undefined : value,
+        search: value === "" ? undefined : value,
         page: 1,
       }),
       replace: true,
-    })
-  }
+    });
+  };
 
-  const handleAdd = (payload: Omit<CoaRecord, 'id'>) => {
-    const id = Math.max(0, ...data.map((item) => item.id)) + 1
-    setData((prev) => [{ id, ...payload }, ...prev])
-  }
+  const handleAdd = (payload: Omit<CoaRecord, "id">) => {
+    const id = Math.max(0, ...data.map((item) => item.id)) + 1;
+    setData((prev) => [{ id, ...payload }, ...prev]);
+  };
 
   const handleEdit = (payload: CoaRecord) => {
-    setData((prev) => prev.map((item) => (item.id === payload.id ? payload : item)))
-  }
+    setData((prev) =>
+      prev.map((item) => (item.id === payload.id ? payload : item)),
+    );
+  };
 
   const handleDelete = (id: number) => {
-    setData((prev) => prev.filter((item) => item.id !== id))
-  }
+    setData((prev) => prev.filter((item) => item.id !== id));
+  };
 
   return (
     <>
@@ -137,7 +142,7 @@ function RouteComponent() {
       <SearchBar
         placeholder="Cari periode buku..."
         className="mb-4 mt-4"
-        value={search.search ?? ''}
+        value={search.search ?? ""}
         onChange={(event) => handleSearchChange(event.target.value)}
       />
 
@@ -153,5 +158,5 @@ function RouteComponent() {
         onAddOpenChange={setAddOpen}
       />
     </>
-  )
+  );
 }

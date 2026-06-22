@@ -1,56 +1,56 @@
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
-import { Link } from '@tanstack/react-router'
-import type { ChartConfig } from '@/components/ui/chart'
-import type { DashboardStats } from '@/services/dashboardService'
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Link } from "@tanstack/react-router";
+import type { ChartConfig } from "@/components/ui/chart";
+import type { DashboardStats } from "@/services/dashboardService";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from '@/components/ui/chart'
+} from "@/components/ui/chart";
 
 const DEFAULT_DAYS = [
-  'Minggu',
-  'Senin',
-  'Selasa',
-  'Rabu',
-  'Kamis',
-  'Jumat',
-  'Sabtu',
-]
+  "Minggu",
+  "Senin",
+  "Selasa",
+  "Rabu",
+  "Kamis",
+  "Jumat",
+  "Sabtu",
+];
 
 const chartConfig = {
   pemasukan: {
-    label: 'Penghasilan',
-    color: '#22c55e',
+    label: "Penghasilan",
+    color: "#22c55e",
   },
   pengeluaran: {
-    label: 'Pengeluaran',
-    color: '#ef4444',
+    label: "Pengeluaran",
+    color: "#ef4444",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function DashboardBarChart({
   chartData,
 }: {
-  chartData?: DashboardStats['grafik']
+  chartData?: DashboardStats["grafik"];
 }) {
   const sourceLabels =
     chartData?.labels && chartData.labels.length > 0
       ? chartData.labels
-      : DEFAULT_DAYS
+      : DEFAULT_DAYS;
 
   const processedData = sourceLabels.map((day, index) => ({
     day: day,
     pemasukan: chartData?.cashflows.pemasukan[index] ?? 0,
     pengeluaran: chartData?.cashflows.pengeluaran[index] ?? 0,
-  }))
+  }));
 
   return (
     <Card className="h-full shadow-lg border-3 border-slate-200 pb-0">
@@ -59,11 +59,13 @@ export function DashboardBarChart({
           Pemasukan & Pengeluaran Seminggu
         </CardTitle>
         <Link
-          to={'/keuangan' as any}
-          search={{
-            page: 1,
-            per_page: 10,
-          } as any}
+          to={"/keuangan" as any}
+          search={
+            {
+              page: 1,
+              per_page: 10,
+            } as any
+          }
           className="text-sm font-medium text-blue-600 hover:underline"
         >
           Lihat Detail
@@ -89,7 +91,7 @@ export function DashboardBarChart({
               stroke="#94a3b8"
             />
             <ChartTooltip
-              cursor={{ fill: 'transparent' }}
+              cursor={{ fill: "transparent" }}
               content={<ChartTooltipContent indicator="dashed" />}
             />
             <Bar
@@ -120,5 +122,5 @@ export function DashboardBarChart({
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

@@ -6,5 +6,5 @@ export function ProfileHeader() {
         Kelola informasi profil Anda
       </p>
     </div>
-  )
+  );
 }

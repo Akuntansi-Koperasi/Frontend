@@ -1,37 +1,44 @@
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
-import type { ChartConfig } from "@/components/ui/chart"
-import type { DashboardStats } from "@/services/dashboardService"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import type { ChartConfig } from "@/components/ui/chart";
+import type { DashboardStats } from "@/services/dashboardService";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent
-} from "@/components/ui/chart"
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
-const DEFAULT_DAYS = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"]
+const DEFAULT_DAYS = [
+  "Minggu",
+  "Senin",
+  "Selasa",
+  "Rabu",
+  "Kamis",
+  "Jumat",
+  "Sabtu",
+];
 
 const chartConfig = {
   hours: {
     label: "Jam Kerja",
     color: "#3b82f6",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
-export function DashboardLineChart({ chartData }: { chartData?: DashboardStats['grafik'] }) {
-
-  const sourceLabels = chartData?.labels && chartData.labels.length > 0 
-    ? chartData.labels 
-    : DEFAULT_DAYS
+export function DashboardLineChart({
+  chartData,
+}: {
+  chartData?: DashboardStats["grafik"];
+}) {
+  const sourceLabels =
+    chartData?.labels && chartData.labels.length > 0
+      ? chartData.labels
+      : DEFAULT_DAYS;
 
   const processedData = sourceLabels.map((day, index) => ({
     day: day,
     hours: chartData?.work_hours?.data?.[index] ?? 0,
-  }))
+  }));
 
   return (
     <Card className="h-full shadow-lg border-3 border-slate-200">
@@ -61,7 +68,7 @@ export function DashboardLineChart({ chartData }: { chartData?: DashboardStats['
               tickFormatter={(value) => value.slice(0, 3)}
               stroke="#94a3b8"
             />
-            <YAxis 
+            <YAxis
               tickLine={false}
               axisLine={false}
               tickMargin={8}
@@ -81,7 +88,7 @@ export function DashboardLineChart({ chartData }: { chartData?: DashboardStats['
                 fill: "var(--color-hours)",
                 r: 7,
                 strokeWidth: 3,
-                stroke: "#ffffff"
+                stroke: "#ffffff",
               }}
               activeDot={{
                 r: 6,
@@ -91,5 +98,5 @@ export function DashboardLineChart({ chartData }: { chartData?: DashboardStats['
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,14 +1,14 @@
-import * as React from 'react'
-import { Button } from '../ui/button'
+import * as React from "react";
+import { Button } from "../ui/button";
 
-type LucideIconElement = React.ReactElement<{ className?: string }>
+type LucideIconElement = React.ReactElement<{ className?: string }>;
 
 interface HeaderCompProps {
-  title: string
-  description: string
-  icon?: LucideIconElement
-  actionLabel?: string
-  onAction?: React.MouseEventHandler<HTMLButtonElement>
+  title: string;
+  description: string;
+  icon?: LucideIconElement;
+  actionLabel?: string;
+  onAction?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const HeaderComp = ({
@@ -21,10 +21,10 @@ const HeaderComp = ({
   const iconElement =
     icon &&
     React.cloneElement(icon, {
-      className: [icon.props.className, 'h-4 w-4'].filter(Boolean).join(' '),
-    })
+      className: [icon.props.className, "h-4 w-4"].filter(Boolean).join(" "),
+    });
 
-  const hasActionButton = Boolean(actionLabel && onAction)
+  const hasActionButton = Boolean(actionLabel && onAction);
 
   return (
     <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between">
@@ -41,7 +41,7 @@ const HeaderComp = ({
         </div>
       ) : null}
     </div>
-  )
-}
+  );
+};
 
-export default HeaderComp
+export default HeaderComp;

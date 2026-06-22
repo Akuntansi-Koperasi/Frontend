@@ -1,21 +1,19 @@
-import * as React from 'react'
+import * as React from "react";
 import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
-} from '@tanstack/react-table'
-import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react'
-import { ProdukSimpananAddDialog } from './produk-simpanan-add-dialog'
-import { ProdukSimpananEditDialog } from './produk-simpanan-edit-dialog'
-import { ProdukSimpananDeleteDialog } from './produk-simpanan-delete-dialog'
-import type {
-  ColumnDef,
-  SortingState} from '@tanstack/react-table';
-import type { ProdukSimpananRecord } from './types'
-import { Toaster } from '@/components/ui/sonner'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+} from "@tanstack/react-table";
+import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
+import { ProdukSimpananAddDialog } from "./produk-simpanan-add-dialog";
+import { ProdukSimpananEditDialog } from "./produk-simpanan-edit-dialog";
+import { ProdukSimpananDeleteDialog } from "./produk-simpanan-delete-dialog";
+import type { ColumnDef, SortingState } from "@tanstack/react-table";
+import type { ProdukSimpananRecord } from "./types";
+import { Toaster } from "@/components/ui/sonner";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -23,31 +21,31 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { DataTablePagination } from '@/components/data-table-pagination'
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { DataTablePagination } from "@/components/data-table-pagination";
 
 interface ProdukSimpananTableProps {
-  data: Array<ProdukSimpananRecord>
+  data: Array<ProdukSimpananRecord>;
   pagination: {
-    pageIndex: number
-    pageSize: number
-    pageCount: number
-    total: number
-  }
-  onPageChange: (newPageIndex: number) => void
-  onPageSizeChange: (pageSize: number) => void
-  onAdd: (payload: Omit<ProdukSimpananRecord, 'id'>) => Promise<boolean>
-  onEdit: (payload: ProdukSimpananRecord) => Promise<boolean>
-  onDelete: (id: number) => void
-  addOpen: boolean
-  onAddOpenChange: (open: boolean) => void
-  isLoading?: boolean
-  canManage: boolean
-  canDelete: boolean
-  addErrors?: Partial<Record<string, Array<string>>> | null
-  editErrors?: Partial<Record<string, Array<string>>> | null
-  onEditClose?: () => void
+    pageIndex: number;
+    pageSize: number;
+    pageCount: number;
+    total: number;
+  };
+  onPageChange: (newPageIndex: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
+  onAdd: (payload: Omit<ProdukSimpananRecord, "id">) => Promise<boolean>;
+  onEdit: (payload: ProdukSimpananRecord) => Promise<boolean>;
+  onDelete: (id: number) => void;
+  addOpen: boolean;
+  onAddOpenChange: (open: boolean) => void;
+  isLoading?: boolean;
+  canManage: boolean;
+  canDelete: boolean;
+  addErrors?: Partial<Record<string, Array<string>>> | null;
+  editErrors?: Partial<Record<string, Array<string>>> | null;
+  onEditClose?: () => void;
 }
 
 export function ProdukSimpananTable({
@@ -67,28 +65,34 @@ export function ProdukSimpananTable({
   editErrors,
   onEditClose,
 }: ProdukSimpananTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [editOpen, setEditOpen] = React.useState(false)
-  const [deleteOpen, setDeleteOpen] = React.useState(false)
-  const [editing, setEditing] = React.useState<ProdukSimpananRecord | undefined>()
-  const [deleting, setDeleting] = React.useState<ProdukSimpananRecord | undefined>()
-  const [isDeletingLocal, setIsDeletingLocal] = React.useState(false)
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [editOpen, setEditOpen] = React.useState(false);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [editing, setEditing] = React.useState<
+    ProdukSimpananRecord | undefined
+  >();
+  const [deleting, setDeleting] = React.useState<
+    ProdukSimpananRecord | undefined
+  >();
+  const [isDeletingLocal, setIsDeletingLocal] = React.useState(false);
 
   const handleDeleteConfirm = (id: number) => {
-    setIsDeletingLocal(true)
+    setIsDeletingLocal(true);
     try {
-      onDelete(id)
-      setDeleteOpen(false)
-      setDeleting(undefined)
+      onDelete(id);
+      setDeleteOpen(false);
+      setDeleting(undefined);
     } finally {
-      setIsDeletingLocal(false)
+      setIsDeletingLocal(false);
     }
-  }
+  };
 
   const columns: Array<ColumnDef<ProdukSimpananRecord>> = [
     {
-      accessorKey: 'id',
-      header: () => <div className="text-center font-semibold text-slate-900">No.</div>,
+      accessorKey: "id",
+      header: () => (
+        <div className="text-center font-semibold text-slate-900">No.</div>
+      ),
       cell: ({ row }) => (
         <div className="text-center font-medium text-muted-foreground">
           {row.index + 1 + pagination.pageIndex * pagination.pageSize}.
@@ -96,27 +100,37 @@ export function ProdukSimpananTable({
       ),
     },
     {
-      accessorKey: 'nama',
+      accessorKey: "nama",
       header: ({ column }) => (
         <Button
           variant="ghost"
           className="p-0 hover:bg-transparent font-semibold text-slate-900 justify-start cursor-pointer"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Nama
           <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground" />
         </Button>
       ),
-      cell: ({ row }) => <div className="font-medium text-slate-900">{row.original.nama}</div>,
+      cell: ({ row }) => (
+        <div className="font-medium text-slate-900">{row.original.nama}</div>
+      ),
     },
     {
-      accessorKey: 'jenis',
-      header: () => <div className="text-center font-semibold text-slate-900">Jenis</div>,
-      cell: ({ row }) => <div className="text-center font-medium text-slate-700">{row.original.jenis}</div>,
+      accessorKey: "jenis",
+      header: () => (
+        <div className="text-center font-semibold text-slate-900">Jenis</div>
+      ),
+      cell: ({ row }) => (
+        <div className="text-center font-medium text-slate-700">
+          {row.original.jenis}
+        </div>
+      ),
     },
     {
-      accessorKey: 'bunga',
-      header: () => <div className="text-center font-semibold text-slate-900">Bunga</div>,
+      accessorKey: "bunga",
+      header: () => (
+        <div className="text-center font-semibold text-slate-900">Bunga</div>
+      ),
       cell: ({ row }) => (
         <div className="flex justify-center">
           <Badge
@@ -129,30 +143,40 @@ export function ProdukSimpananTable({
       ),
     },
     {
-      accessorKey: 'nominal',
-      header: () => <div className="text-center font-semibold text-slate-900">Nominal/Jumlah (Rp)</div>,
+      accessorKey: "nominal",
+      header: () => (
+        <div className="text-center font-semibold text-slate-900">
+          Nominal/Jumlah (Rp)
+        </div>
+      ),
       cell: ({ row }) => (
         <div className="flex justify-center">
           <Badge
             variant="green"
             className="cursor-default rounded-full h-8 px-3 font-bold"
           >
-            Rp {row.original.nominal.toLocaleString('id-ID')}
+            Rp {row.original.nominal.toLocaleString("id-ID")}
           </Badge>
         </div>
       ),
     },
     {
-      accessorKey: 'keterangan',
-      header: () => <div className="text-left font-semibold text-slate-900">Keterangan</div>,
-      cell: ({ row }) => <div className="text-slate-700">{row.original.keterangan}</div>,
+      accessorKey: "keterangan",
+      header: () => (
+        <div className="text-left font-semibold text-slate-900">Keterangan</div>
+      ),
+      cell: ({ row }) => (
+        <div className="text-slate-700">{row.original.keterangan}</div>
+      ),
     },
-  ]
+  ];
 
   if (canManage || canDelete) {
     columns.push({
-      id: 'actions',
-      header: () => <div className="text-center font-semibold text-slate-900">Action</div>,
+      id: "actions",
+      header: () => (
+        <div className="text-center font-semibold text-slate-900">Action</div>
+      ),
       cell: ({ row }) => (
         <div className="flex items-center gap-2 justify-center">
           {canManage && (
@@ -161,8 +185,8 @@ export function ProdukSimpananTable({
               size="icon"
               className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
               onClick={() => {
-                setEditing(row.original)
-                setEditOpen(true)
+                setEditing(row.original);
+                setEditOpen(true);
               }}
             >
               <Pencil className="h-4 w-4" />
@@ -174,8 +198,8 @@ export function ProdukSimpananTable({
               size="icon"
               className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
               onClick={() => {
-                setDeleting(row.original)
-                setDeleteOpen(true)
+                setDeleting(row.original);
+                setDeleteOpen(true);
               }}
             >
               <Trash2 className="h-4 w-4" />
@@ -183,7 +207,7 @@ export function ProdukSimpananTable({
           )}
         </div>
       ),
-    })
+    });
   }
 
   const table = useReactTable({
@@ -195,7 +219,7 @@ export function ProdukSimpananTable({
     state: {
       sorting,
     },
-  })
+  });
 
   return (
     <>
@@ -206,8 +230,8 @@ export function ProdukSimpananTable({
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="hover:bg-transparent">
                   {headerGroup.headers.map((header, index) => {
-                    let alignClass = 'text-center'
-                    if (index === 1 || index === 5) alignClass = 'text-left'
+                    let alignClass = "text-center";
+                    if (index === 1 || index === 5) alignClass = "text-left";
 
                     return (
                       <TableHead
@@ -216,9 +240,12 @@ export function ProdukSimpananTable({
                       >
                         {header.isPlaceholder
                           ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                       </TableHead>
-                    )
+                    );
                   })}
                 </TableRow>
               ))}
@@ -226,7 +253,10 @@ export function ProdukSimpananTable({
             <TableBody>
               {isLoading && !table.getRowModel().rows.length ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center text-muted-foreground"
+                  >
                     Memuat data...
                   </TableCell>
                 </TableRow>
@@ -234,20 +264,29 @@ export function ProdukSimpananTable({
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {
-                      let alignClass = 'text-center'
-                      if (index === 1 || index === 5) alignClass = 'text-left'
+                      let alignClass = "text-center";
+                      if (index === 1 || index === 5) alignClass = "text-left";
 
                       return (
-                        <TableCell key={cell.id} className={`py-3 ${alignClass}`}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        <TableCell
+                          key={cell.id}
+                          className={`py-3 ${alignClass}`}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
                         </TableCell>
-                      )
+                      );
                     })}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
                     Tidak ada data
                   </TableCell>
                 </TableRow>
@@ -279,10 +318,10 @@ export function ProdukSimpananTable({
           open={editOpen}
           onOpenChange={(isOpen) => {
             if (!isOpen) {
-              setEditing(undefined)
-              onEditClose?.()
+              setEditing(undefined);
+              onEditClose?.();
             }
-            setEditOpen(isOpen)
+            setEditOpen(isOpen);
           }}
           onEdit={onEdit}
           produk={editing}
@@ -302,5 +341,5 @@ export function ProdukSimpananTable({
 
       <Toaster position="top-right" richColors closeButton theme="light" />
     </>
-  )
+  );
 }

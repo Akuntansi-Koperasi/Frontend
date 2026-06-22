@@ -1,27 +1,32 @@
-import { ArrowDownRight, ArrowUpRight } from "lucide-react"
-import type { CashflowResponse } from "@/services/deprecated/cashflowService"
-import { Card, CardContent } from "@/components/ui/card"
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
+import type { CashflowResponse } from "@/services/deprecated/cashflowService";
+import { Card, CardContent } from "@/components/ui/card";
 
-export function KeuanganStats({ summary }: { summary?: CashflowResponse['summary'] }) {
-  
+export function KeuanganStats({
+  summary,
+}: {
+  summary?: CashflowResponse["summary"];
+}) {
   const formatRp = (val: number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(val)
-  }
+    }).format(val);
+  };
 
-  const pemasukan = summary?.pemasukan ?? 0
-  const pengeluaran = summary?.pengeluaran ?? 0
+  const pemasukan = summary?.pemasukan ?? 0;
+  const pengeluaran = summary?.pengeluaran ?? 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="shadow-lg border-slate-200 border-3">
         <CardContent className="px-6 flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-md font-medium text-muted-foreground">Total Pemasukan</p>
+            <p className="text-md font-medium text-muted-foreground">
+              Total Pemasukan
+            </p>
             <h3 className="text-2xl font-bold text-slate-900">
               {formatRp(pemasukan)}
             </h3>
@@ -39,7 +44,9 @@ export function KeuanganStats({ summary }: { summary?: CashflowResponse['summary
       <Card className="shadow-lg border-slate-200 border-3">
         <CardContent className="px-6 flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-md font-medium text-muted-foreground">Total Pengeluaran</p>
+            <p className="text-md font-medium text-muted-foreground">
+              Total Pengeluaran
+            </p>
             <h3 className="text-2xl font-bold text-slate-900">
               {formatRp(pengeluaran)}
             </h3>
@@ -54,5 +61,5 @@ export function KeuanganStats({ summary }: { summary?: CashflowResponse['summary
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

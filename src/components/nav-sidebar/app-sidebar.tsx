@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import * as React from 'react'
-import { Link } from '@tanstack/react-router'
-import { LogOut, User } from 'lucide-react'
-import { navItems } from './nav-data'
-import { SearchBar } from './search-bar'
-import { logout } from '@/services/authService'
-import { getPermissionAccess } from '@/services/permissionService'
-import { useUserProfile } from '@/hooks/use-user-profile'
+import * as React from "react";
+import { Link } from "@tanstack/react-router";
+import { LogOut, User } from "lucide-react";
+import { navItems } from "./nav-data";
+import { SearchBar } from "./search-bar";
+import { logout } from "@/services/authService";
+import { getPermissionAccess } from "@/services/permissionService";
+import { useUserProfile } from "@/hooks/use-user-profile";
 import {
   Sidebar,
   SidebarContent,
@@ -21,26 +21,26 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from '@/components/ui/sidebar'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+} from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function AppSidebar({
   pathname,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { pathname: string }) {
-  const { data: user } = useUserProfile()
-  const [openSections, setOpenSections] = React.useState<Record<string, boolean>>(
-    {}
-  )
+  const { data: user } = useUserProfile();
+  const [openSections, setOpenSections] = React.useState<
+    Record<string, boolean>
+  >({});
 
   const getInitials = (name: string) => {
-    return (name || 'User')
-      .split(' ')
+    return (name || "User")
+      .split(" ")
       .map((n) => n[0])
-      .join('')
+      .join("")
       .toUpperCase()
-      .substring(0, 2)
-  }
+      .substring(0, 2);
+  };
 
   const filteredNavItems = React.useMemo(() => {
     return navItems
@@ -48,56 +48,60 @@ export function AppSidebar({
         if (item.items) {
           const filteredSubItems = item.items.filter((subItem: any) => {
             if (subItem.permission_class) {
-              const { canView, canManage, canDelete } = getPermissionAccess(subItem.permission_class)
-              return canView || canManage || canDelete
+              const { canView, canManage, canDelete } = getPermissionAccess(
+                subItem.permission_class,
+              );
+              return canView || canManage || canDelete;
             }
-            return true
-          })
-          return { ...item, items: filteredSubItems }
+            return true;
+          });
+          return { ...item, items: filteredSubItems };
         }
-        
+
         // Handle parent items with permission_class
         if ((item as any).permission_class) {
-          const { canView, canManage, canDelete } = getPermissionAccess((item as any).permission_class)
-          if (!canView && !canManage && !canDelete) return null
+          const { canView, canManage, canDelete } = getPermissionAccess(
+            (item as any).permission_class,
+          );
+          if (!canView && !canManage && !canDelete) return null;
         }
-        
-        return item
+
+        return item;
       })
       .filter((item): item is NonNullable<typeof item> => {
-        if (!item) return false
+        if (!item) return false;
         if (item.items) {
-          return item.items.length > 0
+          return item.items.length > 0;
         }
-        return true
-      })
-  }, [])
+        return true;
+      });
+  }, []);
 
   React.useEffect(() => {
     filteredNavItems.forEach((item) => {
       if (!item.items?.length) {
-        return
+        return;
       }
 
       const hasActiveChild = item.items.some(
         (subItem) =>
-          pathname === subItem.url || pathname.startsWith(`${subItem.url}/`)
-      )
+          pathname === subItem.url || pathname.startsWith(`${subItem.url}/`),
+      );
 
       if (hasActiveChild) {
         setOpenSections((current) =>
-          current[item.title] ? current : { ...current, [item.title]: true }
-        )
+          current[item.title] ? current : { ...current, [item.title]: true },
+        );
       }
-    })
-  }, [pathname, filteredNavItems])
+    });
+  }, [pathname, filteredNavItems]);
 
   const toggleSection = (key: string) => {
     setOpenSections((current) => ({
       ...current,
       [key]: !current[key],
-    }))
-  }
+    }));
+  };
 
   return (
     <Sidebar collapsible="icon" {...props} className="pt-4">
@@ -137,8 +141,8 @@ export function AppSidebar({
               </SidebarMenuItem>
               {filteredNavItems.map((item) => {
                 const isActive =
-                  pathname === item.url || pathname.startsWith(`${item.url}/`)
-                const isSectionOpen = openSections[item.title] ?? false
+                  pathname === item.url || pathname.startsWith(`${item.url}/`);
+                const isSectionOpen = openSections[item.title] ?? false;
 
                 if (item.items?.length) {
                   return (
@@ -159,7 +163,7 @@ export function AppSidebar({
                           {item.items.map((subItem) => {
                             const isSubActive =
                               pathname === subItem.url ||
-                              pathname.startsWith(`${subItem.url}/`)
+                              pathname.startsWith(`${subItem.url}/`);
 
                             return (
                               <SidebarMenuSubItem key={subItem.title}>
@@ -173,12 +177,12 @@ export function AppSidebar({
                                   </Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
-                            )
+                            );
                           })}
                         </SidebarMenuSub>
                       ) : null}
                     </SidebarMenuItem>
-                  )
+                  );
                 }
                 return (
                   <SidebarMenuItem key={item.title}>
@@ -194,7 +198,7 @@ export function AppSidebar({
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                )
+                );
               })}
             </SidebarMenu>
           </SidebarGroupContent>
@@ -209,26 +213,30 @@ export function AppSidebar({
               size="lg"
               className="group-data-[collapsible=icon]:p-1! hover:bg-slate-100"
             >
-              <Link to='/profile'>
+              <Link to="/profile">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full border">
                   <Avatar className="h-full w-full">
                     <AvatarImage
                       src={user?.photo_profile || undefined}
-                      alt={user?.nama || 'User'}
+                      alt={user?.nama || "User"}
                       className="object-cover"
                     />
                     <AvatarFallback className="bg-slate-200 text-slate-700 font-bold">
-                      {user?.nama ? getInitials(user.nama) : <User className="w-5 h-5" />}
+                      {user?.nama ? (
+                        getInitials(user.nama)
+                      ) : (
+                        <User className="w-5 h-5" />
+                      )}
                     </AvatarFallback>
                   </Avatar>
                 </div>
 
                 <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                   <span className="truncate font-semibold">
-                    {user?.nama || 'Pengguna'}
+                    {user?.nama || "Pengguna"}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {user?.email || 'Memuat...'}
+                    {user?.email || "Memuat..."}
                   </span>
                 </div>
               </Link>
@@ -250,5 +258,5 @@ export function AppSidebar({
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

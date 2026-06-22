@@ -1,110 +1,117 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { Calendar, Filter } from 'lucide-react'
-import type { DepositParams, DepositResponse } from '@/services/deprecated/depositService'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
+import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { Calendar, Filter } from "lucide-react";
+import type {
+  DepositParams,
+  DepositResponse,
+} from "@/services/deprecated/depositService";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 interface SetoranFiltersProps {
-  currentFilters: DepositParams
-  summary?: DepositResponse['summary']
+  currentFilters: DepositParams;
+  summary?: DepositResponse["summary"];
 }
 
 export function SetoranFilters({
   currentFilters,
   summary,
 }: SetoranFiltersProps) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const getToday = () => {
-    const date = new Date()
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
-  }
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   const getFirstDayOfMonth = () => {
-    const date = new Date()
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    return `${year}-${month}-01`
-  }
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    return `${year}-${month}-01`;
+  };
 
   const [filters, setFilters] = useState<DepositParams>(() => ({
     ...currentFilters,
     start_date: currentFilters.start_date || getFirstDayOfMonth(),
     end_date: currentFilters.end_date || getToday(),
-  }))
+  }));
 
   useEffect(() => {
-    const defaultStart = getFirstDayOfMonth()
-    const defaultEnd = getToday()
-    const hasStart = !!currentFilters.start_date
-    const hasEnd = !!currentFilters.end_date
+    const defaultStart = getFirstDayOfMonth();
+    const defaultEnd = getToday();
+    const hasStart = !!currentFilters.start_date;
+    const hasEnd = !!currentFilters.end_date;
 
     if (!hasStart || !hasEnd) {
       navigate({
-        to: '/setoran' as any,
+        to: "/setoran" as any,
         search: ((prev: any) => ({
           ...prev,
           start_date: hasStart ? currentFilters.start_date : defaultStart,
           end_date: hasEnd ? currentFilters.end_date : defaultEnd,
         })) as any,
         replace: true,
-      })
+      });
     } else {
-      setFilters(currentFilters)
+      setFilters(currentFilters);
     }
-  }, [currentFilters, navigate])
+  }, [currentFilters, navigate]);
 
   const formatRp = (val: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(val)
-  }
+    }).format(val);
+  };
 
   const applyFilter = (key: keyof DepositParams, value: any) => {
-    const newFilters = { ...filters, [key]: value }
-    setFilters(newFilters)
+    const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
 
     navigate({
-      to: '/setoran' as any,
-      search: ({ ...newFilters, page: 1, per_page: newFilters.per_page ?? 10 } as any) as any,
+      to: "/setoran" as any,
+      search: {
+        ...newFilters,
+        page: 1,
+        per_page: newFilters.per_page ?? 10,
+      } as any as any,
       replace: true,
-    })
-  }
+    });
+  };
 
-  const isSimpananChecked = filters.type !== 'angsuran'
-  const isAngsuranChecked = filters.type !== 'simpanan'
+  const isSimpananChecked = filters.type !== "angsuran";
+  const isAngsuranChecked = filters.type !== "simpanan";
 
-  const handleTypeToggle = (toggled: 'simpanan' | 'angsuran') => {
-    if (toggled === 'simpanan') {
-      if (!isSimpananChecked) applyFilter('type', undefined)
-      else applyFilter('type', 'angsuran')
+  const handleTypeToggle = (toggled: "simpanan" | "angsuran") => {
+    if (toggled === "simpanan") {
+      if (!isSimpananChecked) applyFilter("type", undefined);
+      else applyFilter("type", "angsuran");
     } else {
-      if (!isAngsuranChecked) applyFilter('type', undefined)
-      else applyFilter('type', 'simpanan')
+      if (!isAngsuranChecked) applyFilter("type", undefined);
+      else applyFilter("type", "simpanan");
     }
-  }
+  };
 
-  const isVerifiedChecked = filters.status !== 'pending'
-  const isPendingChecked = filters.status !== 'verified'
+  const isVerifiedChecked = filters.status !== "pending";
+  const isPendingChecked = filters.status !== "verified";
 
-  const handleStatusToggle = (toggled: 'verified' | 'pending') => {
-    if (toggled === 'verified') {
-      if (!isVerifiedChecked) applyFilter('status', undefined)
-      else applyFilter('status', 'pending')
+  const handleStatusToggle = (toggled: "verified" | "pending") => {
+    if (toggled === "verified") {
+      if (!isVerifiedChecked) applyFilter("status", undefined);
+      else applyFilter("status", "pending");
     } else {
-      if (!isPendingChecked) applyFilter('status', undefined)
-      else applyFilter('status', 'verified')
+      if (!isPendingChecked) applyFilter("status", undefined);
+      else applyFilter("status", "verified");
     }
-  }
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -120,8 +127,8 @@ export function SetoranFilters({
                 <Input
                   type="date"
                   className="pl-10"
-                  value={filters.start_date || ''}
-                  onChange={(e) => applyFilter('start_date', e.target.value)}
+                  value={filters.start_date || ""}
+                  onChange={(e) => applyFilter("start_date", e.target.value)}
                 />
               </div>
               <div className="relative w-full">
@@ -129,8 +136,8 @@ export function SetoranFilters({
                 <Input
                   type="date"
                   className="pl-10"
-                  value={filters.end_date || ''}
-                  onChange={(e) => applyFilter('end_date', e.target.value)}
+                  value={filters.end_date || ""}
+                  onChange={(e) => applyFilter("end_date", e.target.value)}
                 />
               </div>
             </div>
@@ -146,7 +153,7 @@ export function SetoranFilters({
                 <Checkbox
                   id="simpanan"
                   checked={isSimpananChecked}
-                  onCheckedChange={() => handleTypeToggle('simpanan')}
+                  onCheckedChange={() => handleTypeToggle("simpanan")}
                 />
                 <Label htmlFor="simpanan" className="cursor-pointer font-bold">
                   Simpanan
@@ -156,7 +163,7 @@ export function SetoranFilters({
                 <Checkbox
                   id="angsuran"
                   checked={isAngsuranChecked}
-                  onCheckedChange={() => handleTypeToggle('angsuran')}
+                  onCheckedChange={() => handleTypeToggle("angsuran")}
                 />
                 <Label htmlFor="angsuran" className="cursor-pointer font-bold">
                   Angsuran
@@ -173,7 +180,7 @@ export function SetoranFilters({
                 <Checkbox
                   id="verified"
                   checked={isVerifiedChecked}
-                  onCheckedChange={() => handleStatusToggle('verified')}
+                  onCheckedChange={() => handleStatusToggle("verified")}
                 />
                 <Label htmlFor="verified" className="cursor-pointer font-bold">
                   Terverifikasi
@@ -183,7 +190,7 @@ export function SetoranFilters({
                 <Checkbox
                   id="pending"
                   checked={isPendingChecked}
-                  onCheckedChange={() => handleStatusToggle('pending')}
+                  onCheckedChange={() => handleStatusToggle("pending")}
                 />
                 <Label htmlFor="pending" className="cursor-pointer font-bold">
                   Belum
@@ -216,5 +223,5 @@ export function SetoranFilters({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-import { AlertTriangle, Loader2 } from 'lucide-react'
+import { AlertTriangle, Loader2 } from "lucide-react";
 
-import type { JabatanRecord } from './types'
+import type { JabatanRecord } from "./types";
 
 import {
   AlertDialog,
@@ -11,17 +11,23 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from "@/components/ui/alert-dialog";
 
 interface JabatanDeleteDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  jabatan: JabatanRecord | null
-  onConfirm: (id: number) => void
-  isDeleting: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  jabatan: JabatanRecord | null;
+  onConfirm: (id: number) => void;
+  isDeleting: boolean;
 }
 
-export function JabatanDeleteDialog({ open, onOpenChange, jabatan, onConfirm, isDeleting }: JabatanDeleteDialogProps) {
+export function JabatanDeleteDialog({
+  open,
+  onOpenChange,
+  jabatan,
+  onConfirm,
+  isDeleting,
+}: JabatanDeleteDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -31,7 +37,8 @@ export function JabatanDeleteDialog({ open, onOpenChange, jabatan, onConfirm, is
             <AlertDialogTitle>Hapus data jabatan?</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat
+            dibatalkan.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -44,8 +51,8 @@ export function JabatanDeleteDialog({ open, onOpenChange, jabatan, onConfirm, is
           <AlertDialogAction
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
             onClick={(e) => {
-              e.preventDefault()
-              if (jabatan) onConfirm(jabatan.id)
+              e.preventDefault();
+              if (jabatan) onConfirm(jabatan.id);
             }}
             disabled={isDeleting}
           >
@@ -55,11 +62,11 @@ export function JabatanDeleteDialog({ open, onOpenChange, jabatan, onConfirm, is
                 Menghapus...
               </>
             ) : (
-              'Ya, Hapus'
+              "Ya, Hapus"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

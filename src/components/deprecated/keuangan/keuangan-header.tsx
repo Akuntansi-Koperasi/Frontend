@@ -1,63 +1,65 @@
-import { useState } from "react"
-import { FileSpreadsheet, Loader2 } from "lucide-react"
-import { toast } from "sonner"
-import type { CashflowParams} from "@/services/deprecated/cashflowService";
-import { Button } from "@/components/ui/button"
-import { exportCashflowExcel } from "@/services/deprecated/cashflowService"
+import { useState } from "react";
+import { FileSpreadsheet, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import type { CashflowParams } from "@/services/deprecated/cashflowService";
+import { Button } from "@/components/ui/button";
+import { exportCashflowExcel } from "@/services/deprecated/cashflowService";
 
 interface KeuanganHeaderProps {
-  currentFilters: CashflowParams
+  currentFilters: CashflowParams;
 }
 
 export function KeuanganHeader({ currentFilters }: KeuanganHeaderProps) {
-  const [isExporting, setIsExporting] = useState(false)
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async () => {
-    setIsExporting(true)
+    setIsExporting(true);
     try {
-      const response = await exportCashflowExcel(currentFilters)
-      
-      let filename = `Laporan_Keuangan_${new Date().toISOString().split('T')[0]}.xlsx`
-      
-      const disposition = response.headers['content-disposition']
-      if (disposition && disposition.indexOf('attachment') !== -1) {
-        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
-        const matches = filenameRegex.exec(disposition)
+      const response = await exportCashflowExcel(currentFilters);
+
+      let filename = `Laporan_Keuangan_${new Date().toISOString().split("T")[0]}.xlsx`;
+
+      const disposition = response.headers["content-disposition"];
+      if (disposition && disposition.indexOf("attachment") !== -1) {
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(disposition);
         if (matches != null && matches[1]) {
-          filename = matches[1].replace(/['"]/g, '')
+          filename = matches[1].replace(/['"]/g, "");
         }
       }
-      
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-      const link = document.createElement('a')
-      link.href = url
-      
-      link.setAttribute('download', filename)
-      
-      document.body.appendChild(link)
-      link.click()
-      
-      link.parentNode?.removeChild(link)
-      window.URL.revokeObjectURL(url)
-      
-      toast.success("Export Excel berhasil diunduh")
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      link.setAttribute("download", filename);
+
+      document.body.appendChild(link);
+      link.click();
+
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Export Excel berhasil diunduh");
     } catch (error) {
-      console.error("Export failed", error)
-      toast.error("Gagal mengunduh file Excel")
+      console.error("Export failed", error);
+      toast.error("Gagal mengunduh file Excel");
     } finally {
-      setIsExporting(false)
+      setIsExporting(false);
     }
-  }
+  };
 
   return (
     <div className="flex md:items-center items-start justify-between pt-4 flex-col sm:flex-row gap-4">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">Manajemen Pemasukan dan Pengeluaran</h1>
+        <h1 className="text-3xl font-bold">
+          Manajemen Pemasukan dan Pengeluaran
+        </h1>
         <p className="text-lg text-muted-foreground">
           Rekapitulasi keuangan harian toko
         </p>
       </div>
-      <Button 
+      <Button
         className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 h-12 cursor-pointer"
         onClick={handleExport}
         disabled={isExporting}
@@ -70,5 +72,5 @@ export function KeuanganHeader({ currentFilters }: KeuanganHeaderProps) {
         {isExporting ? "Mengunduh..." : "Export Excel"}
       </Button>
     </div>
-  )
+  );
 }

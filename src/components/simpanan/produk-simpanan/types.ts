@@ -1,5 +1,5 @@
-import type { ProdukSimpananRecord } from '@/services/produkSimpananService'
+import type { ProdukSimpananRecord } from "@/services/produkSimpananService";
 
-export const JENIS_SIMPANAN = ['Sukarela', 'Wajib', 'Pokok'] as const
+export const JENIS_SIMPANAN = ["Sukarela", "Wajib", "Pokok"] as const;
 
-export type { ProdukSimpananRecord }
+export type { ProdukSimpananRecord };

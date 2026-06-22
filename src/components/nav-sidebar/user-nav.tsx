@@ -1,21 +1,17 @@
-import * as React from "react"
-import { useQueryClient } from "@tanstack/react-query"
-import { Link } from "@tanstack/react-router"
+import * as React from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import {
   Building2,
   Check,
   ChevronDown,
   LogOut,
   User as UserIcon,
-} from "lucide-react"
-import type { Koperasi } from "@/services/authService"
-import { logout } from "@/services/authService"
-import { useUserProfile } from "@/hooks/use-user-profile"
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+} from "lucide-react";
+import type { Koperasi } from "@/services/authService";
+import { logout } from "@/services/authService";
+import { useUserProfile } from "@/hooks/use-user-profile";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,69 +20,73 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 function getKoperasiList(): Array<Koperasi> {
   try {
-    if (typeof window === "undefined") return []
-    const stored = localStorage.getItem("koperasiList")
-    return stored ? JSON.parse(stored) : []
+    if (typeof window === "undefined") return [];
+    const stored = localStorage.getItem("koperasiList");
+    return stored ? JSON.parse(stored) : [];
   } catch {
-    return []
+    return [];
   }
 }
 
 function getActiveKoperasiId(): number | null {
   try {
-    if (typeof window === "undefined") return null
-    const stored = localStorage.getItem("koperasiActive")
-    if (!stored) return null
-    const parsed = JSON.parse(stored)
-    const id = parsed?.koperasi?.id
-    return typeof id === "number" ? id : null
+    if (typeof window === "undefined") return null;
+    const stored = localStorage.getItem("koperasiActive");
+    if (!stored) return null;
+    const parsed = JSON.parse(stored);
+    const id = parsed?.koperasi?.id;
+    return typeof id === "number" ? id : null;
   } catch {
-    return null
+    return null;
   }
 }
 
 function getActiveKoperasi(): Koperasi | null {
   try {
-    if (typeof window === "undefined") return null
-    const stored = localStorage.getItem("koperasiActive")
-    return stored ? (JSON.parse(stored) as Koperasi) : null
+    if (typeof window === "undefined") return null;
+    const stored = localStorage.getItem("koperasiActive");
+    return stored ? (JSON.parse(stored) as Koperasi) : null;
   } catch {
-    return null
+    return null;
   }
 }
 
 export function UserNav() {
-  const { data: user } = useUserProfile()
-  const qc = useQueryClient()
+  const { data: user } = useUserProfile();
+  const qc = useQueryClient();
 
-  const [koperasiList] = React.useState<Array<Koperasi>>(() => getKoperasiList())
-  const [activeId, setActiveId] = React.useState<number | null>(() => getActiveKoperasiId())
+  const [koperasiList] = React.useState<Array<Koperasi>>(() =>
+    getKoperasiList(),
+  );
+  const [activeId, setActiveId] = React.useState<number | null>(() =>
+    getActiveKoperasiId(),
+  );
 
-  const activeKoperasi = getActiveKoperasi()
+  const activeKoperasi = getActiveKoperasi();
 
   const switchKoperasi = async (item: Koperasi) => {
-    if (item.koperasi.id === activeId) return
+    if (item.koperasi.id === activeId) return;
 
-    localStorage.setItem("koperasiActive", JSON.stringify(item))
-    localStorage.setItem("anggota", JSON.stringify(item.anggota))
-    localStorage.setItem("permissions", JSON.stringify(item.permissions))
+    localStorage.setItem("koperasiActive", JSON.stringify(item));
+    localStorage.setItem("anggota", JSON.stringify(item.anggota));
+    localStorage.setItem("permissions", JSON.stringify(item.permissions));
 
-    setActiveId(item.koperasi.id)
+    setActiveId(item.koperasi.id);
 
     // Panggil ulang profile segera (akan memanggil API /profile/me)
     // supaya storage (anggota/permissions/koperasiActive) tersinkron sebelum reload.
     try {
-      await qc.refetchQueries({ queryKey: ["profile"], exact: true })
+      await qc.refetchQueries({ queryKey: ["profile"], exact: true });
     } finally {
       // Reload page to apply new permissions everywhere
-      window.location.reload()
+      window.location.reload();
     }
-  }
+  };
 
   const getInitials = (name: string) => {
     return (name || "User")
@@ -94,8 +94,8 @@ export function UserNav() {
       .map((n) => n[0])
       .join("")
       .toUpperCase()
-      .substring(0, 2)
-  }
+      .substring(0, 2);
+  };
 
   return (
     <DropdownMenu>
@@ -118,7 +118,9 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user?.nama || "Pengguna"}</p>
+            <p className="text-sm font-medium leading-none">
+              {user?.nama || "Pengguna"}
+            </p>
             <p className="text-xs leading-none text-muted-foreground">
               {activeKoperasi?.koperasi.nama || "—"}
             </p>
@@ -169,5 +171,5 @@ export function UserNav() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

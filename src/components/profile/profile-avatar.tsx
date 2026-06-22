@@ -1,59 +1,59 @@
-import { useRef, useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { AlertCircle, Camera, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { updatePhoto } from '@/services/profileService'
+import { useRef, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AlertCircle, Camera, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { updatePhoto } from "@/services/profileService";
 
 interface ProfileAvatarProps {
   user: {
-    profile_image?: string | null
-    name: string
-    username: string
-  }
+    profile_image?: string | null;
+    name: string;
+    username: string;
+  };
 }
 
 export function ProfileAvatar({ user }: ProfileAvatarProps) {
-  const queryClient = useQueryClient()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [error, setError] = useState('')
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState("");
 
   const mutation = useMutation({
     mutationFn: updatePhoto,
     onSuccess: () => {
-      toast.success('Foto profil berhasil diperbarui')
-      queryClient.invalidateQueries({ queryKey: ['profile'] })
-      setError('')
+      toast.success("Foto profil berhasil diperbarui");
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      setError("");
       if (fileInputRef.current) {
-        fileInputRef.current.value = ''
+        fileInputRef.current.value = "";
       }
     },
     onError: (err: any) => {
       const errorMessage =
         err?.response?.data?.message ||
-        'Terjadi kesalahan saat mengunggah foto.'
-      setError(errorMessage)
+        "Terjadi kesalahan saat mengunggah foto.";
+      setError(errorMessage);
 
       if (fileInputRef.current) {
-        fileInputRef.current.value = ''
+        fileInputRef.current.value = "";
       }
     },
-  })
+  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setError('')
-      mutation.mutate(file)
+      setError("");
+      mutation.mutate(file);
     }
-  }
+  };
 
   const handleButtonClick = () => {
-    setError('')
-    fileInputRef.current?.click()
-  }
+    setError("");
+    fileInputRef.current?.click();
+  };
 
   return (
     <Card>
@@ -101,9 +101,9 @@ export function ProfileAvatar({ user }: ProfileAvatarProps) {
           ) : (
             <Camera className="w-4 h-4" />
           )}
-          {mutation.isPending ? 'Mengupload...' : 'Ubah Foto'}
+          {mutation.isPending ? "Mengupload..." : "Ubah Foto"}
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }

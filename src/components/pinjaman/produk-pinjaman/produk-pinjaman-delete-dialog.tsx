@@ -1,5 +1,5 @@
-import { AlertTriangle, Loader2 } from 'lucide-react'
-import type { ProdukPinjamanRecord } from './types'
+import { AlertTriangle, Loader2 } from "lucide-react";
+import type { ProdukPinjamanRecord } from "./types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,14 +9,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from "@/components/ui/alert-dialog";
 
 interface ProdukPinjamanDeleteDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: (id: number) => void
-  produk?: ProdukPinjamanRecord
-  isDeleting?: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: (id: number) => void;
+  produk?: ProdukPinjamanRecord;
+  isDeleting?: boolean;
 }
 
 export function ProdukPinjamanDeleteDialog({
@@ -35,7 +35,8 @@ export function ProdukPinjamanDeleteDialog({
             <AlertDialogTitle>Hapus Data Produk Pinjaman?</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat
+            dibatalkan.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -48,8 +49,8 @@ export function ProdukPinjamanDeleteDialog({
           <AlertDialogAction
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
             onClick={(e) => {
-              e.preventDefault()
-              if (produk !== undefined) onConfirm(produk.id)
+              e.preventDefault();
+              if (produk !== undefined) onConfirm(produk.id);
             }}
             disabled={isDeleting}
           >
@@ -59,11 +60,11 @@ export function ProdukPinjamanDeleteDialog({
                 Menghapus...
               </>
             ) : (
-              'Ya, Hapus'
+              "Ya, Hapus"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

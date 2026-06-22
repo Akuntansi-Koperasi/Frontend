@@ -1,6 +1,6 @@
-import { AlertTriangle, Loader2 } from 'lucide-react'
+import { AlertTriangle, Loader2 } from "lucide-react";
 
-import type { PengurusRecord } from './types'
+import type { PengurusRecord } from "./types";
 
 import {
   AlertDialog,
@@ -11,17 +11,23 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from "@/components/ui/alert-dialog";
 
 interface PengurusDeleteDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  pengurus: PengurusRecord | null
-  onConfirm: (id: number) => Promise<boolean>
-  isDeleting: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  pengurus: PengurusRecord | null;
+  onConfirm: (id: number) => Promise<boolean>;
+  isDeleting: boolean;
 }
 
-export function PengurusDeleteDialog({ open, onOpenChange, pengurus, onConfirm, isDeleting }: PengurusDeleteDialogProps) {
+export function PengurusDeleteDialog({
+  open,
+  onOpenChange,
+  pengurus,
+  onConfirm,
+  isDeleting,
+}: PengurusDeleteDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -31,7 +37,8 @@ export function PengurusDeleteDialog({ open, onOpenChange, pengurus, onConfirm, 
             <AlertDialogTitle>Hapus data pengurus koperasi?</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat
+            dibatalkan.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -44,8 +51,8 @@ export function PengurusDeleteDialog({ open, onOpenChange, pengurus, onConfirm, 
           <AlertDialogAction
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
             onClick={async (e) => {
-              e.preventDefault()
-              if (pengurus) await onConfirm(pengurus.id)
+              e.preventDefault();
+              if (pengurus) await onConfirm(pengurus.id);
             }}
             disabled={isDeleting}
           >
@@ -55,11 +62,11 @@ export function PengurusDeleteDialog({ open, onOpenChange, pengurus, onConfirm, 
                 Menghapus...
               </>
             ) : (
-              'Ya, Hapus'
+              "Ya, Hapus"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

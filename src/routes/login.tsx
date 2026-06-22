@@ -1,20 +1,20 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { useEffect } from 'react'
-import { LoginForm } from '@/components/login/login-form'
-import { isAuthenticated } from '@/services/authService'
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { LoginForm } from "@/components/login/login-form";
+import { isAuthenticated } from "@/services/authService";
 
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute("/login")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     if (isAuthenticated()) {
-      router.navigate({ to: '/dashboard', replace: true })
+      router.navigate({ to: "/dashboard", replace: true });
     }
-  }, [router])
+  }, [router]);
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -22,5 +22,5 @@ function RouteComponent() {
         <LoginForm />
       </div>
     </div>
-  )
+  );
 }

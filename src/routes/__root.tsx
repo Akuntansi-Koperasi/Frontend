@@ -3,42 +3,42 @@ import {
   Link,
   Scripts,
   createRootRouteWithContext,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { GoogleOAuthProvider } from '@react-oauth/google'
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-import appCss from '../styles.css?url'
-import type { QueryClient } from '@tanstack/react-query'
-import { env } from '@/env'
+} from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
+import appCss from "../styles.css?url";
+import type { QueryClient } from "@tanstack/react-query";
+import { env } from "@/env";
 
 interface MyRouterContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        title: 'KPRI Bina Sejahtera',
+        title: "KPRI Bina Sejahtera",
       },
     ],
     links: [
       {
-        rel: 'stylesheet',
+        rel: "stylesheet",
         href: appCss,
       },
       {
-        rel: 'icon',
-        href: '/Logo.ico',
-      }
+        rel: "icon",
+        href: "/Logo.ico",
+      },
     ],
   }),
   notFoundComponent: () => {
@@ -53,10 +53,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           Kembali ke Dashboard
         </Link>
       </div>
-    )
+    );
   },
   shellComponent: RootDocument,
-})
+});
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -65,7 +65,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-
         {/* Tempat masuk utama aplikasi */}
         <GoogleOAuthProvider clientId={env.VITE_GOOGLE_CLIENT_ID}>
           {children}
@@ -74,11 +73,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         {/* Devtools akan dihilangkan otomatis di production */}
         <TanStackDevtools
           config={{
-            position: 'bottom-right',
+            position: "bottom-right",
           }}
           plugins={[
             {
-              name: 'Tanstack Router',
+              name: "Tanstack Router",
               render: <TanStackRouterDevtoolsPanel />,
             },
             TanStackQueryDevtools,
@@ -87,5 +86,5 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }

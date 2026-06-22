@@ -1,9 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/_auth/gerai-retail')({
+export const Route = createFileRoute("/_auth/gerai-retail")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  return <div>Hello "/_auth/gerai-retail"!</div>
+  return <div>Hello "/_auth/gerai-retail"!</div>;
 }

@@ -2,19 +2,22 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from '@tanstack/react-table'
-import type { PermissionLevel, PermissionMenuItem } from '@/components/settings/roles/types'
-import type { ColumnDef } from '@tanstack/react-table'
+} from "@tanstack/react-table";
+import type {
+  PermissionLevel,
+  PermissionMenuItem,
+} from "@/components/settings/roles/types";
+import type { ColumnDef } from "@tanstack/react-table";
 
-import { Card, CardContent } from '@/components/ui/card'
-import { DataTablePagination } from '@/components/data-table-pagination'
+import { Card, CardContent } from "@/components/ui/card";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -22,30 +25,30 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 
 const DEFAULT_LEVEL_OPTIONS: Array<{ id: PermissionLevel; label: string }> = [
-  { id: 'tanpa_akses', label: 'Tanpa Akses' },
-  { id: 'lihat', label: 'Lihat' },
-  { id: 'modifikasi', label: 'Modifikasi' },
-  { id: 'admin', label: 'Admin' },
-]
+  { id: "tanpa_akses", label: "Tanpa Akses" },
+  { id: "lihat", label: "Lihat" },
+  { id: "modifikasi", label: "Modifikasi" },
+  { id: "admin", label: "Admin" },
+];
 
 interface PermissionsTableProps {
-  roleName: string
-  menus: Array<PermissionMenuItem>
-  totalMenus: number
-  levels: Record<string, PermissionLevel>
-  onChangeLevel: (menuKey: string, level: PermissionLevel) => void
-  disabled?: boolean
-  levelOptions?: Array<{ id: PermissionLevel; label: string }>
+  roleName: string;
+  menus: Array<PermissionMenuItem>;
+  totalMenus: number;
+  levels: Record<string, PermissionLevel>;
+  onChangeLevel: (menuKey: string, level: PermissionLevel) => void;
+  disabled?: boolean;
+  levelOptions?: Array<{ id: PermissionLevel; label: string }>;
   pagination: {
-    pageIndex: number
-    pageCount: number
-    pageSize: number
-  }
-  onPageChange: (page: number) => void
-  onPageSizeChange: (size: number) => void
+    pageIndex: number;
+    pageCount: number;
+    pageSize: number;
+  };
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 }
 
 export function PermissionsTable({
@@ -60,8 +63,8 @@ export function PermissionsTable({
 }: PermissionsTableProps) {
   const columns: Array<ColumnDef<PermissionMenuItem>> = [
     {
-      id: 'index',
-      header: 'No.',
+      id: "index",
+      header: "No.",
       cell: ({ row }) => (
         <span className="text-muted-foreground font-medium">
           {pagination.pageIndex * pagination.pageSize + row.index + 1}.
@@ -69,22 +72,29 @@ export function PermissionsTable({
       ),
     },
     {
-      accessorKey: 'label',
-      header: 'Menu',
+      accessorKey: "label",
+      header: "Menu",
       cell: ({ row }) => (
-        <span className="font-semibold text-slate-900 text-sm">{row.original.label}</span>
+        <span className="font-semibold text-slate-900 text-sm">
+          {row.original.label}
+        </span>
       ),
     },
     {
-      id: 'level',
-      header: 'Izin',
+      id: "level",
+      header: "Izin",
       cell: ({ row }) => (
         <div className="flex justify-center">
           <Select
-            value={(levels[row.original.key]) ?? 'tanpa_akses'}
-            onValueChange={(v) => onChangeLevel(row.original.key, v as PermissionLevel)}
+            value={levels[row.original.key] ?? "tanpa_akses"}
+            onValueChange={(v) =>
+              onChangeLevel(row.original.key, v as PermissionLevel)
+            }
           >
-            <SelectTrigger className="h-9 w-auto min-w-fit bg-white cursor-pointer text-sm" disabled={disabled}>
+            <SelectTrigger
+              className="h-9 w-auto min-w-fit bg-white cursor-pointer text-sm"
+              disabled={disabled}
+            >
               <SelectValue placeholder="Pilih level" />
             </SelectTrigger>
             <SelectContent>
@@ -98,13 +108,13 @@ export function PermissionsTable({
         </div>
       ),
     },
-  ]
+  ];
 
   const table = useReactTable({
     data: menus,
     columns,
     getCoreRowModel: getCoreRowModel(),
-  })
+  });
 
   return (
     <Card className="shadow-lg border-3 border-slate-200 p-0">
@@ -114,17 +124,20 @@ export function PermissionsTable({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header, index) => {
-                  let alignClass = 'text-center'
-                  if (index === 1) alignClass = 'text-left'
+                  let alignClass = "text-center";
+                  if (index === 1) alignClass = "text-left";
 
                   return (
                     <TableHead
                       key={header.id}
                       className={`font-semibold text-slate-900 ${alignClass}`}
                     >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -134,14 +147,17 @@ export function PermissionsTable({
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} className="hover:bg-slate-50">
                   {row.getVisibleCells().map((cell, index) => {
-                    let alignClass = 'text-center'
-                    if (index === 1) alignClass = 'text-left'
+                    let alignClass = "text-center";
+                    if (index === 1) alignClass = "text-left";
 
                     return (
                       <TableCell key={cell.id} className={`py-3 ${alignClass}`}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
                       </TableCell>
-                    )
+                    );
                   })}
                 </TableRow>
               ))
@@ -164,5 +180,5 @@ export function PermissionsTable({
         />
       </CardContent>
     </Card>
-  )
+  );
 }

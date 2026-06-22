@@ -1,20 +1,20 @@
-import * as React from 'react'
+import * as React from "react";
 import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
-} from '@tanstack/react-table'
+} from "@tanstack/react-table";
 import {
   ArrowDownRight,
   ArrowUpDown,
   ArrowUpRight,
   Calendar,
-} from 'lucide-react'
-import { useNavigate } from '@tanstack/react-router'
-import { DataTablePagination } from '../../data-table-pagination'
-import type { ColumnDef, SortingState } from '@tanstack/react-table'
-import type { CashflowRecord } from '@/services/deprecated/cashflowService'
+} from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { DataTablePagination } from "../../data-table-pagination";
+import type { ColumnDef, SortingState } from "@tanstack/react-table";
+import type { CashflowRecord } from "@/services/deprecated/cashflowService";
 import {
   Table,
   TableBody,
@@ -22,49 +22,51 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface KeuanganTableProps {
-  data: Array<CashflowRecord>
+  data: Array<CashflowRecord>;
   pagination: {
-    pageIndex: number
-    pageSize: number
-    pageCount: number
-    total: number
-  }
+    pageIndex: number;
+    pageSize: number;
+    pageCount: number;
+    total: number;
+  };
 }
 
 const formatRp = (val: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(val)
-}
+  }).format(val);
+};
 
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 const columns: Array<ColumnDef<CashflowRecord>> = [
   {
-    id: 'index',
-    header: 'No.',
+    id: "index",
+    header: "No.",
     cell: ({ row, table }) => {
       const index =
         row.index +
         1 +
         table.getState().pagination.pageIndex *
-          table.getState().pagination.pageSize
-      return <span className="text-muted-foreground font-medium">{index}.</span>
+          table.getState().pagination.pageSize;
+      return (
+        <span className="text-muted-foreground font-medium">{index}.</span>
+      );
     },
   },
   {
-    accessorKey: 'date',
-    header: 'Tanggal',
+    accessorKey: "date",
+    header: "Tanggal",
     cell: ({ row }) => (
       <div className="flex items-center justify-center gap-2 font-medium text-slate-700">
         <Calendar className="h-4 w-4 text-slate-800" />
@@ -73,23 +75,23 @@ const columns: Array<ColumnDef<CashflowRecord>> = [
     ),
   },
   {
-    accessorKey: 'user.name',
+    accessorKey: "user.name",
     header: ({ column }) => (
       <Button
         variant="ghost"
         className="p-0 hover:bg-transparent font-bold text-slate-900 justify-start"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
         Penginput
         <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground" />
       </Button>
     ),
     cell: ({ row }) => {
-      const user = row.original.user
+      const user = row.original.user;
       return (
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 border border-slate-200">
-            <AvatarImage src={user.profile_image || ''} />
+            <AvatarImage src={user.profile_image || ""} />
             <AvatarFallback className="bg-slate-100 text-slate-600 font-medium">
               {user.name.charAt(0)}
             </AvatarFallback>
@@ -103,21 +105,21 @@ const columns: Array<ColumnDef<CashflowRecord>> = [
             </span>
           </div>
         </div>
-      )
+      );
     },
   },
   {
-    accessorKey: 'type',
-    header: 'Tipe',
+    accessorKey: "type",
+    header: "Tipe",
     cell: ({ row }) => {
-      const isIncome = row.original.type === 'pemasukan'
+      const isIncome = row.original.type === "pemasukan";
       return (
         <Badge
           variant="outline"
           className={`px-3 py-0.5 rounded-full border gap-1 ${
             isIncome
-              ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-              : 'bg-rose-50 text-rose-600 border-rose-200'
+              ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+              : "bg-rose-50 text-rose-600 border-rose-200"
           }`}
         >
           {isIncome ? (
@@ -127,45 +129,49 @@ const columns: Array<ColumnDef<CashflowRecord>> = [
           )}
           {capitalize(row.original.type)}
         </Badge>
-      )
+      );
     },
   },
   {
-    accessorKey: 'value',
-    header: 'Jumlah Uang',
+    accessorKey: "value",
+    header: "Jumlah Uang",
     cell: ({ row }) => {
-      const isIncome = row.original.type === 'pemasukan'
+      const isIncome = row.original.type === "pemasukan";
       return (
         <span
-          className={`font-bold ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}
+          className={`font-bold ${isIncome ? "text-emerald-600" : "text-rose-600"}`}
         >
-          {isIncome ? '+' : '-'}
+          {isIncome ? "+" : "-"}
           {formatRp(row.original.value)}
         </span>
-      )
+      );
     },
   },
-]
+];
 
 export function KeuanganTable({ data, pagination }: KeuanganTableProps) {
-  const navigate = useNavigate()
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const navigate = useNavigate();
+  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const handlePageChange = (newPageIndex: number) => {
     navigate({
-      to: '/keuangan' as any,
+      to: "/keuangan" as any,
       search: ((prev: any) => ({ ...prev, page: newPageIndex + 1 })) as any,
       replace: true,
-    })
-  }
+    });
+  };
 
   const handlePageSizeChange = (newPageSize: number) => {
     navigate({
-      to: '/keuangan' as any,
-      search: ((prev: any) => ({ ...prev, per_page: newPageSize, page: 1 })) as any,
+      to: "/keuangan" as any,
+      search: ((prev: any) => ({
+        ...prev,
+        per_page: newPageSize,
+        page: 1,
+      })) as any,
       replace: true,
-    })
-  }
+    });
+  };
 
   const table = useReactTable({
     data,
@@ -182,7 +188,7 @@ export function KeuanganTable({ data, pagination }: KeuanganTableProps) {
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-  })
+  });
 
   return (
     <Card className="shadow-lg border-3 border-slate-200 p-0">
@@ -192,8 +198,8 @@ export function KeuanganTable({ data, pagination }: KeuanganTableProps) {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header, index) => {
-                  let alignClass = 'text-center'
-                  if (index === 2) alignClass = 'text-left'
+                  let alignClass = "text-center";
+                  if (index === 2) alignClass = "text-left";
 
                   return (
                     <TableHead
@@ -207,7 +213,7 @@ export function KeuanganTable({ data, pagination }: KeuanganTableProps) {
                             header.getContext(),
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -217,8 +223,8 @@ export function KeuanganTable({ data, pagination }: KeuanganTableProps) {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} className="hover:bg-slate-50">
                   {row.getVisibleCells().map((cell, index) => {
-                    let alignClass = 'text-center'
-                    if (index === 2) alignClass = 'text-left'
+                    let alignClass = "text-center";
+                    if (index === 2) alignClass = "text-left";
 
                     return (
                       <TableCell key={cell.id} className={`py-3 ${alignClass}`}>
@@ -227,7 +233,7 @@ export function KeuanganTable({ data, pagination }: KeuanganTableProps) {
                           cell.getContext(),
                         )}
                       </TableCell>
-                    )
+                    );
                   })}
                 </TableRow>
               ))
@@ -253,5 +259,5 @@ export function KeuanganTable({ data, pagination }: KeuanganTableProps) {
         />
       </CardContent>
     </Card>
-  )
+  );
 }

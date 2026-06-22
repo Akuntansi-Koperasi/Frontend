@@ -5,72 +5,72 @@ import {
   TrendingUp,
   Users,
   Wallet,
-} from 'lucide-react'
-import type { DashboardStats } from '@/services/dashboardService'
-import { Card, CardContent } from '@/components/ui/card'
+} from "lucide-react";
+import type { DashboardStats } from "@/services/dashboardService";
+import { Card, CardContent } from "@/components/ui/card";
 
 const formatRp = (val: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(val)
-}
+  }).format(val);
+};
 
-const formatPercent = (val: number) => `${Math.abs(val).toFixed(1)}%`
+const formatPercent = (val: number) => `${Math.abs(val).toFixed(1)}%`;
 
 export function DashboardCards({
   stats,
 }: {
-  stats?: DashboardStats['statistik']
+  stats?: DashboardStats["statistik"];
 }) {
-  if (!stats) return null
+  if (!stats) return null;
 
   const items = [
     {
-      label: 'Pemasukan',
+      label: "Pemasukan",
       value: formatRp(stats.pemasukan.total),
       footerText: `${formatPercent(stats.pemasukan.change)} dari bulan lalu`,
       footerTextColor:
-        stats.pemasukan.change >= 0 ? 'text-emerald-600' : 'text-rose-600',
+        stats.pemasukan.change >= 0 ? "text-emerald-600" : "text-rose-600",
       footerIcon: stats.pemasukan.change >= 0 ? ArrowUpRight : ArrowDownRight,
       icon: TrendingUp,
-      iconColor: 'text-emerald-600',
-      iconBg: 'bg-emerald-50',
+      iconColor: "text-emerald-600",
+      iconBg: "bg-emerald-50",
     },
     {
-      label: 'Pengeluaran',
+      label: "Pengeluaran",
       value: formatRp(stats.pengeluaran.total),
       footerText: `${formatPercent(stats.pengeluaran.change)} dari bulan lalu`,
       footerTextColor:
-        stats.pengeluaran.change <= 0 ? 'text-emerald-600' : 'text-rose-600',
+        stats.pengeluaran.change <= 0 ? "text-emerald-600" : "text-rose-600",
       footerIcon: stats.pengeluaran.change >= 0 ? ArrowUpRight : ArrowDownRight,
       icon: TrendingDown,
-      iconColor: 'text-rose-600',
-      iconBg: 'bg-rose-50',
+      iconColor: "text-rose-600",
+      iconBg: "bg-rose-50",
     },
     {
-      label: 'Total Setoran',
+      label: "Total Setoran",
       value: formatRp(stats.deposit.total),
       isSpecial: true,
       subValue: `${stats.deposit.person} Anggota`,
       icon: Wallet,
-      iconColor: 'text-purple-600',
-      iconBg: 'bg-purple-50',
+      iconColor: "text-purple-600",
+      iconBg: "bg-purple-50",
     },
     {
-      label: 'Rata-Rata Jam kerja',
+      label: "Rata-Rata Jam kerja",
       value: stats.work_hours.average.text,
       footerText: `${formatPercent(stats.work_hours.change)} dari bulan lalu`,
       footerTextColor:
-        stats.work_hours.change >= 0 ? 'text-emerald-600' : 'text-rose-600',
+        stats.work_hours.change >= 0 ? "text-emerald-600" : "text-rose-600",
       footerIcon: stats.work_hours.change >= 0 ? ArrowUpRight : ArrowDownRight,
       icon: Users,
-      iconColor: 'text-blue-600',
-      iconBg: 'bg-blue-50',
+      iconColor: "text-blue-600",
+      iconBg: "bg-blue-50",
     },
-  ]
+  ];
 
   return (
     <div className="space-y-4">
@@ -121,5 +121,5 @@ export function DashboardCards({
         ))}
       </div>
     </div>
-  )
+  );
 }

@@ -1,36 +1,40 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { Search, X } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export function SetoranSearch({ currentSearch }: { currentSearch?: string }) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [searchTerm, setSearchTerm] = useState(currentSearch || '')
+  const [searchTerm, setSearchTerm] = useState(currentSearch || "");
 
   useEffect(() => {
-    setSearchTerm(currentSearch || '')
-  }, [currentSearch])
+    setSearchTerm(currentSearch || "");
+  }, [currentSearch]);
 
   const handleSearch = (term: string) => {
     navigate({
-      to: '/setoran' as any,
-      search: ((prev: any) => ({ ...prev, search: term || undefined, page: 1 })) as any,
+      to: "/setoran" as any,
+      search: ((prev: any) => ({
+        ...prev,
+        search: term || undefined,
+        page: 1,
+      })) as any,
       replace: true,
-    })
-  }
+    });
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch(searchTerm)
+    if (e.key === "Enter") {
+      handleSearch(searchTerm);
     }
-  }
+  };
 
   const clearSearch = () => {
-    setSearchTerm('')
-    handleSearch('')
-  }
+    setSearchTerm("");
+    handleSearch("");
+  };
 
   return (
     <div className="relative shadow-lg">
@@ -54,5 +58,5 @@ export function SetoranSearch({ currentSearch }: { currentSearch?: string }) {
         </Button>
       )}
     </div>
-  )
+  );
 }
