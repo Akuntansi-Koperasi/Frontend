@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { handleApiError } from "./errorService";
 
 type ApiRecordResponse<T> = {
   status: string;
@@ -10,17 +11,6 @@ export type RolePermissionItem = {
   menu: string;
   class: string;
   level: "lihat" | "modifikasi" | "admin";
-};
-
-const handleApiError = (err: any): never => {
-  const data = err?.response?.data;
-  const message = data?.message ?? err?.message ?? "Terjadi kesalahan";
-  const errors = data?.errors ?? {};
-  const status = err?.response?.status ?? 500;
-  const error: any = new Error(message);
-  error.apiErrors = errors;
-  error.status = status;
-  throw error;
 };
 
 export const getRolePermissions = async (roleId: string | number) => {

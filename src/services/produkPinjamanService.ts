@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { handleApiError } from "./errorService";
 
 export type ProdukPinjamanParams = {
   page?: number;
@@ -67,17 +68,6 @@ const mapBackend = (b: ProdukPinjamanBackendRecord): ProdukPinjamanRecord => {
     bunga: Number(b.suku_bunga || 0),
     keterangan: b.keterangan || "",
   };
-};
-
-const handleApiError = (err: any): never => {
-  const data = err?.response?.data;
-  const message = data?.message ?? err?.message ?? "Terjadi kesalahan";
-  const errors = data?.errors ?? {};
-  const status = err?.response?.status ?? 500;
-  const e: any = new Error(message);
-  e.apiErrors = errors;
-  e.status = status;
-  throw e;
 };
 
 export const getProdukPinjamanList = async (

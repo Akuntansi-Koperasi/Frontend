@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { handleApiError } from "./errorService";
 
 export type ProdukSimpananParams = {
   page?: number;
@@ -50,17 +51,6 @@ export type ProdukSimpananListResult = {
   per_page: number;
   total: number;
   data: Array<ProdukSimpananRecord>;
-};
-
-const handleApiError = (err: any): never => {
-  const data = err?.response?.data;
-  const message = data?.message ?? err?.message ?? "Terjadi kesalahan";
-  const errors = data?.errors ?? {};
-  const status = err?.response?.status ?? 500;
-  const e: any = new Error(message);
-  e.apiErrors = errors;
-  e.status = status;
-  throw e;
 };
 
 export const getProdukSimpananList = async (

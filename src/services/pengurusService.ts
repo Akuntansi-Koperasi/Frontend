@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { handleApiError } from "./errorService";
 
 import type {
   AnggotaOption,
@@ -53,17 +54,6 @@ type ApiRecordResponse<T> = {
   status: string;
   message: string;
   data: T;
-};
-
-const handleApiError = (err: any): never => {
-  const data = err?.response?.data;
-  const message = data?.message ?? err?.message ?? "Terjadi kesalahan";
-  const errors = data?.errors ?? {};
-  const status = err?.response?.status ?? 500;
-  const error: any = new Error(message);
-  error.apiErrors = errors;
-  error.status = status;
-  throw error;
 };
 
 const mapBackendRecord = (record: PengurusBackendRecord): PengurusRecord => ({

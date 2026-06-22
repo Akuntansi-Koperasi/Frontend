@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { handleApiError } from "./errorService";
 
 type ApiListResponse<T> = {
   status: string;
@@ -34,31 +35,6 @@ type ApiRecordResponse<T> = {
   status: string;
   message: string;
   data: T;
-};
-
-const handleApiError = (err: unknown): never => {
-  const errorResponse = err as {
-    response?: {
-      data?: {
-        message?: string;
-        errors?: Partial<Record<string, Array<string>>>;
-        status?: number;
-      };
-      status?: number;
-    };
-    message?: string;
-  };
-  const data = errorResponse.response?.data;
-  const message = data?.message ?? errorResponse.message ?? "Terjadi kesalahan";
-  const errors = data?.errors ?? {};
-  const status = errorResponse.response?.status ?? 500;
-  const error = new Error(message) as Error & {
-    apiErrors?: Partial<Record<string, Array<string>>>;
-    status?: number;
-  };
-  error.apiErrors = errors;
-  error.status = status;
-  throw error;
 };
 
 const cleanParams = (params: RoleParams): Record<string, unknown> => {

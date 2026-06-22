@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { handleApiError } from "./errorService";
 
 type ApiListResponse<T> = {
   status: string;
@@ -57,17 +58,6 @@ export type UserRecord = {
   peran?: string | null;
   profile_image?: string | null;
   role?: { id: number; name: string } | null;
-};
-
-const handleApiError = (err: any): never => {
-  const data = err?.response?.data;
-  const message = data?.message ?? err?.message ?? "Terjadi kesalahan";
-  const errors = data?.errors ?? {};
-  const status = err?.response?.status ?? 500;
-  const error: any = new Error(message);
-  error.apiErrors = errors;
-  error.status = status;
-  throw error;
 };
 
 const mapUser = (anggota: BackendAnggota): UserRecord => ({

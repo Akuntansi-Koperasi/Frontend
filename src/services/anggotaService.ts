@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { handleApiError } from "./errorService";
 import type {
   AnggotaDropdownOption,
   AnggotaGender,
@@ -58,17 +59,6 @@ type BackendAnggota = {
   akses?: string | null;
   user?: BackendUser | null;
   role?: BackendRole | null;
-};
-
-const handleApiError = (err: any): never => {
-  const data = err?.response?.data;
-  const message = data?.message ?? err?.message ?? "Terjadi kesalahan";
-  const errors = data?.errors ?? {};
-  const status = err?.response?.status ?? 500;
-  const error: any = new Error(message);
-  error.apiErrors = errors;
-  error.status = status;
-  throw error;
 };
 
 const mapAnggota = (anggota: BackendAnggota): AnggotaRecord => ({
