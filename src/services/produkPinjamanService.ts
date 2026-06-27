@@ -148,7 +148,9 @@ export const createProdukPinjaman = createServerFn({ method: "POST" })
   });
 
 export const updateProdukPinjaman = createServerFn({ method: "POST" })
-  .validator((data: { id: number; payload: Omit<ProdukPinjamanRecord, "id"> }) => data)
+  .validator(
+    (data: { id: number; payload: Omit<ProdukPinjamanRecord, "id"> }) => data,
+  )
   .handler(async ({ data }) => {
     try {
       const body = {

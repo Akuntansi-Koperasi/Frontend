@@ -47,7 +47,12 @@ export const getAllPermissions = createServerFn({ method: "GET" }).handler(
 );
 
 export const updateRolePermissions = createServerFn({ method: "POST" })
-  .validator((data: { roleId: string | number; permissions: Array<{ class: string; level: string }> }) => data)
+  .validator(
+    (data: {
+      roleId: string | number;
+      permissions: Array<{ class: string; level: string }>;
+    }) => data,
+  )
   .handler(async ({ data }) => {
     try {
       const response = await api.put<ApiRecordResponse<any>>(

@@ -8,7 +8,10 @@ import type {
   PengurusUpsertPayload,
 } from "@/components/koperasi/pengurus/types";
 
-export type { AnggotaOption, JabatanOption } from "@/components/koperasi/pengurus/types";
+export type {
+  AnggotaOption,
+  JabatanOption,
+} from "@/components/koperasi/pengurus/types";
 
 export type PengurusParams = {
   page?: number;
@@ -158,7 +161,9 @@ export const createPengurus = createServerFn({ method: "POST" })
         jabatan_id: data.payload.jabatanId,
         mulai: String(data.payload.mulaiMenjabat),
         selesai:
-          data.payload.selesaiMenjabat == null ? null : String(data.payload.selesaiMenjabat),
+          data.payload.selesaiMenjabat == null
+            ? null
+            : String(data.payload.selesaiMenjabat),
         status: data.payload.status,
       };
 
@@ -180,7 +185,9 @@ export const updatePengurus = createServerFn({ method: "POST" })
         jabatan_id: data.payload.jabatanId,
         mulai: String(data.payload.mulaiMenjabat),
         selesai:
-          data.payload.selesaiMenjabat == null ? null : String(data.payload.selesaiMenjabat),
+          data.payload.selesaiMenjabat == null
+            ? null
+            : String(data.payload.selesaiMenjabat),
         status: data.payload.status,
       };
 
@@ -211,9 +218,9 @@ export const akhiriPengurus = createServerFn({ method: "POST" })
   .validator((data: { id: number }) => data)
   .handler(async ({ data }) => {
     try {
-      const response = await api.patch<ApiRecordResponse<PengurusBackendRecord>>(
-        `/pengurus/${data.id}/akhiri`,
-      );
+      const response = await api.patch<
+        ApiRecordResponse<PengurusBackendRecord>
+      >(`/pengurus/${data.id}/akhiri`);
       return mapBackendRecord(response.data.data);
     } catch (err) {
       handleApiError(err);

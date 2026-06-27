@@ -130,7 +130,9 @@ export const createProdukSimpanan = createServerFn({ method: "POST" })
   });
 
 export const updateProdukSimpanan = createServerFn({ method: "POST" })
-  .validator((data: { id: number; payload: Omit<ProdukSimpananRecord, "id"> }) => data)
+  .validator(
+    (data: { id: number; payload: Omit<ProdukSimpananRecord, "id"> }) => data,
+  )
   .handler(async ({ data }) => {
     try {
       const body = {

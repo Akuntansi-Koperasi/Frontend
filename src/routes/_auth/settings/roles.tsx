@@ -81,8 +81,7 @@ function RouteComponent() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: number }) =>
-      deleteRoleFn({ data: { id } }),
+    mutationFn: ({ id }: { id: number }) => deleteRoleFn({ data: { id } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["roles"] }),
   });
 

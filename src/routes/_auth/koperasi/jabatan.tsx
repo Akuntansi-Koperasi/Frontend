@@ -85,8 +85,7 @@ function RouteComponent() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: number }) =>
-      deleteJabatanFn({ data: { id } }),
+    mutationFn: ({ id }: { id: number }) => deleteJabatanFn({ data: { id } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["jabatan"] }),
   });
 

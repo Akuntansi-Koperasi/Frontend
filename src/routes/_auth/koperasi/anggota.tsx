@@ -86,19 +86,13 @@ function RouteComponent() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: number;
-      payload: any;
-    }) => updateAnggotaFn({ data: { id, payload } }),
+    mutationFn: ({ id, payload }: { id: number; payload: any }) =>
+      updateAnggotaFn({ data: { id, payload } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["anggota"] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: number }) =>
-      deleteAnggotaFn({ data: { id } }),
+    mutationFn: ({ id }: { id: number }) => deleteAnggotaFn({ data: { id } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["anggota"] }),
   });
 

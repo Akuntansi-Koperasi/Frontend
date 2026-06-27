@@ -9,6 +9,7 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { parse } from "cookie";
+import { useServerFn } from "@tanstack/react-start";
 import type { Koperasi } from "@/services/authService";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,7 +23,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useServerFn } from "@tanstack/react-start";
 import { switchKoperasi } from "@/services/profileService";
 import { logout as logoutFn } from "@/services/authService";
 

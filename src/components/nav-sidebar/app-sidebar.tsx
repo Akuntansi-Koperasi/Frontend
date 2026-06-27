@@ -3,12 +3,12 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import { LogOut, User } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { navItems } from "./nav-data";
 import { SearchBar } from "./search-bar";
 import { getPermissionAccess } from "@/services/permissionService";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { logout as logoutFn } from "@/services/authService";
-import { useServerFn } from "@tanstack/react-start";
 import {
   Sidebar,
   SidebarContent,

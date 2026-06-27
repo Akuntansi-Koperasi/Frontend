@@ -241,75 +241,77 @@ export const loginWithGoogle = createServerFn({ method: "POST" })
     }
   });
 
-export const logout = createServerFn({ method: "POST" }).handler(async (): Promise<Response> => {
-  const tokenCookie = serialize("token", "", {
-    httpOnly: true,
-    secure: env.VITE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 0,
-  });
+export const logout = createServerFn({ method: "POST" }).handler(
+  async (): Promise<Response> => {
+    const tokenCookie = serialize("token", "", {
+      httpOnly: true,
+      secure: env.VITE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 0,
+    });
 
-  const userCookie = serialize("user", "", {
-    httpOnly: false,
-    secure: env.VITE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 0,
-  });
+    const userCookie = serialize("user", "", {
+      httpOnly: false,
+      secure: env.VITE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 0,
+    });
 
-  const koperasiListCookie = serialize("koperasiList", "", {
-    httpOnly: false,
-    secure: env.VITE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 0,
-  });
+    const koperasiListCookie = serialize("koperasiList", "", {
+      httpOnly: false,
+      secure: env.VITE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 0,
+    });
 
-  const koperasiActiveCookie = serialize("koperasiActive", "", {
-    httpOnly: false,
-    secure: env.VITE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 0,
-  });
+    const koperasiActiveCookie = serialize("koperasiActive", "", {
+      httpOnly: false,
+      secure: env.VITE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 0,
+    });
 
-  const anggotaCookie = serialize("anggota", "", {
-    httpOnly: false,
-    secure: env.VITE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 0,
-  });
+    const anggotaCookie = serialize("anggota", "", {
+      httpOnly: false,
+      secure: env.VITE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 0,
+    });
 
-  const permissionsCookie = serialize("permissions", "", {
-    httpOnly: false,
-    secure: env.VITE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 0,
-  });
+    const permissionsCookie = serialize("permissions", "", {
+      httpOnly: false,
+      secure: env.VITE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 0,
+    });
 
-  try {
-    await api.post("/auth/logout");
-  } catch (error) {
-    console.error("Logout API error:", error);
-  }
+    try {
+      await api.post("/auth/logout");
+    } catch (error) {
+      console.error("Logout API error:", error);
+    }
 
-  return new Response(JSON.stringify({ success: true }), {
-    headers: {
-      "Set-Cookie": [
-        tokenCookie,
-        userCookie,
-        koperasiListCookie,
-        koperasiActiveCookie,
-        anggotaCookie,
-        permissionsCookie,
-      ].join(", "),
-      "Content-Type": "application/json",
-    },
-  });
-});
+    return new Response(JSON.stringify({ success: true }), {
+      headers: {
+        "Set-Cookie": [
+          tokenCookie,
+          userCookie,
+          koperasiListCookie,
+          koperasiActiveCookie,
+          anggotaCookie,
+          permissionsCookie,
+        ].join(", "),
+        "Content-Type": "application/json",
+      },
+    });
+  },
+);
 
 export const isAuthenticated = (): boolean => {
   if (typeof document === "undefined") {

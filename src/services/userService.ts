@@ -87,7 +87,11 @@ const cleanParams = (params: {
 };
 
 export const getUsers = createServerFn({ method: "GET" })
-  .validator((data: { params?: { page?: number; per_page?: number; search?: string } }) => data)
+  .validator(
+    (data: {
+      params?: { page?: number; per_page?: number; search?: string };
+    }) => data,
+  )
   .handler(async ({ data }) => {
     try {
       const response = await api.get<ApiListResponse<BackendAnggota>>("/user", {

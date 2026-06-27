@@ -28,7 +28,7 @@ export const api = axios.create({
 api.interceptors.request.use((config) => {
   const request = getRequest();
 
-  const cookieHeader = request?.headers.get("cookie") || "";
+  const cookieHeader = request.headers.get("cookie") || "";
   const cookies = parse(cookieHeader);
   const token = cookies.token;
   const koperasiActive = cookies.koperasiActive;

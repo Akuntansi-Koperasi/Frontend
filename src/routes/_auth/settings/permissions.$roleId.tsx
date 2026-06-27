@@ -144,12 +144,15 @@ function RouteComponent() {
 
   const updateMutation = useMutation({
     mutationFn: ({
-      roleId,
+      roleId: mutationRoleId,
       permissions,
     }: {
       roleId: string | number;
       permissions: Array<{ class: string; level: string }>;
-    }) => updateRolePermissionsFn({ data: { roleId, permissions } }),
+    }) =>
+      updateRolePermissionsFn({
+        data: { roleId: mutationRoleId, permissions },
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       queryClient.invalidateQueries({

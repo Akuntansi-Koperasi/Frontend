@@ -95,8 +95,7 @@ function RouteComponent() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
   });
   const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: number }) =>
-      deleteUserFn({ data: { id } }),
+    mutationFn: ({ id }: { id: number }) => deleteUserFn({ data: { id } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
   });
 

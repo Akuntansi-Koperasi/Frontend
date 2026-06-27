@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 
+import { useServerFn } from "@tanstack/react-start";
 import type {
   PengurusFormErrors,
   PengurusUpsertPayload,
@@ -24,7 +25,6 @@ import {
   getPengurusList,
   updatePengurus,
 } from "@/services/pengurusService";
-import { useServerFn } from "@tanstack/react-start";
 
 const pengurusSearchSchema = z.object({
   page: z.number().int().positive().catch(1),
@@ -126,16 +126,14 @@ function RouteComponent() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: number }) =>
-      deletePengurusFn({ data: { id } }),
+    mutationFn: ({ id }: { id: number }) => deletePengurusFn({ data: { id } }),
     onSuccess: async () => {
       await invalidatePengurusQueries();
     },
   });
 
   const finishMutation = useMutation({
-    mutationFn: ({ id }: { id: number }) =>
-      akhiriPengurusFn({ data: { id } }),
+    mutationFn: ({ id }: { id: number }) => akhiriPengurusFn({ data: { id } }),
     onSuccess: async () => {
       await invalidatePengurusQueries();
     },

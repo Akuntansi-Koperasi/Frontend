@@ -97,7 +97,11 @@ export const getJabatanList = createServerFn({ method: "GET" })
   });
 
 export const createJabatan = createServerFn({ method: "POST" })
-  .validator((data: { payload: { nama: string; kategori: string; multiple: boolean } }) => data)
+  .validator(
+    (data: {
+      payload: { nama: string; kategori: string; multiple: boolean };
+    }) => data,
+  )
   .handler(async ({ data }) => {
     try {
       const body = {
@@ -119,7 +123,12 @@ export const createJabatan = createServerFn({ method: "POST" })
   });
 
 export const updateJabatan = createServerFn({ method: "POST" })
-  .validator((data: { id: number; payload: { nama: string; kategori: string; multiple: boolean } }) => data)
+  .validator(
+    (data: {
+      id: number;
+      payload: { nama: string; kategori: string; multiple: boolean };
+    }) => data,
+  )
   .handler(async ({ data }) => {
     try {
       const body = {

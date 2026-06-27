@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { parse, serialize } from "cookie";
 import type { ProfileData } from "@/services/profileService";
+import type { Anggota } from "@/services/authService";
 import { getProfile } from "@/services/profileService";
 import { env } from "@/env";
-import type { Anggota } from "@/services/authService";
 
 function syncProfileStorage(data: ProfileData) {
   if (typeof document === "undefined") return;
@@ -15,7 +15,9 @@ function syncProfileStorage(data: ProfileData) {
   const existingRaw = cookies.koperasiList;
   let existingList: Array<any> = [];
   try {
-    existingList = existingRaw ? JSON.parse(decodeURIComponent(existingRaw)) : [];
+    existingList = existingRaw
+      ? JSON.parse(decodeURIComponent(existingRaw))
+      : [];
   } catch {
     existingList = [];
   }
@@ -36,17 +38,13 @@ function syncProfileStorage(data: ProfileData) {
     maxAge: 60 * 60 * 24 * 5,
   });
 
-  const koperasiListCookie = serialize(
-    "koperasiList",
-    JSON.stringify(merged),
-    {
-      httpOnly: false,
-      secure: env.VITE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 5,
-    },
-  );
+  const koperasiListCookie = serialize("koperasiList", JSON.stringify(merged), {
+    httpOnly: false,
+    secure: env.VITE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 5,
+  });
 
   const existingActiveRaw = cookies.koperasiActive;
   let existingActive = null;
@@ -76,7 +74,7 @@ function syncProfileStorage(data: ProfileData) {
     nextActive = idx >= 0 ? merged[idx] : incomingList[0];
   }
 
-  const cookiesToSet: string[] = [userCookie, koperasiListCookie];
+  const cookiesToSet: Array<string> = [userCookie, koperasiListCookie];
 
   if (nextActive) {
     const koperasiActiveCookie = serialize(

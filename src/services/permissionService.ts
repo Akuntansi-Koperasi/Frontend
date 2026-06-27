@@ -15,7 +15,9 @@ function readStoredPermissions(): Array<string> {
     );
     if (!permissionsCookie) return [];
     const cookieValue = permissionsCookie.split("=")[1];
-    return cookieValue ? (JSON.parse(decodeURIComponent(cookieValue)) as Array<string>) : [];
+    return cookieValue
+      ? (JSON.parse(decodeURIComponent(cookieValue)) as Array<string>)
+      : [];
   } catch {
     return [];
   }

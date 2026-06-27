@@ -2,8 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { serialize } from "cookie";
 import { api } from "./api";
 import { handleApiError } from "./errorService";
-import { env } from "@/env";
 import type { Koperasi, User } from "./authService";
+import { env } from "@/env";
 
 export type ProfileData = {
   user: User;
@@ -42,7 +42,7 @@ export const getProfile = createServerFn({ method: "GET" }).handler(
 
 export const switchKoperasi = createServerFn({ method: "POST" })
   .validator((data: { koperasi: Koperasi }) => data)
-  .handler(async ({ data }): Promise<Response> => {
+  .handler(({ data }): Response => {
     const koperasiActiveCookie = serialize(
       "koperasiActive",
       JSON.stringify(data.koperasi),

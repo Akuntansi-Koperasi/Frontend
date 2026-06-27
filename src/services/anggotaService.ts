@@ -104,9 +104,12 @@ export const getAnggotaList = createServerFn({ method: "GET" })
   .validator((data: { params?: AnggotaParams }) => data)
   .handler(async ({ data }) => {
     try {
-      const response = await api.get<ApiListResponse<BackendAnggota>>("/anggota", {
-        params: cleanParams(data.params ?? {}),
-      });
+      const response = await api.get<ApiListResponse<BackendAnggota>>(
+        "/anggota",
+        {
+          params: cleanParams(data.params ?? {}),
+        },
+      );
 
       const payload = response.data;
       const meta = payload.meta ?? {
@@ -146,22 +149,22 @@ export const getAnggotaDropdown = createServerFn({ method: "GET" }).handler(
   },
 );
 
-export const getAnggotaNoUserDropdown = createServerFn({ method: "GET" }).handler(
-  async () => {
-    try {
-      const response = await api.get<ApiListResponse<{ id: number; nama: string }>>(
-        "/anggota/dropdown/no-user",
-      );
+export const getAnggotaNoUserDropdown = createServerFn({
+  method: "GET",
+}).handler(async () => {
+  try {
+    const response = await api.get<
+      ApiListResponse<{ id: number; nama: string }>
+    >("/anggota/dropdown/no-user");
 
-      return response.data.data.map((anggota) => ({
-        id: anggota.id,
-        nama: anggota.nama,
-      }));
-    } catch (err) {
-      handleApiError(err);
-    }
-  },
-);
+    return response.data.data.map((anggota) => ({
+      id: anggota.id,
+      nama: anggota.nama,
+    }));
+  } catch (err) {
+    handleApiError(err);
+  }
+});
 
 const buildPayload = (payload: AnggotaUpsertPayload) => ({
   nama: payload.nama,
