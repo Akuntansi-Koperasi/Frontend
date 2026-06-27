@@ -15,6 +15,7 @@ export const env = createEnv({
   client: {
     VITE_APP_TITLE: z.string().min(1).optional(),
     VITE_API_URL: z.string().url(),
+    VITE_ENV: z.enum(["development", "production"]),
     VITE_GOOGLE_CLIENT_ID: z.string().min(1, "Google Client ID is required"),
   },
 
