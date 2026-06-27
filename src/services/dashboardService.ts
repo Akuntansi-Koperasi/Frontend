@@ -1,4 +1,6 @@
+import { createServerFn } from "@tanstack/react-start";
 import { api } from "./api";
+import { handleApiError } from "./errorService";
 
 export type DashboardStats = {
   statistik: {
@@ -39,7 +41,13 @@ export type DashboardResponse = {
   data: DashboardStats;
 };
 
-export const getDashboardData = async () => {
-  const response = await api.get<DashboardResponse>("/admin/dashboard");
-  return response.data.data;
-};
+export const getDashboardData = createServerFn({ method: "GET" }).handler(
+  async () => {
+    try {
+      const response = await api.get<DashboardResponse>("/admin/dashboard");
+      return response.data.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+);

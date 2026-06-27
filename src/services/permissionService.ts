@@ -1,3 +1,5 @@
+import { parse } from "cookie";
+
 export type PermissionAccess = {
   canView: boolean;
   canManage: boolean;
@@ -6,9 +8,14 @@ export type PermissionAccess = {
 
 function readStoredPermissions(): Array<string> {
   try {
-    if (typeof window === "undefined") return [];
-    const stored = localStorage.getItem("permissions");
-    return stored ? (JSON.parse(stored) as Array<string>) : [];
+    if (typeof document === "undefined") return [];
+    const cookies = document.cookie.split(";");
+    const permissionsCookie = cookies.find((cookie) =>
+      cookie.trim().startsWith("permissions="),
+    );
+    if (!permissionsCookie) return [];
+    const cookieValue = permissionsCookie.split("=")[1];
+    return cookieValue ? (JSON.parse(decodeURIComponent(cookieValue)) as Array<string>) : [];
   } catch {
     return [];
   }

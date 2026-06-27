@@ -1,13 +1,14 @@
+import { createServerFn } from "@tanstack/react-start";
 import { api } from "./api";
 import { handleApiError } from "./errorService";
 
 import type {
-  AnggotaOption,
-  JabatanOption,
   PengurusRecord,
   PengurusStatus,
   PengurusUpsertPayload,
 } from "@/components/koperasi/pengurus/types";
+
+export type { AnggotaOption, JabatanOption } from "@/components/koperasi/pengurus/types";
 
 export type PengurusParams = {
   page?: number;
@@ -81,117 +82,140 @@ const cleanParams = (params: PengurusParams): Record<string, unknown> => {
   return result;
 };
 
-export const getPengurusList = async (params: PengurusParams) => {
-  const response = await api.get<ApiListResponse<PengurusBackendRecord>>(
-    "/pengurus",
-    {
-      params: cleanParams(params),
-    },
-  );
+export const getPengurusList = createServerFn({ method: "GET" })
+  .validator((data: { params?: PengurusParams }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.get<ApiListResponse<PengurusBackendRecord>>(
+        "/pengurus",
+        {
+          params: cleanParams(data.params ?? {}),
+        },
+      );
 
-  const payload = response.data;
-  const meta = payload.meta ?? {
-    current_page: 1,
-    last_page: 1,
-    per_page: 10,
-    total: payload.data.length,
-  };
+      const payload = response.data;
+      const meta = payload.meta ?? {
+        current_page: 1,
+        last_page: 1,
+        per_page: 10,
+        total: payload.data.length,
+      };
 
-  return {
-    current_page: meta.current_page,
-    last_page: meta.last_page,
-    per_page: meta.per_page,
-    total: meta.total,
-    data: payload.data.map(mapBackendRecord),
-  };
-};
+      return {
+        current_page: meta.current_page,
+        last_page: meta.last_page,
+        per_page: meta.per_page,
+        total: meta.total,
+        data: payload.data.map(mapBackendRecord),
+      };
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const getAnggotaDropdown = async (): Promise<Array<AnggotaOption>> => {
-  const response =
-    await api.get<ApiListResponse<BackendAnggota>>("/anggota/dropdown");
+export const getAnggotaDropdown = createServerFn({ method: "GET" }).handler(
+  async () => {
+    try {
+      const response =
+        await api.get<ApiListResponse<BackendAnggota>>("/anggota/dropdown");
 
-  return response.data.data.map((anggota) => ({
-    id: anggota.id,
-    nama: anggota.nama,
-    email: anggota.email,
-    photo_profile: anggota.photo_profile ?? null,
-  }));
-};
+      return response.data.data.map((anggota) => ({
+        id: anggota.id,
+        nama: anggota.nama,
+        email: anggota.email,
+        photo_profile: anggota.photo_profile ?? null,
+      }));
+    } catch (err) {
+      handleApiError(err);
+    }
+  },
+);
 
-export const getJabatanDropdown = async (): Promise<Array<JabatanOption>> => {
-  const response =
-    await api.get<ApiListResponse<BackendJabatan>>("/jabatan/dropdown");
+export const getJabatanDropdown = createServerFn({ method: "GET" }).handler(
+  async () => {
+    try {
+      const response =
+        await api.get<ApiListResponse<BackendJabatan>>("/jabatan/dropdown");
 
-  return response.data.data.map((jabatan) => ({
-    id: jabatan.id,
-    nama_posisi: jabatan.nama_posisi,
-    jenis_posisi: jabatan.jenis_posisi,
-    multiple: Boolean(jabatan.multiple),
-  }));
-};
+      return response.data.data.map((jabatan) => ({
+        id: jabatan.id,
+        nama_posisi: jabatan.nama_posisi,
+        jenis_posisi: jabatan.jenis_posisi,
+        multiple: Boolean(jabatan.multiple),
+      }));
+    } catch (err) {
+      handleApiError(err);
+    }
+  },
+);
 
-export const createPengurus = async (payload: PengurusUpsertPayload) => {
-  const body = {
-    anggota_id: payload.anggotaId,
-    jabatan_id: payload.jabatanId,
-    mulai: String(payload.mulaiMenjabat),
-    selesai:
-      payload.selesaiMenjabat == null ? null : String(payload.selesaiMenjabat),
-    status: payload.status,
-  };
+export const createPengurus = createServerFn({ method: "POST" })
+  .validator((data: { payload: PengurusUpsertPayload }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const body = {
+        anggota_id: data.payload.anggotaId,
+        jabatan_id: data.payload.jabatanId,
+        mulai: String(data.payload.mulaiMenjabat),
+        selesai:
+          data.payload.selesaiMenjabat == null ? null : String(data.payload.selesaiMenjabat),
+        status: data.payload.status,
+      };
 
-  try {
-    const response = await api.post<ApiRecordResponse<PengurusBackendRecord>>(
-      "/pengurus",
-      body,
-    );
-    return mapBackendRecord(response.data.data);
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+      const response = await api.post<ApiRecordResponse<PengurusBackendRecord>>(
+        "/pengurus",
+        body,
+      );
+      return mapBackendRecord(response.data.data);
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const updatePengurus = async (
-  id: number,
-  payload: PengurusUpsertPayload,
-) => {
-  const body = {
-    jabatan_id: payload.jabatanId,
-    mulai: String(payload.mulaiMenjabat),
-    selesai:
-      payload.selesaiMenjabat == null ? null : String(payload.selesaiMenjabat),
-    status: payload.status,
-  };
+export const updatePengurus = createServerFn({ method: "POST" })
+  .validator((data: { id: number; payload: PengurusUpsertPayload }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const body = {
+        jabatan_id: data.payload.jabatanId,
+        mulai: String(data.payload.mulaiMenjabat),
+        selesai:
+          data.payload.selesaiMenjabat == null ? null : String(data.payload.selesaiMenjabat),
+        status: data.payload.status,
+      };
 
-  try {
-    const response = await api.put<ApiRecordResponse<PengurusBackendRecord>>(
-      `/pengurus/${id}`,
-      body,
-    );
-    return mapBackendRecord(response.data.data);
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+      const response = await api.put<ApiRecordResponse<PengurusBackendRecord>>(
+        `/pengurus/${data.id}`,
+        body,
+      );
+      return mapBackendRecord(response.data.data);
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const deletePengurus = async (id: number) => {
-  try {
-    const response = await api.delete<{ status: string; message: string }>(
-      `/pengurus/${id}`,
-    );
-    return response.data;
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+export const deletePengurus = createServerFn({ method: "POST" })
+  .validator((data: { id: number }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.delete<{ status: string; message: string }>(
+        `/pengurus/${data.id}`,
+      );
+      return response.data;
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const akhiriPengurus = async (id: number) => {
-  try {
-    const response = await api.patch<ApiRecordResponse<PengurusBackendRecord>>(
-      `/pengurus/${id}/akhiri`,
-    );
-    return mapBackendRecord(response.data.data);
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+export const akhiriPengurus = createServerFn({ method: "POST" })
+  .validator((data: { id: number }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.patch<ApiRecordResponse<PengurusBackendRecord>>(
+        `/pengurus/${data.id}/akhiri`,
+      );
+      return mapBackendRecord(response.data.data);
+    } catch (err) {
+      handleApiError(err);
+    }
+  });

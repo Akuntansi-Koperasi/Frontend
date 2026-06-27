@@ -23,7 +23,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Toaster } from "@/components/ui/sonner";
 import {
   Table,
   TableBody,
@@ -375,8 +374,6 @@ export function AnggotaTable({
         anggota={anggotaToDelete}
         onConfirm={onDelete}
       />
-
-      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   );
 }

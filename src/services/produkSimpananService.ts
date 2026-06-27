@@ -1,3 +1,4 @@
+import { createServerFn } from "@tanstack/react-start";
 import { api } from "./api";
 import { handleApiError } from "./errorService";
 
@@ -53,108 +54,114 @@ export type ProdukSimpananListResult = {
   data: Array<ProdukSimpananRecord>;
 };
 
-export const getProdukSimpananList = async (
-  params: ProdukSimpananParams,
-): Promise<ProdukSimpananListResult> => {
-  const cleanParams: Record<string, any> = {};
-  if (params.page != null) cleanParams.page = params.page;
-  if (params.per_page != null) cleanParams.per_page = params.per_page;
-  if (params.search != null && params.search !== "")
-    cleanParams.search = params.search;
+export const getProdukSimpananList = createServerFn({ method: "GET" })
+  .validator((data: { params?: ProdukSimpananParams }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const cleanParams: Record<string, any> = {};
+      const params = data.params ?? {};
+      if (params.page != null) cleanParams.page = params.page;
+      if (params.per_page != null) cleanParams.per_page = params.per_page;
+      if (params.search != null && params.search !== "")
+        cleanParams.search = params.search;
 
-  const response = await api.get<{
-    status: string;
-    message: string;
-    data: ProdukSimpananListResponse;
-  }>("/produk-simpanan", {
-    params: cleanParams,
+      const response = await api.get<{
+        status: string;
+        message: string;
+        data: ProdukSimpananListResponse;
+      }>("/produk-simpanan", {
+        params: cleanParams,
+      });
+
+      const payload = response.data;
+
+      if (Array.isArray(payload.data)) {
+        const items = payload.data as Array<ProdukSimpananBackendRecord>;
+        const meta = (payload as any).meta ?? {
+          current_page: 1,
+          last_page: 1,
+          per_page: 10,
+          total: items.length,
+        };
+        return {
+          current_page: meta.current_page,
+          last_page: meta.last_page,
+          per_page: meta.per_page,
+          total: meta.total,
+          data: items.map(mapBackend),
+        };
+      }
+
+      const d = payload.data;
+      return {
+        current_page: d.current_page,
+        last_page: d.last_page,
+        per_page: d.per_page,
+        total: d.total,
+        data: d.data.map(mapBackend),
+      };
+    } catch (err) {
+      handleApiError(err);
+    }
   });
 
-  const payload = response.data;
+export const createProdukSimpanan = createServerFn({ method: "POST" })
+  .validator((data: { payload: Omit<ProdukSimpananRecord, "id"> }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const body = {
+        nama: data.payload.nama,
+        tipe: data.payload.jenis.toLowerCase(),
+        suku_bunga: data.payload.bunga,
+        jumlah: data.payload.nominal,
+        keterangan: data.payload.keterangan,
+      };
 
-  if (Array.isArray(payload.data)) {
-    const items = payload.data as Array<ProdukSimpananBackendRecord>;
-    const meta = (payload as any).meta ?? {
-      current_page: 1,
-      last_page: 1,
-      per_page: 10,
-      total: items.length,
-    };
-    return {
-      current_page: meta.current_page,
-      last_page: meta.last_page,
-      per_page: meta.per_page,
-      total: meta.total,
-      data: items.map(mapBackend),
-    };
-  }
+      const response = await api.post<{
+        status: string;
+        message: string;
+        data: ProdukSimpananBackendRecord;
+      }>("/produk-simpanan", body);
 
-  const d = payload.data;
-  return {
-    current_page: d.current_page,
-    last_page: d.last_page,
-    per_page: d.per_page,
-    total: d.total,
-    data: d.data.map(mapBackend),
-  };
-};
+      return mapBackend(response.data.data);
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const createProdukSimpanan = async (
-  payload: Omit<ProdukSimpananRecord, "id">,
-) => {
-  const body = {
-    nama: payload.nama,
-    tipe: payload.jenis.toLowerCase(),
-    suku_bunga: payload.bunga,
-    jumlah: payload.nominal,
-    keterangan: payload.keterangan,
-  };
+export const updateProdukSimpanan = createServerFn({ method: "POST" })
+  .validator((data: { id: number; payload: Omit<ProdukSimpananRecord, "id"> }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const body = {
+        nama: data.payload.nama,
+        tipe: data.payload.jenis.toLowerCase(),
+        suku_bunga: data.payload.bunga,
+        jumlah: data.payload.nominal,
+        keterangan: data.payload.keterangan,
+      };
 
-  try {
-    const response = await api.post<{
-      status: string;
-      message: string;
-      data: ProdukSimpananBackendRecord;
-    }>("/produk-simpanan", body);
+      const response = await api.put<{
+        status: string;
+        message: string;
+        data: ProdukSimpananBackendRecord;
+      }>(`/produk-simpanan/${data.id}`, body);
 
-    return mapBackend(response.data.data);
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+      return mapBackend(response.data.data);
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const updateProdukSimpanan = async (
-  id: number,
-  payload: Omit<ProdukSimpananRecord, "id">,
-) => {
-  const body = {
-    nama: payload.nama,
-    tipe: payload.jenis.toLowerCase(),
-    suku_bunga: payload.bunga,
-    jumlah: payload.nominal,
-    keterangan: payload.keterangan,
-  };
-
-  try {
-    const response = await api.put<{
-      status: string;
-      message: string;
-      data: ProdukSimpananBackendRecord;
-    }>(`/produk-simpanan/${id}`, body);
-
-    return mapBackend(response.data.data);
-  } catch (err) {
-    handleApiError(err);
-  }
-};
-
-export const deleteProdukSimpanan = async (id: number) => {
-  try {
-    const response = await api.delete<{ status: string; message: string }>(
-      `/produk-simpanan/${id}`,
-    );
-    return response.data;
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+export const deleteProdukSimpanan = createServerFn({ method: "POST" })
+  .validator((data: { id: number }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.delete<{ status: string; message: string }>(
+        `/produk-simpanan/${data.id}`,
+      );
+      return response.data;
+    } catch (err) {
+      handleApiError(err);
+    }
+  });

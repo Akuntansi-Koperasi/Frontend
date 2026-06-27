@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 
 import type {
   ProdukPinjamanListResult,
@@ -58,6 +59,11 @@ function RouteComponent() {
     Record<string, Array<string>>
   > | null>(null);
 
+  const getProdukPinjamanListFn = useServerFn(getProdukPinjamanList);
+  const createProdukPinjamanFn = useServerFn(createProdukPinjaman);
+  const updateProdukPinjamanFn = useServerFn(updateProdukPinjaman);
+  const deleteProdukPinjamanFn = useServerFn(deleteProdukPinjaman);
+
   const params: ProdukPinjamanParams = {
     page,
     per_page: perPage,
@@ -66,13 +72,14 @@ function RouteComponent() {
 
   const { data, isLoading } = useQuery<ProdukPinjamanListResult>({
     queryKey: ["produk-pinjaman", params],
-    queryFn: () => getProdukPinjamanList(params),
+    queryFn: () => getProdukPinjamanListFn({ data: { params } }),
     staleTime: 1000 * 60 * 2,
     enabled: canView,
   });
 
   const createMutation = useMutation({
-    mutationFn: createProdukPinjaman,
+    mutationFn: ({ payload }: { payload: Omit<ProdukPinjamanRecord, "id"> }) =>
+      createProdukPinjamanFn({ data: { payload } }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["produk-pinjaman"] }),
   });
@@ -84,13 +91,14 @@ function RouteComponent() {
     }: {
       id: number;
       payload: Omit<ProdukPinjamanRecord, "id">;
-    }) => updateProdukPinjaman(id, payload),
+    }) => updateProdukPinjamanFn({ data: { id, payload } }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["produk-pinjaman"] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteProdukPinjaman(id),
+    mutationFn: ({ id }: { id: number }) =>
+      deleteProdukPinjamanFn({ data: { id } }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["produk-pinjaman"] }),
   });
@@ -130,7 +138,7 @@ function RouteComponent() {
 
   const handleAdd = async (payload: Omit<ProdukPinjamanRecord, "id">) => {
     try {
-      await createMutation.mutateAsync(payload);
+      await createMutation.mutateAsync({ payload });
       setAddErrors(null);
       toast.success("Produk pinjaman berhasil ditambahkan");
       return true;
@@ -161,7 +169,7 @@ function RouteComponent() {
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync({ id });
       toast.success("Produk pinjaman berhasil dihapus");
     } catch (err: any) {
       toast.error(err?.message ?? "Gagal menghapus produk pinjaman");

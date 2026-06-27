@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import type { UserFormErrors, UserParams } from "@/services/userService";
 import {
   createUser,
@@ -57,9 +58,14 @@ function RouteComponent() {
     search: searchQuery?.trim() || undefined,
   };
 
+  const getUsersFn = useServerFn(getUsers);
+  const createUserFn = useServerFn(createUser);
+  const updateUserFn = useServerFn(updateUser);
+  const deleteUserFn = useServerFn(deleteUser);
+
   const usersQuery = useQuery({
     queryKey: ["users", params],
-    queryFn: () => getUsers(params),
+    queryFn: () => getUsersFn({ data: { params } }),
     staleTime: 1000 * 60 * 2,
     enabled: canView,
   });
@@ -79,16 +85,18 @@ function RouteComponent() {
   });
 
   const createMutation = useMutation({
-    mutationFn: createUser,
+    mutationFn: ({ payload }: { payload: any }) =>
+      createUserFn({ data: { payload } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
   });
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: any }) =>
-      updateUser(id, payload),
+      updateUserFn({ data: { id, payload } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
   });
   const deleteMutation = useMutation({
-    mutationFn: deleteUser,
+    mutationFn: ({ id }: { id: number }) =>
+      deleteUserFn({ data: { id } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
   });
 
@@ -144,9 +152,12 @@ function RouteComponent() {
       replace: true,
     });
   };
-  const handleAdd = async (payload: Parameters<typeof createUser>[0]) => {
+  const handleAdd = async (payload: {
+    anggota_id: number;
+    role_id: number;
+  }) => {
     try {
-      await createMutation.mutateAsync(payload);
+      await createMutation.mutateAsync({ payload });
       setAddErrors(null);
       toast.success("Pengguna berhasil dibuat");
       return true;
@@ -180,7 +191,7 @@ function RouteComponent() {
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync({ id });
       toast.success("Pengguna berhasil dihapus");
       return true;
     } catch (err: any) {

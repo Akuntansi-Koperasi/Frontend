@@ -24,6 +24,7 @@ import {
   getPengurusList,
   updatePengurus,
 } from "@/services/pengurusService";
+import { useServerFn } from "@tanstack/react-start";
 
 const pengurusSearchSchema = z.object({
   page: z.number().int().positive().catch(1),
@@ -56,6 +57,14 @@ function RouteComponent() {
     throw notFound();
   }
 
+  const getPengurusListFn = useServerFn(getPengurusList);
+  const createPengurusFn = useServerFn(createPengurus);
+  const updatePengurusFn = useServerFn(updatePengurus);
+  const deletePengurusFn = useServerFn(deletePengurus);
+  const akhiriPengurusFn = useServerFn(akhiriPengurus);
+  const getAnggotaDropdownFn = useServerFn(getAnggotaDropdown);
+  const getJabatanDropdownFn = useServerFn(getJabatanDropdown);
+
   const params: PengurusParams = {
     page,
     per_page: perPage,
@@ -64,21 +73,21 @@ function RouteComponent() {
 
   const pengurusQuery = useQuery({
     queryKey: ["pengurus", params],
-    queryFn: () => getPengurusList(params),
+    queryFn: () => getPengurusListFn({ data: { params } }),
     staleTime: 1000 * 60 * 2,
     enabled: canView,
   });
 
   const anggotaDropdownQuery = useQuery({
     queryKey: ["pengurus-anggota-dropdown"],
-    queryFn: () => getAnggotaDropdown(),
+    queryFn: () => getAnggotaDropdownFn(),
     staleTime: 1000 * 60 * 5,
     enabled: canManage,
   });
 
   const jabatanDropdownQuery = useQuery({
     queryKey: ["pengurus-jabatan-dropdown"],
-    queryFn: () => getJabatanDropdown(),
+    queryFn: () => getJabatanDropdownFn(),
     staleTime: 1000 * 60 * 5,
     enabled: canManage,
   });
@@ -96,7 +105,8 @@ function RouteComponent() {
   }, [queryClient]);
 
   const createMutation = useMutation({
-    mutationFn: createPengurus,
+    mutationFn: ({ payload }: { payload: PengurusUpsertPayload }) =>
+      createPengurusFn({ data: { payload } }),
     onSuccess: async () => {
       await invalidatePengurusQueries();
     },
@@ -109,21 +119,23 @@ function RouteComponent() {
     }: {
       id: number;
       payload: PengurusUpsertPayload;
-    }) => updatePengurus(id, payload),
+    }) => updatePengurusFn({ data: { id, payload } }),
     onSuccess: async () => {
       await invalidatePengurusQueries();
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deletePengurus,
+    mutationFn: ({ id }: { id: number }) =>
+      deletePengurusFn({ data: { id } }),
     onSuccess: async () => {
       await invalidatePengurusQueries();
     },
   });
 
   const finishMutation = useMutation({
-    mutationFn: akhiriPengurus,
+    mutationFn: ({ id }: { id: number }) =>
+      akhiriPengurusFn({ data: { id } }),
     onSuccess: async () => {
       await invalidatePengurusQueries();
     },
@@ -170,7 +182,7 @@ function RouteComponent() {
 
   const handleAdd = async (payload: PengurusUpsertPayload) => {
     try {
-      await createMutation.mutateAsync(payload);
+      await createMutation.mutateAsync({ payload });
       setAddErrors(null);
       toast.success("Pengurus berhasil ditambahkan");
       return true;
@@ -198,7 +210,7 @@ function RouteComponent() {
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync({ id });
       toast.success("Pengurus berhasil dihapus");
       return true;
     } catch (err: any) {
@@ -209,7 +221,7 @@ function RouteComponent() {
 
   const handleAkhiri = async (id: number) => {
     try {
-      await finishMutation.mutateAsync(id);
+      await finishMutation.mutateAsync({ id });
       toast.success("Jabatan pengurus berhasil diakhiri");
       return true;
     } catch (err: any) {

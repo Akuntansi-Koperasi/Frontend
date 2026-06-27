@@ -1,7 +1,7 @@
+import { createServerFn } from "@tanstack/react-start";
 import { api } from "./api";
 import { handleApiError } from "./errorService";
 import type {
-  AnggotaDropdownOption,
   AnggotaGender,
   AnggotaRecord,
   AnggotaStatus,
@@ -100,54 +100,68 @@ const cleanParams = (params: AnggotaParams): Record<string, unknown> => {
   return result;
 };
 
-export const getAnggotaList = async (params: AnggotaParams) => {
-  const response = await api.get<ApiListResponse<BackendAnggota>>("/anggota", {
-    params: cleanParams(params),
+export const getAnggotaList = createServerFn({ method: "GET" })
+  .validator((data: { params?: AnggotaParams }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.get<ApiListResponse<BackendAnggota>>("/anggota", {
+        params: cleanParams(data.params ?? {}),
+      });
+
+      const payload = response.data;
+      const meta = payload.meta ?? {
+        current_page: 1,
+        last_page: 1,
+        per_page: 10,
+        total: payload.data.length,
+      };
+
+      return {
+        current_page: meta.current_page,
+        last_page: meta.last_page,
+        per_page: meta.per_page,
+        total: meta.total,
+        data: payload.data.map(mapAnggota),
+      };
+    } catch (err) {
+      handleApiError(err);
+    }
   });
 
-  const payload = response.data;
-  const meta = payload.meta ?? {
-    current_page: 1,
-    last_page: 1,
-    per_page: 10,
-    total: payload.data.length,
-  };
+export const getAnggotaDropdown = createServerFn({ method: "GET" }).handler(
+  async () => {
+    try {
+      const response =
+        await api.get<ApiListResponse<{ id: number; nama: string }>>(
+          "/anggota/dropdown",
+        );
 
-  return {
-    current_page: meta.current_page,
-    last_page: meta.last_page,
-    per_page: meta.per_page,
-    total: meta.total,
-    data: payload.data.map(mapAnggota),
-  };
-};
+      return response.data.data.map((anggota) => ({
+        id: anggota.id,
+        nama: anggota.nama,
+      }));
+    } catch (err) {
+      handleApiError(err);
+    }
+  },
+);
 
-export const getAnggotaDropdown = async (): Promise<
-  Array<AnggotaDropdownOption>
-> => {
-  const response =
-    await api.get<ApiListResponse<{ id: number; nama: string }>>(
-      "/anggota/dropdown",
-    );
+export const getAnggotaNoUserDropdown = createServerFn({ method: "GET" }).handler(
+  async () => {
+    try {
+      const response = await api.get<ApiListResponse<{ id: number; nama: string }>>(
+        "/anggota/dropdown/no-user",
+      );
 
-  return response.data.data.map((anggota) => ({
-    id: anggota.id,
-    nama: anggota.nama,
-  }));
-};
-
-export const getAnggotaNoUserDropdown = async (): Promise<
-  Array<AnggotaDropdownOption>
-> => {
-  const response = await api.get<ApiListResponse<{ id: number; nama: string }>>(
-    "/anggota/dropdown/no-user",
-  );
-
-  return response.data.data.map((anggota) => ({
-    id: anggota.id,
-    nama: anggota.nama,
-  }));
-};
+      return response.data.data.map((anggota) => ({
+        id: anggota.id,
+        nama: anggota.nama,
+      }));
+    } catch (err) {
+      handleApiError(err);
+    }
+  },
+);
 
 const buildPayload = (payload: AnggotaUpsertPayload) => ({
   nama: payload.nama,
@@ -161,55 +175,60 @@ const buildPayload = (payload: AnggotaUpsertPayload) => ({
   status: payload.status,
 });
 
-export const createAnggota = async (payload: AnggotaUpsertPayload) => {
-  try {
-    const response = await api.post<ApiRecordResponse<BackendAnggota>>(
-      "/anggota",
-      buildPayload(payload),
-    );
-    return mapAnggota(response.data.data);
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+export const createAnggota = createServerFn({ method: "POST" })
+  .validator((data: { payload: AnggotaUpsertPayload }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.post<ApiRecordResponse<BackendAnggota>>(
+        "/anggota",
+        buildPayload(data.payload),
+      );
+      return mapAnggota(response.data.data);
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const updateAnggota = async (
-  id: number,
-  payload: AnggotaUpsertPayload,
-) => {
-  try {
-    const response = await api.put<ApiRecordResponse<BackendAnggota>>(
-      `/anggota/${id}`,
-      buildPayload(payload),
-    );
-    return mapAnggota(response.data.data);
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+export const updateAnggota = createServerFn({ method: "POST" })
+  .validator((data: { id: number; payload: AnggotaUpsertPayload }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.put<ApiRecordResponse<BackendAnggota>>(
+        `/anggota/${data.id}`,
+        buildPayload(data.payload),
+      );
+      return mapAnggota(response.data.data);
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const deleteAnggota = async (id: number) => {
-  try {
-    const response = await api.delete<{ status: string; message: string }>(
-      `/anggota/${id}`,
-    );
-    return response.data;
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+export const deleteAnggota = createServerFn({ method: "POST" })
+  .validator((data: { id: number }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.delete<{ status: string; message: string }>(
+        `/anggota/${data.id}`,
+      );
+      return response.data;
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const aktifkanAnggota = async (id: number, roleId: number) => {
-  try {
-    const response = await api.patch<ApiRecordResponse<BackendAnggota>>(
-      `/anggota/${id}/aktifkan`,
-      {
-        role_id: roleId,
-      },
-    );
+export const aktifkanAnggota = createServerFn({ method: "POST" })
+  .validator((data: { id: number; roleId: number }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.patch<ApiRecordResponse<BackendAnggota>>(
+        `/anggota/${data.id}/aktifkan`,
+        {
+          role_id: data.roleId,
+        },
+      );
 
-    return mapAnggota(response.data.data);
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+      return mapAnggota(response.data.data);
+    } catch (err) {
+      handleApiError(err);
+    }
+  });

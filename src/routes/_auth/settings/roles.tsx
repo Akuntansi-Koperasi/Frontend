@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 
 import type { RoleFormErrors, RoleParams } from "@/services/roleService";
 
@@ -49,6 +50,11 @@ function RouteComponent() {
   const [addErrors, setAddErrors] = useState<RoleFormErrors>(null);
   const [editErrors, setEditErrors] = useState<RoleFormErrors>(null);
 
+  const getRoleListFn = useServerFn(getRoleList);
+  const createRoleFn = useServerFn(createRole);
+  const updateRoleFn = useServerFn(updateRole);
+  const deleteRoleFn = useServerFn(deleteRole);
+
   const params: RoleParams = {
     page,
     per_page,
@@ -57,24 +63,26 @@ function RouteComponent() {
 
   const rolesQuery = useQuery({
     queryKey: ["roles", params],
-    queryFn: () => getRoleList(params),
+    queryFn: () => getRoleListFn({ data: { params } }),
     staleTime: 1000 * 60 * 2,
     enabled: canView,
   });
 
   const createMutation = useMutation({
-    mutationFn: createRole,
+    mutationFn: ({ payload }: { payload: { name: string } }) =>
+      createRoleFn({ data: { payload } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["roles"] }),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: { name: string } }) =>
-      updateRole(id, payload),
+      updateRoleFn({ data: { id, payload } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["roles"] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteRole,
+    mutationFn: ({ id }: { id: number }) =>
+      deleteRoleFn({ data: { id } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["roles"] }),
   });
 
@@ -138,7 +146,7 @@ function RouteComponent() {
 
   const handleAdd = async (payload: { name: string }) => {
     try {
-      await createMutation.mutateAsync(payload);
+      await createMutation.mutateAsync({ payload });
       setAddErrors(null);
       toast.success("Peran berhasil ditambahkan");
       return true;
@@ -166,7 +174,7 @@ function RouteComponent() {
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync({ id });
       toast.success("Peran berhasil dihapus");
       return true;
     } catch (err) {

@@ -5,9 +5,10 @@ import { Link } from "@tanstack/react-router";
 import { LogOut, User } from "lucide-react";
 import { navItems } from "./nav-data";
 import { SearchBar } from "./search-bar";
-import { logout } from "@/services/authService";
 import { getPermissionAccess } from "@/services/permissionService";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { logout as logoutFn } from "@/services/authService";
+import { useServerFn } from "@tanstack/react-start";
 import {
   Sidebar,
   SidebarContent,
@@ -29,6 +30,7 @@ export function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar> & { pathname: string }) {
   const { data: user } = useUserProfile();
+  const logoutServerFn = useServerFn(logoutFn);
   const [openSections, setOpenSections] = React.useState<
     Record<string, boolean>
   >({});
@@ -247,7 +249,10 @@ export function AppSidebar({
             <SidebarMenuButton
               size="lg"
               className="bg-[#E11D48] hover:bg-[#BE123C] text-white hover:text-white group-data-[collapsible=icon]:p-2.5! cursor-pointer"
-              onClick={logout}
+              onClick={async () => {
+                await logoutServerFn();
+                window.location.href = "/login";
+              }}
             >
               <LogOut />
               <span className="group-data-[collapsible=icon]:hidden">

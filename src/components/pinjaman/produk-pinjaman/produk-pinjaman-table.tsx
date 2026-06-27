@@ -11,7 +11,6 @@ import { ProdukPinjamanEditDialog } from "./produk-pinjaman-edit-dialog";
 import { ProdukPinjamanDeleteDialog } from "./produk-pinjaman-delete-dialog";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import type { ProdukPinjamanRecord } from "./types";
-import { Toaster } from "@/components/ui/sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -335,8 +334,6 @@ export function ProdukPinjamanTable({
           isDeleting={isDeletingLocal}
         />
       )}
-
-      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   );
 }

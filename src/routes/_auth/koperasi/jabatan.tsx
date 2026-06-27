@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 
 import type { JabatanParams } from "@/services/jabatanService";
 import HeaderComp from "@/components/shared/header-comp";
@@ -53,6 +54,11 @@ function RouteComponent() {
     Record<string, Array<string>>
   > | null>(null);
 
+  const getJabatanListFn = useServerFn(getJabatanList);
+  const createJabatanFn = useServerFn(createJabatan);
+  const updateJabatanFn = useServerFn(updateJabatan);
+  const deleteJabatanFn = useServerFn(deleteJabatan);
+
   const params: JabatanParams = {
     page,
     per_page: perPage,
@@ -61,24 +67,26 @@ function RouteComponent() {
 
   const { data, isLoading } = useQuery<any>({
     queryKey: ["jabatan", params],
-    queryFn: () => getJabatanList(params),
+    queryFn: () => getJabatanListFn({ data: { params } }),
     staleTime: 1000 * 60 * 2,
     enabled: canView,
   });
 
   const createMutation = useMutation({
-    mutationFn: createJabatan,
+    mutationFn: ({ payload }: { payload: any }) =>
+      createJabatanFn({ data: { payload } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["jabatan"] }),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: any }) =>
-      updateJabatan(id, payload),
+      updateJabatanFn({ data: { id, payload } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["jabatan"] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteJabatan(id),
+    mutationFn: ({ id }: { id: number }) =>
+      deleteJabatanFn({ data: { id } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["jabatan"] }),
   });
 
@@ -121,7 +129,7 @@ function RouteComponent() {
     multiple: boolean;
   }) => {
     try {
-      await createMutation.mutateAsync(payload);
+      await createMutation.mutateAsync({ payload });
       setAddErrors(null);
       toast.success("Jabatan berhasil ditambahkan");
       return true;
@@ -159,7 +167,7 @@ function RouteComponent() {
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync({ id });
       toast.success("Jabatan berhasil dihapus");
     } catch (err: any) {
       toast.error(err?.message ?? "Gagal menghapus jabatan");

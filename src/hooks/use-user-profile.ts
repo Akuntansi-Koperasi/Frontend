@@ -1,23 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { parse, serialize } from "cookie";
 import type { ProfileData } from "@/services/profileService";
 import { getProfile } from "@/services/profileService";
-
-export type Anggota = {
-  id: number;
-  nama: string;
-  email: string;
-  photo_profile: string | null;
-};
+import { env } from "@/env";
+import type { Anggota } from "@/services/authService";
 
 function syncProfileStorage(data: ProfileData) {
-  if (typeof window === "undefined") return;
+  if (typeof document === "undefined") return;
   const incomingList = data.koperasi;
 
   // merge koperasiList: update existing entries with same koperasi.id, keep others
-  const existingRaw = localStorage.getItem("koperasiList");
+  const cookies = parse(document.cookie);
+  const existingRaw = cookies.koperasiList;
   let existingList: Array<any> = [];
   try {
-    existingList = existingRaw ? JSON.parse(existingRaw) : [];
+    existingList = existingRaw ? JSON.parse(decodeURIComponent(existingRaw)) : [];
   } catch {
     existingList = [];
   }
@@ -30,13 +28,32 @@ function syncProfileStorage(data: ProfileData) {
     else merged.push(item);
   }
 
-  localStorage.setItem("user", JSON.stringify(data.user));
-  localStorage.setItem("koperasiList", JSON.stringify(merged));
+  const userCookie = serialize("user", JSON.stringify(data.user), {
+    httpOnly: false,
+    secure: env.VITE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 5,
+  });
 
-  const existingActiveRaw = localStorage.getItem("koperasiActive");
+  const koperasiListCookie = serialize(
+    "koperasiList",
+    JSON.stringify(merged),
+    {
+      httpOnly: false,
+      secure: env.VITE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 5,
+    },
+  );
+
+  const existingActiveRaw = cookies.koperasiActive;
   let existingActive = null;
   try {
-    existingActive = existingActiveRaw ? JSON.parse(existingActiveRaw) : null;
+    existingActive = existingActiveRaw
+      ? JSON.parse(decodeURIComponent(existingActiveRaw))
+      : null;
   } catch {
     existingActive = null;
   }
@@ -59,36 +76,100 @@ function syncProfileStorage(data: ProfileData) {
     nextActive = idx >= 0 ? merged[idx] : incomingList[0];
   }
 
+  const cookiesToSet: string[] = [userCookie, koperasiListCookie];
+
   if (nextActive) {
-    localStorage.setItem("koperasiActive", JSON.stringify(nextActive));
-    localStorage.setItem("anggota", JSON.stringify(nextActive.anggota));
-    localStorage.setItem("permissions", JSON.stringify(nextActive.permissions));
+    const koperasiActiveCookie = serialize(
+      "koperasiActive",
+      JSON.stringify(nextActive),
+      {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 5,
+      },
+    );
+    const anggotaCookie = serialize(
+      "anggota",
+      JSON.stringify(nextActive.anggota),
+      {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 5,
+      },
+    );
+    const permissionsCookie = serialize(
+      "permissions",
+      JSON.stringify(nextActive.permissions),
+      {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 5,
+      },
+    );
+    cookiesToSet.push(koperasiActiveCookie, anggotaCookie, permissionsCookie);
   } else if (existingActive) {
     // keep existing active as-is
-    // ensure anggota & permissions kept in sync with existingActive
-    localStorage.setItem("koperasiActive", JSON.stringify(existingActive));
-    if (existingActive.anggota)
-      localStorage.setItem("anggota", JSON.stringify(existingActive.anggota));
-    if (existingActive.permissions)
-      localStorage.setItem(
+    const koperasiActiveCookie = serialize(
+      "koperasiActive",
+      JSON.stringify(existingActive),
+      {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 5,
+      },
+    );
+    cookiesToSet.push(koperasiActiveCookie);
+    if (existingActive.anggota) {
+      const anggotaCookie = serialize(
+        "anggota",
+        JSON.stringify(existingActive.anggota),
+        {
+          httpOnly: false,
+          secure: env.VITE_ENV === "production",
+          sameSite: "strict",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 5,
+        },
+      );
+      cookiesToSet.push(anggotaCookie);
+    }
+    if (existingActive.permissions) {
+      const permissionsCookie = serialize(
         "permissions",
         JSON.stringify(existingActive.permissions),
+        {
+          httpOnly: false,
+          secure: env.VITE_ENV === "production",
+          sameSite: "strict",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 5,
+        },
       );
-  } else {
-    localStorage.removeItem("koperasiActive");
-    localStorage.removeItem("anggota");
-    localStorage.removeItem("permissions");
+      cookiesToSet.push(permissionsCookie);
+    }
   }
+
+  // Set all cookies at once
+  document.cookie = cookiesToSet.join(", ");
 }
 
 function readStoredAnggota(): Anggota | undefined {
   try {
-    if (typeof window === "undefined") return undefined;
+    if (typeof document === "undefined") return undefined;
 
-    const stored = localStorage.getItem("anggota");
+    const cookies = parse(document.cookie);
+    const stored = cookies.anggota;
     if (!stored) return undefined;
 
-    const parsed = JSON.parse(stored);
+    const parsed = JSON.parse(decodeURIComponent(stored));
     return parsed?.user ?? parsed;
   } catch {
     return undefined;
@@ -96,16 +177,18 @@ function readStoredAnggota(): Anggota | undefined {
 }
 
 export function useUserProfile() {
+  const profileFn = useServerFn(getProfile);
   return useQuery<Anggota>({
     queryKey: ["profile"],
     queryFn: async () => {
-      const data = await getProfile();
+      const data = await profileFn();
+      if (!data) {
+        throw new Error("Failed to fetch profile");
+      }
       syncProfileStorage(data);
       return data.koperasi[0].anggota;
     },
-    initialData: () => {
-      return readStoredAnggota();
-    },
+    placeholderData: readStoredAnggota,
     staleTime: 1000 * 60 * 5,
   });
 }

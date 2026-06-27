@@ -1,4 +1,8 @@
+import { createServerFn } from "@tanstack/react-start";
+import { serialize } from "cookie";
 import { api } from "./api";
+import { handleApiError } from "./errorService";
+import { env } from "@/env";
 import type { Koperasi, User } from "./authService";
 
 export type ProfileData = {
@@ -17,44 +21,72 @@ export type UpdatePasswordPayload = {
   password_confirmation: string;
 };
 
-export const getProfile = async () => {
-  const response = await api.get<{ status: string; data: ProfileData }>(
-    "/profile/me",
-  );
-  return response.data.data;
+export type SerializedFile = {
+  name: string;
+  type: string;
+  base64: string;
 };
 
-export const updateProfile = async (data: UpdateProfilePayload) => {
-  const response = await api.put<{ status: string; data: ProfileData }>(
-    "/profile/update",
-    data,
-  );
-  return response.data.data;
-};
+export const getProfile = createServerFn({ method: "GET" }).handler(
+  async () => {
+    try {
+      const response = await api.get<{ status: string; data: ProfileData }>(
+        "/profile/me",
+      );
+      return response.data.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+);
 
-export const updatePassword = async (data: UpdatePasswordPayload) => {
-  const response = await api.put<{ status: string; message: string }>(
-    "/profile/update-password",
-    data,
-  );
-  return response.data;
-};
-
-export const updatePhoto = async (file: File) => {
-  const formData = new FormData();
-  formData.append("photo", file);
-
-  const response = await api.post<{ status: string; data: ProfileData }>(
-    "/profile/photo",
-    formData,
-    {
-      params: {
-        _method: "PUT",
+export const switchKoperasi = createServerFn({ method: "POST" })
+  .validator((data: { koperasi: Koperasi }) => data)
+  .handler(async ({ data }): Promise<Response> => {
+    const koperasiActiveCookie = serialize(
+      "koperasiActive",
+      JSON.stringify(data.koperasi),
+      {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 5, // 5 days
       },
+    );
+
+    const anggotaCookie = serialize(
+      "anggota",
+      JSON.stringify(data.koperasi.anggota),
+      {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 5, // 5 days
+      },
+    );
+
+    const permissionsCookie = serialize(
+      "permissions",
+      JSON.stringify(data.koperasi.permissions),
+      {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 5, // 5 days
+      },
+    );
+
+    return new Response(JSON.stringify({ success: true }), {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Set-Cookie": [
+          koperasiActiveCookie,
+          anggotaCookie,
+          permissionsCookie,
+        ].join(", "),
+        "Content-Type": "application/json",
       },
-    },
-  );
-  return response.data.data;
-};
+    });
+  });

@@ -11,6 +11,7 @@ import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 import type { QueryClient } from "@tanstack/react-query";
 import { env } from "@/env";
+import { Toaster } from "sonner";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -69,6 +70,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <GoogleOAuthProvider clientId={env.VITE_GOOGLE_CLIENT_ID}>
           {children}
         </GoogleOAuthProvider>
+        <Toaster position="top-right" richColors closeButton theme="light" />
 
         {/* Devtools akan dihilangkan otomatis di production */}
         <TanStackDevtools

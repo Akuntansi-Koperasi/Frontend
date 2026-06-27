@@ -34,7 +34,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Toaster } from "@/components/ui/sonner";
 
 interface PengurusTableProps {
   data: Array<PengurusRecord>;
@@ -403,8 +402,6 @@ export function PengurusTable({
           isLoading={isAkhiriLoading}
         />
       ) : null}
-
-      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   );
 }

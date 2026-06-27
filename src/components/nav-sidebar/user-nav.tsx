@@ -8,8 +8,8 @@ import {
   LogOut,
   User as UserIcon,
 } from "lucide-react";
+import { parse } from "cookie";
 import type { Koperasi } from "@/services/authService";
-import { logout } from "@/services/authService";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -22,12 +22,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { useServerFn } from "@tanstack/react-start";
+import { switchKoperasi } from "@/services/profileService";
+import { logout as logoutFn } from "@/services/authService";
 
 function getKoperasiList(): Array<Koperasi> {
   try {
-    if (typeof window === "undefined") return [];
-    const stored = localStorage.getItem("koperasiList");
-    return stored ? JSON.parse(stored) : [];
+    if (typeof document === "undefined") return [];
+    const cookies = parse(document.cookie);
+    const stored = cookies.koperasiList;
+    return stored ? JSON.parse(decodeURIComponent(stored)) : [];
   } catch {
     return [];
   }
@@ -35,10 +39,11 @@ function getKoperasiList(): Array<Koperasi> {
 
 function getActiveKoperasiId(): number | null {
   try {
-    if (typeof window === "undefined") return null;
-    const stored = localStorage.getItem("koperasiActive");
+    if (typeof document === "undefined") return null;
+    const cookies = parse(document.cookie);
+    const stored = cookies.koperasiActive;
     if (!stored) return null;
-    const parsed = JSON.parse(stored);
+    const parsed = JSON.parse(decodeURIComponent(stored));
     const id = parsed?.koperasi?.id;
     return typeof id === "number" ? id : null;
   } catch {
@@ -48,9 +53,10 @@ function getActiveKoperasiId(): number | null {
 
 function getActiveKoperasi(): Koperasi | null {
   try {
-    if (typeof window === "undefined") return null;
-    const stored = localStorage.getItem("koperasiActive");
-    return stored ? (JSON.parse(stored) as Koperasi) : null;
+    if (typeof document === "undefined") return null;
+    const cookies = parse(document.cookie);
+    const stored = cookies.koperasiActive;
+    return stored ? (JSON.parse(decodeURIComponent(stored)) as Koperasi) : null;
   } catch {
     return null;
   }
@@ -59,6 +65,8 @@ function getActiveKoperasi(): Koperasi | null {
 export function UserNav() {
   const { data: user } = useUserProfile();
   const qc = useQueryClient();
+  const switchKoperasiFn = useServerFn(switchKoperasi);
+  const logoutServerFn = useServerFn(logoutFn);
 
   const [koperasiList] = React.useState<Array<Koperasi>>(() =>
     getKoperasiList(),
@@ -69,12 +77,11 @@ export function UserNav() {
 
   const activeKoperasi = getActiveKoperasi();
 
-  const switchKoperasi = async (item: Koperasi) => {
+  const handleSwitchKoperasi = async (item: Koperasi) => {
     if (item.koperasi.id === activeId) return;
 
-    localStorage.setItem("koperasiActive", JSON.stringify(item));
-    localStorage.setItem("anggota", JSON.stringify(item.anggota));
-    localStorage.setItem("permissions", JSON.stringify(item.permissions));
+    // Set cookies via server fn
+    await switchKoperasiFn({ data: { koperasi: item } });
 
     setActiveId(item.koperasi.id);
 
@@ -137,7 +144,7 @@ export function UserNav() {
             {koperasiList.map((item) => (
               <DropdownMenuItem
                 key={item.koperasi.id}
-                onClick={() => switchKoperasi(item)}
+                onClick={() => handleSwitchKoperasi(item)}
                 className="gap-2 cursor-pointer"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border bg-background shrink-0">
@@ -164,7 +171,10 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
-          onClick={logout}
+          onClick={async () => {
+            await logoutServerFn();
+            window.location.href = "/login";
+          }}
         >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>

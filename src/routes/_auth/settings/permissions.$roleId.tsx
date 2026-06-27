@@ -5,11 +5,11 @@ import { z } from "zod";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import type { PermissionLevel } from "@/components/settings/roles/types";
 import { PermissionsTable } from "@/components/settings/roles/permissions-table";
 import HeaderComp from "@/components/shared/header-comp";
 import { SearchBar } from "@/components/shared/search-bar";
-import { Toaster } from "@/components/ui/sonner";
 import { getPermissionAccess } from "@/services/permissionService";
 import {
   getAllPermissions,
@@ -51,21 +51,26 @@ function RouteComponent() {
 
   const queryClient = useQueryClient();
 
+  const getRolePermissionsFn = useServerFn(getRolePermissions);
+  const getRoleDropdownFn = useServerFn(getRoleDropdown);
+  const getAllPermissionsFn = useServerFn(getAllPermissions);
+  const updateRolePermissionsFn = useServerFn(updateRolePermissions);
+
   const rolePermissionsQuery = useQuery({
     queryKey: ["roles", "permissions", roleId],
-    queryFn: () => getRolePermissions(roleId),
+    queryFn: () => getRolePermissionsFn({ data: { roleId } }),
     staleTime: 1000 * 60 * 2,
   });
 
   const roleDropdownQuery = useQuery({
     queryKey: ["roles", "dropdown"],
-    queryFn: () => getRoleDropdown(),
+    queryFn: () => getRoleDropdownFn(),
     staleTime: 1000 * 60 * 10,
   });
 
   const allPermissionsQuery = useQuery({
     queryKey: ["permissions", "all"],
-    queryFn: () => getAllPermissions(),
+    queryFn: () => getAllPermissionsFn(),
     staleTime: 1000 * 60 * 60,
   });
 
@@ -139,12 +144,12 @@ function RouteComponent() {
 
   const updateMutation = useMutation({
     mutationFn: ({
-      rId,
+      roleId,
       permissions,
     }: {
-      rId: string | number;
+      roleId: string | number;
       permissions: Array<{ class: string; level: string }>;
-    }) => updateRolePermissions(rId, permissions),
+    }) => updateRolePermissionsFn({ data: { roleId, permissions } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       queryClient.invalidateQueries({
@@ -215,7 +220,7 @@ function RouteComponent() {
       .filter(([, level]) => level !== "tanpa_akses")
       .map(([cls, level]) => ({ class: cls, level }));
     try {
-      await updateMutation.mutateAsync({ rId: roleId, permissions: payload });
+      await updateMutation.mutateAsync({ roleId, permissions: payload });
       toast.success("Hak akses peran berhasil diperbarui");
       return true;
     } catch (err) {
@@ -272,7 +277,6 @@ function RouteComponent() {
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
       />
-      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   );
 }

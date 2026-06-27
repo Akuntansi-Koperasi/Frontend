@@ -1,3 +1,4 @@
+import { createServerFn } from "@tanstack/react-start";
 import { api } from "./api";
 import { handleApiError } from "./errorService";
 
@@ -70,108 +71,115 @@ const mapBackend = (b: ProdukPinjamanBackendRecord): ProdukPinjamanRecord => {
   };
 };
 
-export const getProdukPinjamanList = async (
-  params: ProdukPinjamanParams,
-): Promise<ProdukPinjamanListResult> => {
-  const cleanParams: Record<string, any> = {};
-  if (params.page != null) cleanParams.page = params.page;
-  if (params.per_page != null) cleanParams.per_page = params.per_page;
-  if (params.search != null && params.search !== "")
-    cleanParams.search = params.search;
+export const getProdukPinjamanList = createServerFn({ method: "GET" })
+  .validator((data: { params?: ProdukPinjamanParams }) => data)
+  .handler(async ({ data }): Promise<ProdukPinjamanListResult> => {
+    try {
+      const cleanParams: Record<string, any> = {};
+      const params = data.params ?? {};
+      if (params.page != null) cleanParams.page = params.page;
+      if (params.per_page != null) cleanParams.per_page = params.per_page;
+      if (params.search != null && params.search !== "")
+        cleanParams.search = params.search;
 
-  const response = await api.get<{
-    status: string;
-    message: string;
-    data: ProdukPinjamanListResponse;
-  }>("/produk-pinjaman", {
-    params: cleanParams,
+      const response = await api.get<{
+        status: string;
+        message: string;
+        data: ProdukPinjamanListResponse;
+      }>("/produk-pinjaman", {
+        params: cleanParams,
+      });
+
+      const payload = response.data;
+
+      if (Array.isArray(payload.data)) {
+        const items = payload.data as Array<ProdukPinjamanBackendRecord>;
+        const meta = (payload as any).meta ?? {
+          current_page: 1,
+          last_page: 1,
+          per_page: 10,
+          total: items.length,
+        };
+        return {
+          current_page: meta.current_page,
+          last_page: meta.last_page,
+          per_page: meta.per_page,
+          total: meta.total,
+          data: items.map(mapBackend),
+        };
+      }
+
+      const d = payload.data;
+      return {
+        current_page: d.current_page,
+        last_page: d.last_page,
+        per_page: d.per_page,
+        total: d.total,
+        data: d.data.map(mapBackend),
+      };
+    } catch (err) {
+      handleApiError(err);
+      throw err; // Never reached, but satisfies TypeScript
+    }
   });
 
-  const payload = response.data;
+export const createProdukPinjaman = createServerFn({ method: "POST" })
+  .validator((data: { payload: Omit<ProdukPinjamanRecord, "id"> }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const body = {
+        nama: data.payload.nama,
+        type: data.payload.jenis.toLowerCase(),
+        periode_pinjaman: data.payload.periode.toLowerCase(),
+        suku_bunga: data.payload.bunga,
+        keterangan: data.payload.keterangan,
+      };
 
-  if (Array.isArray(payload.data)) {
-    const items = payload.data as Array<ProdukPinjamanBackendRecord>;
-    const meta = (payload as any).meta ?? {
-      current_page: 1,
-      last_page: 1,
-      per_page: 10,
-      total: items.length,
-    };
-    return {
-      current_page: meta.current_page,
-      last_page: meta.last_page,
-      per_page: meta.per_page,
-      total: meta.total,
-      data: items.map(mapBackend),
-    };
-  }
+      const response = await api.post<{
+        status: string;
+        message: string;
+        data: ProdukPinjamanBackendRecord;
+      }>("/produk-pinjaman", body);
 
-  const d = payload.data;
-  return {
-    current_page: d.current_page,
-    last_page: d.last_page,
-    per_page: d.per_page,
-    total: d.total,
-    data: d.data.map(mapBackend),
-  };
-};
+      return mapBackend(response.data.data);
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const createProdukPinjaman = async (
-  payload: Omit<ProdukPinjamanRecord, "id">,
-) => {
-  const body = {
-    nama: payload.nama,
-    type: payload.jenis.toLowerCase(),
-    periode_pinjaman: payload.periode.toLowerCase(),
-    suku_bunga: payload.bunga,
-    keterangan: payload.keterangan,
-  };
+export const updateProdukPinjaman = createServerFn({ method: "POST" })
+  .validator((data: { id: number; payload: Omit<ProdukPinjamanRecord, "id"> }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const body = {
+        nama: data.payload.nama,
+        type: data.payload.jenis.toLowerCase(),
+        periode_pinjaman: data.payload.periode.toLowerCase(),
+        suku_bunga: data.payload.bunga,
+        keterangan: data.payload.keterangan,
+      };
 
-  try {
-    const response = await api.post<{
-      status: string;
-      message: string;
-      data: ProdukPinjamanBackendRecord;
-    }>("/produk-pinjaman", body);
+      const response = await api.put<{
+        status: string;
+        message: string;
+        data: ProdukPinjamanBackendRecord;
+      }>(`/produk-pinjaman/${data.id}`, body);
 
-    return mapBackend(response.data.data);
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+      return mapBackend(response.data.data);
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const updateProdukPinjaman = async (
-  id: number,
-  payload: Omit<ProdukPinjamanRecord, "id">,
-) => {
-  const body = {
-    nama: payload.nama,
-    type: payload.jenis.toLowerCase(),
-    periode_pinjaman: payload.periode.toLowerCase(),
-    suku_bunga: payload.bunga,
-    keterangan: payload.keterangan,
-  };
-
-  try {
-    const response = await api.put<{
-      status: string;
-      message: string;
-      data: ProdukPinjamanBackendRecord;
-    }>(`/produk-pinjaman/${id}`, body);
-
-    return mapBackend(response.data.data);
-  } catch (err) {
-    handleApiError(err);
-  }
-};
-
-export const deleteProdukPinjaman = async (id: number) => {
-  try {
-    const response = await api.delete<{ status: string; message: string }>(
-      `/produk-pinjaman/${id}`,
-    );
-    return response.data;
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+export const deleteProdukPinjaman = createServerFn({ method: "POST" })
+  .validator((data: { id: number }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.delete<{ status: string; message: string }>(
+        `/produk-pinjaman/${data.id}`,
+      );
+      return response.data;
+    } catch (err) {
+      handleApiError(err);
+    }
+  });

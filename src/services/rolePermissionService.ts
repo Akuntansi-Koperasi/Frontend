@@ -1,3 +1,4 @@
+import { createServerFn } from "@tanstack/react-start";
 import { api } from "./api";
 import { handleApiError } from "./errorService";
 
@@ -13,51 +14,54 @@ export type RolePermissionItem = {
   level: "lihat" | "modifikasi" | "admin";
 };
 
-export const getRolePermissions = async (roleId: string | number) => {
-  try {
-    const response = await api.get<
-      ApiRecordResponse<{
-        id: number;
-        name: string;
-        permissions: Array<RolePermissionItem>;
-      }>
-    >(`/role/${roleId}/permissions`);
+export const getRolePermissions = createServerFn({ method: "GET" })
+  .validator((data: { roleId: string | number }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.get<
+        ApiRecordResponse<{
+          id: number;
+          name: string;
+          permissions: Array<RolePermissionItem>;
+        }>
+      >(`/role/${data.roleId}/permissions`);
 
-    return response.data.data;
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+      return response.data.data;
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
-export const getAllPermissions = async () => {
-  try {
-    const response =
-      await api.get<ApiRecordResponse<Array<RolePermissionItem>>>(
-        `/permissions`,
+export const getAllPermissions = createServerFn({ method: "GET" }).handler(
+  async () => {
+    try {
+      const response =
+        await api.get<ApiRecordResponse<Array<RolePermissionItem>>>(
+          `/permissions`,
+        );
+      return response.data.data;
+    } catch (err) {
+      handleApiError(err);
+    }
+  },
+);
+
+export const updateRolePermissions = createServerFn({ method: "POST" })
+  .validator((data: { roleId: string | number; permissions: Array<{ class: string; level: string }> }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await api.put<ApiRecordResponse<any>>(
+        `/role/${data.roleId}/permissions`,
+        {
+          permissions: data.permissions,
+        },
       );
-    return response.data.data;
-  } catch (err) {
-    handleApiError(err);
-  }
-};
 
-export const updateRolePermissions = async (
-  roleId: string | number,
-  permissions: Array<{ class: string; level: string }>,
-) => {
-  try {
-    const response = await api.put<ApiRecordResponse<any>>(
-      `/role/${roleId}/permissions`,
-      {
-        permissions,
-      },
-    );
-
-    return response.data;
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+      return response.data;
+    } catch (err) {
+      handleApiError(err);
+    }
+  });
 
 export default {
   getRolePermissions,

@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 
 import type { ProdukSimpananParams } from "@/services/produkSimpananService";
 import type { ProdukSimpananRecord } from "@/components/simpanan/produk-simpanan/types";
@@ -55,6 +56,11 @@ function RouteComponent() {
     Record<string, Array<string>>
   > | null>(null);
 
+  const getProdukSimpananListFn = useServerFn(getProdukSimpananList);
+  const createProdukSimpananFn = useServerFn(createProdukSimpanan);
+  const updateProdukSimpananFn = useServerFn(updateProdukSimpanan);
+  const deleteProdukSimpananFn = useServerFn(deleteProdukSimpanan);
+
   const params: ProdukSimpananParams = {
     page,
     per_page: perPage,
@@ -63,13 +69,14 @@ function RouteComponent() {
 
   const { data, isLoading } = useQuery<any>({
     queryKey: ["produk-simpanan", params],
-    queryFn: () => getProdukSimpananList(params),
+    queryFn: () => getProdukSimpananListFn({ data: { params } }),
     staleTime: 1000 * 60 * 2,
     enabled: canView,
   });
 
   const createMutation = useMutation({
-    mutationFn: createProdukSimpanan,
+    mutationFn: ({ payload }: { payload: Omit<ProdukSimpananRecord, "id"> }) =>
+      createProdukSimpananFn({ data: { payload } }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["produk-simpanan"] }),
   });
@@ -81,13 +88,14 @@ function RouteComponent() {
     }: {
       id: number;
       payload: Omit<ProdukSimpananRecord, "id">;
-    }) => updateProdukSimpanan(id, payload),
+    }) => updateProdukSimpananFn({ data: { id, payload } }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["produk-simpanan"] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteProdukSimpanan(id),
+    mutationFn: ({ id }: { id: number }) =>
+      deleteProdukSimpananFn({ data: { id } }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["produk-simpanan"] }),
   });
@@ -127,7 +135,7 @@ function RouteComponent() {
 
   const handleAdd = async (payload: Omit<ProdukSimpananRecord, "id">) => {
     try {
-      await createMutation.mutateAsync(payload);
+      await createMutation.mutateAsync({ payload });
       setAddErrors(null);
       toast.success("Produk simpanan berhasil ditambahkan");
       return true;
@@ -158,7 +166,7 @@ function RouteComponent() {
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync({ id });
       toast.success("Produk simpanan berhasil dihapus");
     } catch (err: any) {
       toast.error(err?.message ?? "Gagal menghapus produk simpanan");

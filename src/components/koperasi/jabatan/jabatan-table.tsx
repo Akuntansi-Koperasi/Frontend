@@ -6,7 +6,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
-import { Toaster } from "src/components/ui/sonner";
 import { JabatanAddDialog } from "./jabatan-add-dialog";
 import { JabatanEditDialog } from "./jabatan-edit-dialog";
 import { JabatanDeleteDialog } from "./jabatan-delete-dialog";
@@ -311,8 +310,6 @@ export function JabatanTable({
           isDeleting={false}
         />
       ) : null}
-
-      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   );
 }

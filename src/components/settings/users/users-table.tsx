@@ -12,7 +12,6 @@ import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import type { UserFormErrors, UserRecord } from "@/services/userService";
 import type { RoleOption } from "@/services/roleService";
 import { DataTablePagination } from "@/components/data-table-pagination";
-import { Toaster } from "@/components/ui/sonner";
 
 import {
   Table,
@@ -278,7 +277,6 @@ export function UsersTable({
           return Promise.resolve(false);
         }}
       />
-      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   );
 }

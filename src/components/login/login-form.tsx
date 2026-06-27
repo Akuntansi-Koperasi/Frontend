@@ -4,6 +4,8 @@ import { useRouter } from "@tanstack/react-router";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { login, loginWithGoogle } from "@/services/authService";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,14 +29,21 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleAuthSuccess = () => {
-    router.navigate({ to: "/dashboard" });
+  const loginFn = useServerFn(login);
+  const loginWithGoogleFn = useServerFn(loginWithGoogle);
+
+  const handleAuthSuccess = async () => {
+    await queryClient.refetchQueries({
+      queryKey: ["profile"],
+    });
+    router.navigate({ to: "/dashboard", replace: true });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,12 +52,16 @@ export function LoginForm({
     setError("");
 
     try {
-      await login(email, password);
+      await loginFn({ data: { email, password } });
+      toast.success("Login berhasil!");
       handleAuthSuccess();
     } catch (err: any) {
       const msg =
-        err.response?.data?.message || "Login gagal. Cek email/password.";
+        err?.response?.data?.message ||
+        err?.message ||
+        "Login gagal. Cek email/password.";
       setError(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -59,6 +72,7 @@ export function LoginForm({
 
     if (!idToken) {
       setError("Gagal menerima token dari Google");
+      toast.error("Gagal menerima token dari Google");
       return;
     }
 
@@ -66,15 +80,14 @@ export function LoginForm({
     setError("");
 
     try {
-      await loginWithGoogle(idToken);
+      await loginWithGoogleFn({ data: { id_token: idToken } });
+      toast.success("Login Google berhasil!");
       handleAuthSuccess();
     } catch (err: any) {
-      if (err.response) {
-        const msg = err.response.data?.message || "Login Google gagal.";
-        setError(msg);
-      } else {
-        setError("Gagal menghubungi server.");
-      }
+      const msg =
+        err?.response?.data?.message || err?.message || "Login Google gagal.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }

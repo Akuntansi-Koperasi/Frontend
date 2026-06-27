@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import type { AnggotaParams } from "@/services/anggotaService";
 import type { AnggotaFormErrors } from "@/components/koperasi/anggota/types";
 import { AnggotaAddDialog } from "@/components/koperasi/anggota/anggota-add-dialog";
@@ -58,9 +59,15 @@ function RouteComponent() {
     search: searchQuery?.trim() || undefined,
   };
 
+  const getAnggotaListFn = useServerFn(getAnggotaList);
+  const createAnggotaFn = useServerFn(createAnggota);
+  const updateAnggotaFn = useServerFn(updateAnggota);
+  const deleteAnggotaFn = useServerFn(deleteAnggota);
+  const aktifkanAnggotaFn = useServerFn(aktifkanAnggota);
+
   const anggotaQuery = useQuery({
     queryKey: ["anggota", params],
-    queryFn: () => getAnggotaList(params),
+    queryFn: () => getAnggotaListFn({ data: { params } }),
     staleTime: 1000 * 60 * 2,
     enabled: canView,
   });
@@ -73,7 +80,8 @@ function RouteComponent() {
   });
 
   const createMutation = useMutation({
-    mutationFn: createAnggota,
+    mutationFn: ({ payload }: { payload: any }) =>
+      createAnggotaFn({ data: { payload } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["anggota"] }),
   });
 
@@ -83,19 +91,20 @@ function RouteComponent() {
       payload,
     }: {
       id: number;
-      payload: Parameters<typeof updateAnggota>[1];
-    }) => updateAnggota(id, payload),
+      payload: any;
+    }) => updateAnggotaFn({ data: { id, payload } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["anggota"] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteAnggota,
+    mutationFn: ({ id }: { id: number }) =>
+      deleteAnggotaFn({ data: { id } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["anggota"] }),
   });
 
   const activateMutation = useMutation({
     mutationFn: ({ id, roleId }: { id: number; roleId: number }) =>
-      aktifkanAnggota(id, roleId),
+      aktifkanAnggotaFn({ data: { id, roleId } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["anggota"] }),
   });
 
@@ -132,9 +141,9 @@ function RouteComponent() {
     }
   }, [navigate, page, safePage]);
 
-  const handleAdd = async (payload: Parameters<typeof createAnggota>[0]) => {
+  const handleAdd = async (payload: any) => {
     try {
-      await createMutation.mutateAsync(payload);
+      await createMutation.mutateAsync({ payload });
       setAddErrors(null);
       toast.success("Anggota berhasil ditambahkan");
       return true;
@@ -145,9 +154,7 @@ function RouteComponent() {
     }
   };
 
-  const handleEdit = async (
-    payload: Parameters<typeof updateAnggota>[1] & { id: number },
-  ) => {
+  const handleEdit = async (payload: { id: number } & any) => {
     try {
       await updateMutation.mutateAsync({ id: payload.id, payload });
       setEditErrors(null);
@@ -162,7 +169,7 @@ function RouteComponent() {
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync({ id });
       toast.success("Anggota berhasil dihapus");
       return true;
     } catch (err: any) {

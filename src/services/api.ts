@@ -1,4 +1,6 @@
 import axios from "axios";
+import { getRequest } from "@tanstack/react-start/server";
+import { parse, serialize } from "cookie";
 import { env } from "@/env";
 
 export const api = axios.create({
@@ -8,24 +10,49 @@ export const api = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
   },
+  paramsSerializer: {
+    serialize: (params) => {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((v) => searchParams.append(`${key}[]`, v));
+        } else if (value !== undefined && value !== null) {
+          searchParams.append(key, String(value));
+        }
+      });
+      return searchParams.toString();
+    },
+  },
 });
 
 api.interceptors.request.use((config) => {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const koperasi =
-    typeof window !== "undefined"
-      ? localStorage.getItem("koperasiActive")
-      : null;
+  const request = getRequest();
 
-  if (koperasi) {
-    config.headers["X-Koperasi-ID"] =
-      JSON.parse(koperasi).koperasi.id.toString();
-  }
+  const cookieHeader = request?.headers.get("cookie") || "";
+  const cookies = parse(cookieHeader);
+  const token = cookies.token;
+  const koperasiActive = cookies.koperasiActive;
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  if (koperasiActive) {
+    try {
+      const parsed = JSON.parse(koperasiActive);
+      if (parsed?.koperasi?.id) {
+        config.headers["X-Koperasi-ID"] = parsed.koperasi.id.toString();
+      }
+    } catch {
+      // ignore parse error
+    }
+  }
+
+  // Remove Content-Type for FormData to let axios set multipart/form-data automatically
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  }
+
   return config;
 });
 
@@ -33,18 +60,67 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("koperasiList");
-        localStorage.removeItem("koperasiActive");
-        localStorage.removeItem("anggota");
-        localStorage.removeItem("permissions");
+      const tokenCookie = serialize("token", "", {
+        httpOnly: true,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 0,
+      });
 
-        if (window.location.pathname !== "/login") {
-          window.location.href = "/login";
-        }
-      }
+      const userCookie = serialize("user", "", {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 0,
+      });
+
+      const koperasiListCookie = serialize("koperasiList", "", {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 0,
+      });
+
+      const koperasiActiveCookie = serialize("koperasiActive", "", {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 0,
+      });
+
+      const anggotaCookie = serialize("anggota", "", {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 0,
+      });
+
+      const permissionsCookie = serialize("permissions", "", {
+        httpOnly: false,
+        secure: env.VITE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 0,
+      });
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: {
+          "Set-Cookie": [
+            tokenCookie,
+            userCookie,
+            koperasiListCookie,
+            koperasiActiveCookie,
+            anggotaCookie,
+            permissionsCookie,
+          ].join(", "),
+          "Content-Type": "application/json",
+        },
+      });
     }
 
     if (error.code === "ECONNABORTED") {
