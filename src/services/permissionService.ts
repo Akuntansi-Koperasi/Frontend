@@ -1,5 +1,3 @@
-import { parse } from "cookie";
-
 export type PermissionAccess = {
   canView: boolean;
   canManage: boolean;

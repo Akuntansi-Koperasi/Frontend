@@ -13,6 +13,7 @@ export default [
       "prettier.config.js",
       "src/components/deprecated/**",
       "src/components/ui/**",
+      "src/components/profile/**",
       "src/services/deprecated/**",
     ],
   },

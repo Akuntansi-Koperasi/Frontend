@@ -12,7 +12,8 @@
     ".nitro",
     "tmp",
     ".tanstack",
-    "src/components/deprecated"
+    "src/components/deprecated",
+    "src/components/profile"
   ],
 
   "compilerOptions": {
