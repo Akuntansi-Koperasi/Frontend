@@ -28,7 +28,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface JabatanTableProps {
   data: Array<JabatanRecord>;
-  isLoading?: boolean;
   pagination: {
     pageIndex: number;
     pageSize: number;
@@ -60,7 +59,6 @@ interface JabatanTableProps {
 
 export function JabatanTable({
   data,
-  isLoading,
   pagination,
   canManage,
   canDelete,
@@ -188,7 +186,6 @@ export function JabatanTable({
 
   // deletion handled by parent via onDelete
   const hasRows = table.getRowModel().rows.length > 0;
-  const isInitialLoading = Boolean(isLoading) && !hasRows;
 
   return (
     <>
@@ -217,16 +214,7 @@ export function JabatanTable({
               ))}
             </TableHeader>
             <TableBody>
-              {isInitialLoading ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    Memuat data jabatan...
-                  </TableCell>
-                </TableRow>
-              ) : hasRows ? (
+              {hasRows ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {

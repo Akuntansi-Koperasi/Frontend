@@ -9,6 +9,7 @@ import { useServerFn } from "@tanstack/react-start";
 import type { PermissionLevel } from "@/components/settings/roles/types";
 import { PermissionsTable } from "@/components/settings/roles/permissions-table";
 import HeaderComp from "@/components/shared/header-comp";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { SearchBar } from "@/components/shared/search-bar";
 import { getPermissionAccess } from "@/services/permissionService";
 import {
@@ -251,6 +252,30 @@ function RouteComponent() {
       });
     }
   }, [navigate, page, roleId, safePage]);
+
+  const isPageLoading =
+    allPermissionsQuery.isLoading || rolePermissionsQuery.isLoading;
+
+  if (isPageLoading) {
+    return (
+      <>
+        <HeaderComp
+          title="Hak Akses Peran"
+          description="Kelola hak akses peran"
+          icon={<Save />}
+          actionLabel="Simpan Hak Akses Peran"
+          onAction={handleSave}
+        />
+        <SearchBar
+          placeholder="Cari menu..."
+          className="mb-4"
+          value={searchQuery ?? ""}
+          onChange={(event) => handleSearchChange(event.target.value)}
+        />
+        <TableSkeleton columns={3} rows={10} />
+      </>
+    );
+  }
 
   return (
     <>

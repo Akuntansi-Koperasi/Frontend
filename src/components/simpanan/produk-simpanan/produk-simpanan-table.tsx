@@ -11,7 +11,6 @@ import { ProdukSimpananEditDialog } from "./produk-simpanan-edit-dialog";
 import { ProdukSimpananDeleteDialog } from "./produk-simpanan-delete-dialog";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import type { ProdukSimpananRecord } from "./types";
-import { Toaster } from "@/components/ui/sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,7 +39,6 @@ interface ProdukSimpananTableProps {
   onDelete: (id: number) => void;
   addOpen: boolean;
   onAddOpenChange: (open: boolean) => void;
-  isLoading?: boolean;
   canManage: boolean;
   canDelete: boolean;
   addErrors?: Partial<Record<string, Array<string>>> | null;
@@ -58,7 +56,6 @@ export function ProdukSimpananTable({
   onDelete,
   addOpen,
   onAddOpenChange,
-  isLoading,
   canManage,
   canDelete,
   addErrors,
@@ -251,16 +248,7 @@ export function ProdukSimpananTable({
               ))}
             </TableHeader>
             <TableBody>
-              {isLoading && !table.getRowModel().rows.length ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    Memuat data...
-                  </TableCell>
-                </TableRow>
-              ) : table.getRowModel().rows.length ? (
+              {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {
@@ -338,8 +326,6 @@ export function ProdukSimpananTable({
           isDeleting={isDeletingLocal}
         />
       )}
-
-      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   );
 }

@@ -125,12 +125,18 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {user?.nama || "Pengguna"}
-            </p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {activeKoperasi?.koperasi.nama || "—"}
-            </p>
+            {user?.nama ? (
+              <p className="text-sm font-medium leading-none">{user.nama}</p>
+            ) : (
+              <div className="h-4 w-24 rounded bg-slate-200 animate-pulse" />
+            )}
+            {activeKoperasi?.koperasi.nama ? (
+              <p className="text-xs leading-none text-muted-foreground">
+                {activeKoperasi.koperasi.nama}
+              </p>
+            ) : (
+              <div className="h-3 w-28 rounded bg-slate-200 animate-pulse" />
+            )}
           </div>
         </DropdownMenuLabel>
 
@@ -139,7 +145,11 @@ export function UserNav() {
           <>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
-              Pindah Koperasi
+              {user?.nama ? (
+                "Pindah Koperasi"
+              ) : (
+                <div className="h-3 w-20 rounded bg-slate-200 animate-pulse" />
+              )}
             </DropdownMenuLabel>
             {koperasiList.map((item) => (
               <DropdownMenuItem
@@ -150,7 +160,11 @@ export function UserNav() {
                 <div className="flex size-6 items-center justify-center rounded-sm border bg-background shrink-0">
                   <Building2 className="size-3.5" />
                 </div>
-                <span className="flex-1 truncate">{item.koperasi.nama}</span>
+                {user?.nama ? (
+                  <span className="flex-1 truncate">{item.koperasi.nama}</span>
+                ) : (
+                  <div className="h-3 flex-1 rounded bg-slate-200 animate-pulse" />
+                )}
                 {item.koperasi.id === activeId && (
                   <Check className="size-4 text-primary shrink-0" />
                 )}

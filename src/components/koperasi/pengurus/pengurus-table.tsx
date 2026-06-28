@@ -37,7 +37,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface PengurusTableProps {
   data: Array<PengurusRecord>;
-  isLoading?: boolean;
   pagination: {
     pageIndex: number;
     pageSize: number;
@@ -63,7 +62,6 @@ interface PengurusTableProps {
 
 export function PengurusTable({
   data,
-  isLoading,
   pagination,
   canManage,
   canDelete,
@@ -274,7 +272,6 @@ export function PengurusTable({
   };
 
   const hasRows = table.getRowModel().rows.length > 0;
-  const isInitialLoading = Boolean(isLoading) && !hasRows;
 
   return (
     <>
@@ -303,16 +300,7 @@ export function PengurusTable({
               ))}
             </TableHeader>
             <TableBody>
-              {isInitialLoading ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    Memuat data pengurus...
-                  </TableCell>
-                </TableRow>
-              ) : hasRows ? (
+              {hasRows ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {

@@ -15,7 +15,6 @@ import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import type { RoleRecord } from "./types";
 
 import { DataTablePagination } from "@/components/data-table-pagination";
-import { Toaster } from "@/components/ui/sonner";
 import {
   Table,
   TableBody,
@@ -29,7 +28,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface RolesTableProps {
   data: Array<RoleRecord>;
-  isLoading?: boolean;
   pagination: {
     pageIndex: number;
     pageSize: number;
@@ -47,7 +45,6 @@ interface RolesTableProps {
 
 export function RolesTable({
   data,
-  isLoading,
   pagination,
   canManage,
   canDelete,
@@ -186,7 +183,6 @@ export function RolesTable({
   };
 
   const hasRows = table.getRowModel().rows.length > 0;
-  const isInitialLoading = Boolean(isLoading) && !hasRows;
 
   return (
     <>
@@ -215,16 +211,7 @@ export function RolesTable({
               ))}
             </TableHeader>
             <TableBody>
-              {isInitialLoading ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    Memuat data peran...
-                  </TableCell>
-                </TableRow>
-              ) : hasRows ? (
+              {hasRows ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {
@@ -286,7 +273,6 @@ export function RolesTable({
         onConfirm={handleDelete}
         isDeleting={isDeleting}
       />
-      <Toaster position="top-right" richColors closeButton theme="light" />
     </>
   );
 }

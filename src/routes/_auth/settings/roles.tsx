@@ -10,6 +10,7 @@ import type { RoleFormErrors, RoleParams } from "@/services/roleService";
 
 import { RoleAddDialog } from "@/components/settings/roles/role-add-dialog";
 import { RolesTable } from "@/components/settings/roles/roles-table";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 import HeaderComp from "@/components/shared/header-comp";
 import { SearchBar } from "@/components/shared/search-bar";
 import {
@@ -185,61 +186,72 @@ function RouteComponent() {
 
   return (
     <>
-      <HeaderComp
-        title="Manajemen Peran"
-        description="Kelola peran"
-        icon={<Plus />}
-        actionLabel={canManage ? "Tambah Peran" : undefined}
-        onAction={canManage ? () => setOpenAdd(true) : undefined}
-      />
-      <RoleAddDialog
-        open={openAdd}
-        onOpenChange={(isOpen) => {
-          setOpenAdd(isOpen);
-          if (!isOpen) setAddErrors(null);
-        }}
-        onAdd={handleAdd}
-        errors={addErrors}
-      />
-      <SearchBar
-        placeholder="Cari peran..."
-        className="mb-4"
-        value={search.search ?? ""}
-        onChange={(event) => handleSearchChange(event.target.value)}
-      />
+      {rolesQuery.isLoading ? (
+        <div className="flex flex-col gap-6">
+          <div className="h-10 rounded-lg bg-slate-200 animate-pulse" />
+          <div className="h-10 rounded-lg bg-slate-100 animate-pulse" />
+          <div className="rounded-lg border-2 border-slate-200 bg-white overflow-hidden">
+            <TableSkeleton columns={4} rows={10} />
+          </div>
+        </div>
+      ) : (
+        <>
+          <HeaderComp
+            title="Manajemen Peran"
+            description="Kelola peran"
+            icon={<Plus />}
+            actionLabel={canManage ? "Tambah Peran" : undefined}
+            onAction={canManage ? () => setOpenAdd(true) : undefined}
+          />
+          <RoleAddDialog
+            open={openAdd}
+            onOpenChange={(isOpen) => {
+              setOpenAdd(isOpen);
+              if (!isOpen) setAddErrors(null);
+            }}
+            onAdd={handleAdd}
+            errors={addErrors}
+          />
+          <SearchBar
+            placeholder="Cari peran..."
+            className="mb-4"
+            value={search.search ?? ""}
+            onChange={(event) => handleSearchChange(event.target.value)}
+          />
 
-      <RolesTable
-        data={rolesQuery.data?.data ?? []}
-        isLoading={rolesQuery.isLoading}
-        pagination={pagination}
-        canManage={canManage}
-        canDelete={canDelete}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        editErrors={editErrors}
-        onPageChange={(newPageIndex: number) => {
-          navigate({
-            to: "/settings/roles",
-            search: {
-              page: newPageIndex + 1,
-              per_page,
-              search: searchQuery,
-            },
-            replace: true,
-          });
-        }}
-        onPageSizeChange={(newPageSize: number) => {
-          navigate({
-            to: "/settings/roles",
-            search: {
-              page: 1,
-              per_page: newPageSize,
-              search: searchQuery,
-            },
-            replace: true,
-          });
-        }}
-      />
+          <RolesTable
+            data={rolesQuery.data?.data ?? []}
+            pagination={pagination}
+            canManage={canManage}
+            canDelete={canDelete}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            editErrors={editErrors}
+            onPageChange={(newPageIndex: number) => {
+              navigate({
+                to: "/settings/roles",
+                search: {
+                  page: newPageIndex + 1,
+                  per_page,
+                  search: searchQuery,
+                },
+                replace: true,
+              });
+            }}
+            onPageSizeChange={(newPageSize: number) => {
+              navigate({
+                to: "/settings/roles",
+                search: {
+                  page: 1,
+                  per_page: newPageSize,
+                  search: searchQuery,
+                },
+                replace: true,
+              });
+            }}
+          />
+        </>
+      )}
     </>
   );
 }

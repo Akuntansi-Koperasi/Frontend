@@ -9,6 +9,7 @@ import { useServerFn } from "@tanstack/react-start";
 import type { JabatanParams } from "@/services/jabatanService";
 import HeaderComp from "@/components/shared/header-comp";
 import { SearchBar } from "@/components/shared/search-bar";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { getPermissionAccess } from "@/services/permissionService";
 
 import { JabatanTable } from "@/components/koperasi/jabatan/jabatan-table";
@@ -203,41 +204,52 @@ function RouteComponent() {
 
   return (
     <>
-      <HeaderComp
-        title="Manajemen Pengaturan Jabatan"
-        description="Kelola jabatan koperasi"
-        icon={<Plus />}
-        actionLabel={canManage ? "Tambah Jabatan" : undefined}
-        onAction={canManage ? () => setAddOpen(true) : undefined}
-      />
+      {isLoading ? (
+        <div className="flex flex-col gap-6">
+          <div className="h-10 rounded-lg bg-slate-200 animate-pulse" />
+          <div className="h-10 rounded-lg bg-slate-100 animate-pulse" />
+          <div className="rounded-lg border-2 border-slate-200 bg-white overflow-hidden">
+            <TableSkeleton columns={4} rows={10} />
+          </div>
+        </div>
+      ) : (
+        <>
+          <HeaderComp
+            title="Manajemen Pengaturan Jabatan"
+            description="Kelola jabatan koperasi"
+            icon={<Plus />}
+            actionLabel={canManage ? "Tambah Jabatan" : undefined}
+            onAction={canManage ? () => setAddOpen(true) : undefined}
+          />
 
-      <SearchBar
-        placeholder="Cari jabatan..."
-        className="mb-4"
-        value={search.search ?? ""}
-        onChange={(event) => handleSearchChange(event.target.value)}
-      />
+          <SearchBar
+            placeholder="Cari jabatan..."
+            className="mb-4"
+            value={search.search ?? ""}
+            onChange={(event) => handleSearchChange(event.target.value)}
+          />
 
-      <JabatanTable
-        data={data?.data ?? []}
-        isLoading={isLoading}
-        pagination={pagination}
-        canManage={canManage}
-        canDelete={canDelete}
-        addOpen={addOpen}
-        onAddOpenChange={(isOpen: boolean) => {
-          setAddOpen(isOpen);
-          if (!isOpen) setAddErrors(null);
-        }}
-        onAdd={handleAdd}
-        onEdit={handleEdit}
-        onDelete={(id) => handleDelete(id)}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        addErrors={addErrors}
-        editErrors={editErrors}
-        onEditClose={() => setEditErrors(null)}
-      />
+          <JabatanTable
+            data={data?.data ?? []}
+            pagination={pagination}
+            canManage={canManage}
+            canDelete={canDelete}
+            addOpen={addOpen}
+            onAddOpenChange={(isOpen: boolean) => {
+              setAddOpen(isOpen);
+              if (!isOpen) setAddErrors(null);
+            }}
+            onAdd={handleAdd}
+            onEdit={handleEdit}
+            onDelete={(id) => handleDelete(id)}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            addErrors={addErrors}
+            editErrors={editErrors}
+            onEditClose={() => setEditErrors(null)}
+          />
+        </>
+      )}
     </>
   );
 }

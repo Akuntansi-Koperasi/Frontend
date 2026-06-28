@@ -18,6 +18,7 @@ import { getPermissionAccess } from "@/services/permissionService";
 
 import { UserAddDialog } from "@/components/settings/users/user-add-dialog";
 import { UsersTable } from "@/components/settings/users/users-table";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 import HeaderComp from "@/components/shared/header-comp";
 import { SearchBar } from "@/components/shared/search-bar";
 
@@ -201,62 +202,73 @@ function RouteComponent() {
 
   return (
     <>
-      <HeaderComp
-        title="Manajemen Pengguna"
-        description="Kelola akun akses anggota"
-        icon={<Plus />}
-        actionLabel={canManage ? "Aktifkan Pengguna" : undefined}
-        onAction={canManage ? () => setOpen(true) : undefined}
-      />
+      {usersQuery.isLoading ? (
+        <div className="flex flex-col gap-6">
+          <div className="h-10 rounded-lg bg-slate-200 animate-pulse" />
+          <div className="h-10 rounded-lg bg-slate-100 animate-pulse" />
+          <div className="rounded-lg border-2 border-slate-200 bg-white overflow-hidden">
+            <TableSkeleton columns={4} rows={10} />
+          </div>
+        </div>
+      ) : (
+        <>
+          <HeaderComp
+            title="Manajemen Pengguna"
+            description="Kelola akun akses anggota"
+            icon={<Plus />}
+            actionLabel={canManage ? "Aktifkan Pengguna" : undefined}
+            onAction={canManage ? () => setOpen(true) : undefined}
+          />
 
-      <UserAddDialog
-        open={open}
-        onOpenChange={(isOpen) => {
-          setOpen(isOpen);
-          if (!isOpen) setAddErrors(null);
-        }}
-        onCreate={handleAdd}
-        errors={addErrors}
-        anggotaOptions={anggotaDropdownQuery.data ?? []}
-        roleOptions={roleDropdownQuery.data ?? []}
-      />
+          <UserAddDialog
+            open={open}
+            onOpenChange={(isOpen) => {
+              setOpen(isOpen);
+              if (!isOpen) setAddErrors(null);
+            }}
+            onCreate={handleAdd}
+            errors={addErrors}
+            anggotaOptions={anggotaDropdownQuery.data ?? []}
+            roleOptions={roleDropdownQuery.data ?? []}
+          />
 
-      <SearchBar
-        placeholder="Cari pengguna..."
-        className="mb-4"
-        value={searchQuery ?? ""}
-        onChange={(event) => handleSearchChange(event.target.value)}
-      />
+          <SearchBar
+            placeholder="Cari pengguna..."
+            className="mb-4"
+            value={searchQuery ?? ""}
+            onChange={(event) => handleSearchChange(event.target.value)}
+          />
 
-      <UsersTable
-        data={usersQuery.data?.data ?? []}
-        isLoading={usersQuery.isLoading}
-        pagination={pagination}
-        canManage={canManage}
-        canDelete={canDelete}
-        onPageChange={(newPageIndex: number) => {
-          navigate({
-            to: "/settings/users",
-            search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
-            replace: true,
-          });
-        }}
-        onPageSizeChange={(newPageSize: number) => {
-          navigate({
-            to: "/settings/users",
-            search: (prev: any) => ({
-              ...prev,
-              per_page: newPageSize,
-              page: 1,
-            }),
-            replace: true,
-          });
-        }}
-        onUpdate={handleEdit}
-        onDelete={handleDelete}
-        editErrors={editErrors}
-        roleOptions={roleDropdownQuery.data ?? []}
-      />
+          <UsersTable
+            data={usersQuery.data?.data ?? []}
+            pagination={pagination}
+            canManage={canManage}
+            canDelete={canDelete}
+            onPageChange={(newPageIndex: number) => {
+              navigate({
+                to: "/settings/users",
+                search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
+                replace: true,
+              });
+            }}
+            onPageSizeChange={(newPageSize: number) => {
+              navigate({
+                to: "/settings/users",
+                search: (prev: any) => ({
+                  ...prev,
+                  per_page: newPageSize,
+                  page: 1,
+                }),
+                replace: true,
+              });
+            }}
+            onUpdate={handleEdit}
+            onDelete={handleDelete}
+            editErrors={editErrors}
+            roleOptions={roleDropdownQuery.data ?? []}
+          />
+        </>
+      )}
     </>
   );
 }

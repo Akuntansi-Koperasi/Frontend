@@ -19,6 +19,7 @@ import { getPermissionAccess } from "@/services/permissionService";
 import HeaderComp from "@/components/shared/header-comp";
 import { SearchBar } from "@/components/shared/search-bar";
 import { ProdukSimpananTable } from "@/components/simpanan/produk-simpanan/produk-simpanan-table";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 
 const produkSimpananSearchSchema = z.object({
   page: z.number().int().positive().catch(1),
@@ -203,40 +204,51 @@ function RouteComponent() {
 
   return (
     <>
-      <HeaderComp
-        title="Manajemen Produk Simpanan"
-        description="Kelola produk simpanan"
-        icon={<Plus />}
-        actionLabel={canManage ? "Tambah Simpanan" : undefined}
-        onAction={canManage ? () => setAddOpen(true) : undefined}
-      />
-      <SearchBar
-        placeholder="Cari produk simpanan..."
-        className="mb-4"
-        value={search.search ?? ""}
-        onChange={(event) => handleSearchChange(event.target.value)}
-      />
+      {isLoading ? (
+        <div className="flex flex-col gap-6">
+          <div className="h-10 rounded-lg bg-slate-200 animate-pulse" />
+          <div className="h-10 rounded-lg bg-slate-100 animate-pulse" />
+          <div className="rounded-lg border-2 border-slate-200 bg-white overflow-hidden">
+            <TableSkeleton columns={6} rows={10} />
+          </div>
+        </div>
+      ) : (
+        <>
+          <HeaderComp
+            title="Manajemen Produk Simpanan"
+            description="Kelola produk simpanan"
+            icon={<Plus />}
+            actionLabel={canManage ? "Tambah Simpanan" : undefined}
+            onAction={canManage ? () => setAddOpen(true) : undefined}
+          />
+          <SearchBar
+            placeholder="Cari produk simpanan..."
+            className="mb-4"
+            value={search.search ?? ""}
+            onChange={(event) => handleSearchChange(event.target.value)}
+          />
 
-      <ProdukSimpananTable
-        data={data?.data ?? []}
-        isLoading={isLoading}
-        pagination={pagination}
-        canManage={canManage}
-        canDelete={canDelete}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        onAdd={handleAdd}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        addOpen={addOpen}
-        onAddOpenChange={(isOpen: boolean) => {
-          setAddOpen(isOpen);
-          if (!isOpen) setAddErrors(null);
-        }}
-        addErrors={addErrors}
-        editErrors={editErrors}
-        onEditClose={() => setEditErrors(null)}
-      />
+          <ProdukSimpananTable
+            data={data?.data ?? []}
+            pagination={pagination}
+            canManage={canManage}
+            canDelete={canDelete}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            onAdd={handleAdd}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            addOpen={addOpen}
+            onAddOpenChange={(isOpen: boolean) => {
+              setAddOpen(isOpen);
+              if (!isOpen) setAddErrors(null);
+            }}
+            addErrors={addErrors}
+            editErrors={editErrors}
+            onEditClose={() => setEditErrors(null)}
+          />
+        </>
+      )}
     </>
   );
 }

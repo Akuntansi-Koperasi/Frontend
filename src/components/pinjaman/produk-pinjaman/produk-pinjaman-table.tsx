@@ -39,7 +39,6 @@ interface ProdukPinjamanTableProps {
   onDelete: (id: number) => void;
   addOpen: boolean;
   onAddOpenChange: (open: boolean) => void;
-  isLoading?: boolean;
   canManage: boolean;
   canDelete: boolean;
   addErrors?: Partial<Record<string, Array<string>>> | null;
@@ -57,7 +56,6 @@ export function ProdukPinjamanTable({
   onDelete,
   addOpen,
   onAddOpenChange,
-  isLoading,
   canManage,
   canDelete,
   addErrors,
@@ -247,16 +245,7 @@ export function ProdukPinjamanTable({
               ))}
             </TableHeader>
             <TableBody>
-              {isLoading && !table.getRowModel().rows.length ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    Memuat data...
-                  </TableCell>
-                </TableRow>
-              ) : table.getRowModel().rows.length ? (
+              {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {

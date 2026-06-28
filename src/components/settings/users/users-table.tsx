@@ -28,7 +28,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface UsersTableProps {
   data: Array<UserRecord>;
-  isLoading?: boolean;
   pagination: {
     pageIndex: number;
     pageSize: number;
@@ -49,7 +48,6 @@ const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function UsersTable({
   data,
-  isLoading,
   pagination,
   canManage,
   canDelete,
@@ -175,7 +173,6 @@ export function UsersTable({
   });
 
   const hasRows = table.getRowModel().rows.length > 0;
-  const isInitialLoading = Boolean(isLoading) && !hasRows;
 
   return (
     <>
@@ -204,16 +201,7 @@ export function UsersTable({
               ))}
             </TableHeader>
             <TableBody>
-              {isInitialLoading ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    Memuat data pengguna...
-                  </TableCell>
-                </TableRow>
-              ) : hasRows ? (
+              {hasRows ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} className="hover:bg-slate-50">
                     {row.getVisibleCells().map((cell, index) => {

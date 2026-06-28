@@ -9,6 +9,7 @@ import type { AnggotaParams } from "@/services/anggotaService";
 import type { AnggotaFormErrors } from "@/components/koperasi/anggota/types";
 import { AnggotaAddDialog } from "@/components/koperasi/anggota/anggota-add-dialog";
 import { AnggotaTable } from "@/components/koperasi/anggota/anggota-table";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 import HeaderComp from "@/components/shared/header-comp";
 import { SearchBar } from "@/components/shared/search-bar";
 import {
@@ -247,63 +248,74 @@ function RouteComponent() {
 
   return (
     <>
-      <HeaderComp
-        title="Manajemen Anggota"
-        description="Kelola anggota koperasi"
-        icon={<Plus />}
-        actionLabel={canManage ? "Tambah Anggota" : undefined}
-        onAction={canManage ? () => setOpenAdd(true) : undefined}
-      />
+      {anggotaQuery.isLoading ? (
+        <div className="flex flex-col gap-6">
+          <div className="h-10 rounded-lg bg-slate-200 animate-pulse" />
+          <div className="h-10 rounded-lg bg-slate-100 animate-pulse" />
+          <div className="rounded-lg border-2 border-slate-200 bg-white overflow-hidden">
+            <TableSkeleton columns={7} rows={10} />
+          </div>
+        </div>
+      ) : (
+        <>
+          <HeaderComp
+            title="Manajemen Anggota"
+            description="Kelola anggota koperasi"
+            icon={<Plus />}
+            actionLabel={canManage ? "Tambah Anggota" : undefined}
+            onAction={canManage ? () => setOpenAdd(true) : undefined}
+          />
 
-      <AnggotaAddDialog
-        open={openAdd}
-        onOpenChange={(isOpen) => {
-          setOpenAdd(isOpen);
-          if (!isOpen) setAddErrors(null);
-        }}
-        onCreate={handleAdd}
-        errors={addErrors}
-      />
+          <AnggotaAddDialog
+            open={openAdd}
+            onOpenChange={(isOpen) => {
+              setOpenAdd(isOpen);
+              if (!isOpen) setAddErrors(null);
+            }}
+            onCreate={handleAdd}
+            errors={addErrors}
+          />
 
-      <SearchBar
-        placeholder="Cari anggota..."
-        className="mb-4"
-        value={search.search ?? ""}
-        onChange={(event) => handleSearchChange(event.target.value)}
-      />
+          <SearchBar
+            placeholder="Cari anggota..."
+            className="mb-4"
+            value={search.search ?? ""}
+            onChange={(event) => handleSearchChange(event.target.value)}
+          />
 
-      <AnggotaTable
-        data={anggotaQuery.data?.data ?? []}
-        isLoading={anggotaQuery.isLoading}
-        pagination={pagination}
-        canManage={canManage}
-        canDelete={canDelete}
-        canActivateAccess={canActivateAccess}
-        roleOptions={roleQuery.data ?? []}
-        editErrors={editErrors}
-        onPageChange={(newPageIndex) => {
-          navigate({
-            to: "/koperasi/anggota",
-            search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
-            replace: true,
-          });
-        }}
-        onPageSizeChange={(newPageSize) => {
-          navigate({
-            to: "/koperasi/anggota",
-            search: (prev: any) => ({
-              ...prev,
-              per_page: newPageSize,
-              page: 1,
-            }),
-            replace: true,
-          });
-        }}
-        onUpdate={handleEdit}
-        onDelete={handleDelete}
-        onActivateAccess={handleActivate}
-        onKeluarkan={handleKeluarkan}
-      />
+          <AnggotaTable
+            data={anggotaQuery.data?.data ?? []}
+            pagination={pagination}
+            canManage={canManage}
+            canDelete={canDelete}
+            canActivateAccess={canActivateAccess}
+            roleOptions={roleQuery.data ?? []}
+            editErrors={editErrors}
+            onPageChange={(newPageIndex) => {
+              navigate({
+                to: "/koperasi/anggota",
+                search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
+                replace: true,
+              });
+            }}
+            onPageSizeChange={(newPageSize) => {
+              navigate({
+                to: "/koperasi/anggota",
+                search: (prev: any) => ({
+                  ...prev,
+                  per_page: newPageSize,
+                  page: 1,
+                }),
+                replace: true,
+              });
+            }}
+            onUpdate={handleEdit}
+            onDelete={handleDelete}
+            onActivateAccess={handleActivate}
+            onKeluarkan={handleKeluarkan}
+          />
+        </>
+      )}
     </>
   );
 }

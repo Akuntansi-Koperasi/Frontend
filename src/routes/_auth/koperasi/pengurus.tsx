@@ -14,6 +14,7 @@ import type { PengurusParams } from "@/services/pengurusService";
 import HeaderComp from "@/components/shared/header-comp";
 import { SearchBar } from "@/components/shared/search-bar";
 import { PengurusTable } from "@/components/koperasi/pengurus/pengurus-table";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { getPermissionAccess } from "@/services/permissionService";
 
 import {
@@ -258,44 +259,55 @@ function RouteComponent() {
 
   return (
     <>
-      <HeaderComp
-        title="Manajemen Pengurus Koperasi"
-        description="Kelola anggota pengurus koperasi"
-        icon={<Plus />}
-        actionLabel={canManage ? "Tambah Struktur" : undefined}
-        onAction={canManage ? () => setAddOpen(true) : undefined}
-      />
+      {pengurusQuery.isLoading ? (
+        <div className="flex flex-col gap-6">
+          <div className="h-10 rounded-lg bg-slate-200 animate-pulse" />
+          <div className="h-10 rounded-lg bg-slate-100 animate-pulse" />
+          <div className="rounded-lg border-2 border-slate-200 bg-white overflow-hidden">
+            <TableSkeleton columns={5} rows={10} />
+          </div>
+        </div>
+      ) : (
+        <>
+          <HeaderComp
+            title="Manajemen Pengurus Koperasi"
+            description="Kelola anggota pengurus koperasi"
+            icon={<Plus />}
+            actionLabel={canManage ? "Tambah Struktur" : undefined}
+            onAction={canManage ? () => setAddOpen(true) : undefined}
+          />
 
-      <SearchBar
-        placeholder="Cari nama pengurus..."
-        className="mb-4"
-        value={search.search ?? ""}
-        onChange={(event) => handleSearchChange(event.target.value)}
-      />
+          <SearchBar
+            placeholder="Cari nama pengurus..."
+            className="mb-4"
+            value={search.search ?? ""}
+            onChange={(event) => handleSearchChange(event.target.value)}
+          />
 
-      <PengurusTable
-        data={pengurusQuery.data?.data ?? []}
-        isLoading={pengurusQuery.isLoading}
-        pagination={pagination}
-        canManage={canManage}
-        canDelete={canDelete}
-        anggotaOptions={anggotaDropdownQuery.data ?? []}
-        jabatanOptions={jabatanDropdownQuery.data ?? []}
-        addOpen={addOpen}
-        onAddOpenChange={(isOpen: boolean) => {
-          setAddOpen(isOpen);
-          if (!isOpen) setAddErrors(null);
-        }}
-        onAdd={handleAdd}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onAkhiri={handleAkhiri}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        addErrors={addErrors}
-        editErrors={editErrors}
-        onEditClose={() => setEditErrors(null)}
-      />
+          <PengurusTable
+            data={pengurusQuery.data?.data ?? []}
+            pagination={pagination}
+            canManage={canManage}
+            canDelete={canDelete}
+            anggotaOptions={anggotaDropdownQuery.data ?? []}
+            jabatanOptions={jabatanDropdownQuery.data ?? []}
+            addOpen={addOpen}
+            onAddOpenChange={(isOpen: boolean) => {
+              setAddOpen(isOpen);
+              if (!isOpen) setAddErrors(null);
+            }}
+            onAdd={handleAdd}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onAkhiri={handleAkhiri}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            addErrors={addErrors}
+            editErrors={editErrors}
+            onEditClose={() => setEditErrors(null)}
+          />
+        </>
+      )}
     </>
   );
 }

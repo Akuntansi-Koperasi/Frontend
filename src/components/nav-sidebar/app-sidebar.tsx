@@ -29,7 +29,7 @@ export function AppSidebar({
   pathname,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { pathname: string }) {
-  const { data: user } = useUserProfile();
+  const { data: user, isLoading } = useUserProfile();
   const logoutServerFn = useServerFn(logoutFn);
   const [openSections, setOpenSections] = React.useState<
     Record<string, boolean>
@@ -141,67 +141,74 @@ export function AppSidebar({
               <SidebarMenuItem>
                 <SearchBar className="sm:hidden block" />
               </SidebarMenuItem>
-              {filteredNavItems.map((item) => {
-                const isActive =
-                  pathname === item.url || pathname.startsWith(`${item.url}/`);
-                const isSectionOpen = openSections[item.title] ?? false;
-
-                if (item.items?.length) {
-                  return (
-                    <SidebarMenuItem key={item.title}>
-                      <div className="flex items-center gap-1">
-                        <SidebarMenuButton
-                          tooltip={item.title}
-                          className="h-12 flex-1 font-medium cursor-pointer hover:bg-slate-100 data-[active=true]:bg-slate-900 data-[active=true]:text-white data-[active=true]:hover:bg-slate-800 data-[active=true]:hover:text-white"
-                          onClick={() => toggleSection(item.title)}
-                        >
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </SidebarMenuButton>
-                      </div>
-
-                      {isSectionOpen ? (
-                        <SidebarMenuSub>
-                          {item.items.map((subItem) => {
-                            const isSubActive =
-                              pathname === subItem.url ||
-                              pathname.startsWith(`${subItem.url}/`);
-
-                            return (
-                              <SidebarMenuSubItem key={subItem.title}>
-                                <SidebarMenuSubButton
-                                  asChild
-                                  isActive={isSubActive}
-                                  className="h-10 rounded-md px-2 text-sm hover:bg-slate-100 data-[active=true]:bg-slate-900 data-[active=true]:text-white data-[active=true]:hover:bg-slate-800 data-[active=true]:hover:text-white"
-                                >
-                                  <Link to={subItem.url}>
-                                    <span>{subItem.title}</span>
-                                  </Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            );
-                          })}
-                        </SidebarMenuSub>
-                      ) : null}
+              {isLoading
+                ? Array.from({ length: 5 }).map((_, i) => (
+                    <SidebarMenuItem key={i}>
+                      <div className="h-12 w-full rounded-lg bg-slate-100 animate-pulse" />
                     </SidebarMenuItem>
-                  );
-                }
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={item.title}
-                      isActive={isActive}
-                      className="h-12 font-medium hover:bg-slate-100 data-[active=true]:bg-slate-900 data-[active=true]:text-white data-[active=true]:hover:bg-slate-800 data-[active=true]:hover:text-white"
-                    >
-                      <Link to={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+                  ))
+                : filteredNavItems.map((item) => {
+                    const isActive =
+                      pathname === item.url ||
+                      pathname.startsWith(`${item.url}/`);
+                    const isSectionOpen = openSections[item.title] ?? false;
+
+                    if (item.items?.length) {
+                      return (
+                        <SidebarMenuItem key={item.title}>
+                          <div className="flex items-center gap-1">
+                            <SidebarMenuButton
+                              tooltip={item.title}
+                              className="h-12 flex-1 font-medium cursor-pointer hover:bg-slate-100 data-[active=true]:bg-slate-900 data-[active=true]:text-white data-[active=true]:hover:bg-slate-800 data-[active=true]:hover:text-white"
+                              onClick={() => toggleSection(item.title)}
+                            >
+                              <item.icon />
+                              <span>{item.title}</span>
+                            </SidebarMenuButton>
+                          </div>
+
+                          {isSectionOpen ? (
+                            <SidebarMenuSub>
+                              {item.items.map((subItem) => {
+                                const isSubActive =
+                                  pathname === subItem.url ||
+                                  pathname.startsWith(`${subItem.url}/`);
+
+                                return (
+                                  <SidebarMenuSubItem key={subItem.title}>
+                                    <SidebarMenuSubButton
+                                      asChild
+                                      isActive={isSubActive}
+                                      className="h-10 rounded-md px-2 text-sm hover:bg-slate-100 data-[active=true]:bg-slate-900 data-[active=true]:text-white data-[active=true]:hover:bg-slate-800 data-[active=true]:hover:text-white"
+                                    >
+                                      <Link to={subItem.url}>
+                                        <span>{subItem.title}</span>
+                                      </Link>
+                                    </SidebarMenuSubButton>
+                                  </SidebarMenuSubItem>
+                                );
+                              })}
+                            </SidebarMenuSub>
+                          ) : null}
+                        </SidebarMenuItem>
+                      );
+                    }
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton
+                          asChild
+                          tooltip={item.title}
+                          isActive={isActive}
+                          className="h-12 font-medium hover:bg-slate-100 data-[active=true]:bg-slate-900 data-[active=true]:text-white data-[active=true]:hover:bg-slate-800 data-[active=true]:hover:text-white"
+                        >
+                          <Link to={item.url}>
+                            <item.icon />
+                            <span>{item.title}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -234,12 +241,18 @@ export function AppSidebar({
                 </div>
 
                 <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                  <span className="truncate font-semibold">
-                    {user?.nama || "Pengguna"}
-                  </span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {user?.email || "Memuat..."}
-                  </span>
+                  {user?.nama ? (
+                    <span className="truncate font-semibold">{user.nama}</span>
+                  ) : (
+                    <div className="h-4 w-24 rounded bg-slate-200 animate-pulse" />
+                  )}
+                  {user?.email ? (
+                    <span className="truncate text-xs text-muted-foreground">
+                      {user.email}
+                    </span>
+                  ) : (
+                    <div className="h-3 w-32 rounded bg-slate-200 animate-pulse mt-1" />
+                  )}
                 </div>
               </Link>
             </SidebarMenuButton>

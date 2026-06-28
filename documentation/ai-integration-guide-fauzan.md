@@ -33,7 +33,7 @@ Integrasikan halaman yang diberikan ke backend Laravel secara penuh, dengan meng
 - Ikuti pattern komponen yang sudah ada di `src/components`.
 - Jangan pakai `any` kalau bisa dihindari.
 - gunakan useServerFn untuk memanggil service yang sudah dibuat, jangan panggil service langsung di komponen.
-- ketika loading data atau permission maka pakai skeleton atau animate pulse untuk di tabel dan card, jangan pakai spinner di tengah halaman.
+- ketika loading data atau permission maka pakai skeleton atau animate pulse untuk di tabel dan card, jangan pakai spinner di tengah halaman. seperti yang sudah di terapkan di route `src/routes/_auth/settings/roles` atau di route `src/routes/_auth/` lainnya.
 
 ## Permission Frontend
 
