@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import {
   Building2,
   Check,
@@ -25,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { switchKoperasi } from "@/services/profileService";
 import { logout as logoutFn } from "@/services/authService";
+import { toast } from "sonner";
 
 function getKoperasiList(): Array<Koperasi> {
   try {
@@ -64,9 +65,10 @@ function getActiveKoperasi(): Koperasi | null {
 
 export function UserNav() {
   const { data: user } = useUserProfile();
-  const qc = useQueryClient();
   const switchKoperasiFn = useServerFn(switchKoperasi);
   const logoutServerFn = useServerFn(logoutFn);
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
   const [koperasiList] = React.useState<Array<Koperasi>>(() =>
     getKoperasiList(),
@@ -88,7 +90,7 @@ export function UserNav() {
     // Panggil ulang profile segera (akan memanggil API /profile/me)
     // supaya storage (anggota/permissions/koperasiActive) tersinkron sebelum reload.
     try {
-      await qc.refetchQueries({ queryKey: ["profile"], exact: true });
+      await queryClient.refetchQueries({ queryKey: ["profile"], exact: true });
     } finally {
       // Reload page to apply new permissions everywhere
       window.location.reload();
@@ -103,6 +105,22 @@ export function UserNav() {
       .toUpperCase()
       .substring(0, 2);
   };
+  
+  const logout = async () => {
+    try {
+      await logoutServerFn();
+      toast.success("Logout berhasil!");
+    } catch (err: any) {
+      const msg =
+        err?.message ||
+        "Logout gagal. Coba lagi.";
+      toast.error(msg);
+    }
+    queryClient.removeQueries({
+      queryKey: ["profile"],
+    });
+    router.navigate({ to: "/login", replace: true });
+  }
 
   return (
     <DropdownMenu>
@@ -186,8 +204,7 @@ export function UserNav() {
         <DropdownMenuItem
           className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
           onClick={async () => {
-            await logoutServerFn();
-            window.location.href = "/login";
+            await logout();
           }}
         >
           <LogOut className="mr-2 h-4 w-4" />

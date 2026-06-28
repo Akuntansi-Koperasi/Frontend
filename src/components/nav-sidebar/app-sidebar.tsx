@@ -1,9 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { LogOut, User } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { navItems } from "./nav-data";
 import { SearchBar } from "./search-bar";
 import { getPermissionAccess } from "@/services/permissionService";
@@ -24,6 +25,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "sonner";
 
 export function AppSidebar({
   pathname,
@@ -31,6 +33,8 @@ export function AppSidebar({
 }: React.ComponentProps<typeof Sidebar> & { pathname: string }) {
   const { data: user, isLoading } = useUserProfile();
   const logoutServerFn = useServerFn(logoutFn);
+  const queryClient = useQueryClient();
+  const router = useRouter();
   const [openSections, setOpenSections] = React.useState<
     Record<string, boolean>
   >({});
@@ -104,6 +108,22 @@ export function AppSidebar({
       [key]: !current[key],
     }));
   };
+
+  const logout = async () => {
+    try {
+      await logoutServerFn();
+      toast.success("Logout berhasil!");
+    } catch (err: any) {
+      const msg =
+        err?.message ||
+        "Logout gagal. Coba lagi.";
+      toast.error(msg);
+    }
+    queryClient.removeQueries({
+      queryKey: ["profile"],
+    });
+    router.navigate({ to: "/login", replace: true });
+  }
 
   return (
     <Sidebar collapsible="icon" {...props} className="pt-4">
@@ -263,8 +283,7 @@ export function AppSidebar({
               size="lg"
               className="bg-[#E11D48] hover:bg-[#BE123C] text-white hover:text-white group-data-[collapsible=icon]:p-2.5! cursor-pointer"
               onClick={async () => {
-                await logoutServerFn();
-                window.location.href = "/login";
+                await logout();
               }}
             >
               <LogOut />
