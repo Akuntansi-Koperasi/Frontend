@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { parse } from "cookie";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import type { Koperasi } from "@/services/authService";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -25,7 +26,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { switchKoperasi } from "@/services/profileService";
 import { logout as logoutFn } from "@/services/authService";
-import { toast } from "sonner";
 
 function getKoperasiList(): Array<Koperasi> {
   try {
@@ -105,22 +105,20 @@ export function UserNav() {
       .toUpperCase()
       .substring(0, 2);
   };
-  
+
   const logout = async () => {
     try {
       await logoutServerFn();
       toast.success("Logout berhasil!");
     } catch (err: any) {
-      const msg =
-        err?.message ||
-        "Logout gagal. Coba lagi.";
+      const msg = err?.message || "Logout gagal. Coba lagi.";
       toast.error(msg);
     }
     queryClient.removeQueries({
       queryKey: ["profile"],
     });
     router.navigate({ to: "/login", replace: true });
-  }
+  };
 
   return (
     <DropdownMenu>

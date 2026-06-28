@@ -5,6 +5,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { LogOut, User } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { navItems } from "./nav-data";
 import { SearchBar } from "./search-bar";
 import { getPermissionAccess } from "@/services/permissionService";
@@ -25,7 +26,6 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { toast } from "sonner";
 
 export function AppSidebar({
   pathname,
@@ -114,16 +114,14 @@ export function AppSidebar({
       await logoutServerFn();
       toast.success("Logout berhasil!");
     } catch (err: any) {
-      const msg =
-        err?.message ||
-        "Logout gagal. Coba lagi.";
+      const msg = err?.message || "Logout gagal. Coba lagi.";
       toast.error(msg);
     }
     queryClient.removeQueries({
       queryKey: ["profile"],
     });
     router.navigate({ to: "/login", replace: true });
-  }
+  };
 
   return (
     <Sidebar collapsible="icon" {...props} className="pt-4">
