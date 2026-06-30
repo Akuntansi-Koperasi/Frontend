@@ -1,13 +1,24 @@
 import * as React from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { BookOpen, HelpCircle, Plus } from "lucide-react";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { Plus } from "lucide-react";
 import { z } from "zod";
+import { toast } from "sonner";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 
-import type { CoaRecord } from "@/components/akuntansi/coa/types";
-import { MOCK_COA } from "@/components/akuntansi/coa/types";
 import { CoaTable } from "@/components/akuntansi/coa/coa-table";
 import { SearchBar } from "@/components/shared/search-bar";
-import { Button } from "@/components/ui/button";
+import HeaderComp from "@/components/shared/header-comp";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
+
+import {
+  createCoa,
+  deleteCoa,
+  getCoaList,
+  getKategoriCoaDropdown,
+  updateCoa,
+} from "@/services/coaService";
+import { getPermissionAccess } from "@/services/permissionService";
 
 const coaSearchSchema = z.object({
   page: z.number().int().positive().catch(1),
@@ -23,45 +34,71 @@ export const Route = createFileRoute("/_auth/akuntansi/coa")({
 function RouteComponent() {
   const navigate = useNavigate();
   const search = Route.useSearch();
+  const queryClient = useQueryClient();
+  const { canView, canManage, canDelete } = React.useMemo(
+    () => getPermissionAccess("coa"),
+    [],
+  );
 
-  const [data, setData] = React.useState<Array<CoaRecord>>(MOCK_COA);
-  const [addOpen, setAddOpen] = React.useState(false);
+  if (!canView && !canManage && !canDelete) {
+    throw notFound();
+  }
 
-  const page = search.page || 1;
-  const perPage = search.per_page || 10;
-  const searchQuery = (search.search ?? "").trim().toLowerCase();
+  const { page, per_page, search: searchQuery } = search;
 
-  const filteredData = React.useMemo(() => {
-    if (!searchQuery) return data;
+  const params = { page, per_page, search: searchQuery?.trim() || undefined };
 
-    return data.filter((item) => {
-      const kode = item.kode.toLowerCase();
-      const nama = item.namaAkun.toLowerCase();
-      const kategori = item.kategori.toLowerCase();
-      const keterangan = item.keterangan.toLowerCase();
+  const getCoaListFn = useServerFn(getCoaList);
+  const createCoaFn = useServerFn(createCoa);
+  const updateCoaFn = useServerFn(updateCoa);
+  const deleteCoaFn = useServerFn(deleteCoa);
 
-      return (
-        kode.includes(searchQuery) ||
-        nama.includes(searchQuery) ||
-        kategori.includes(searchQuery) ||
-        keterangan.includes(searchQuery)
-      );
-    });
-  }, [data, searchQuery]);
+  const coaQuery = useQuery({
+    queryKey: ["coa", params],
+    queryFn: () => getCoaListFn({ data: { params } }),
+    staleTime: 1000 * 60 * 2,
+    enabled: canView,
+  });
 
-  const pageCount = Math.max(1, Math.ceil(filteredData.length / perPage));
+  const kategoriQuery = useQuery({
+    queryKey: ["kategori-coa-dropdown"],
+    queryFn: useServerFn(getKategoriCoaDropdown),
+    staleTime: 1000 * 60 * 10,
+    enabled: canManage,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: ({ payload }: { payload: any }) =>
+      createCoaFn({ data: { payload } }),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: any }) =>
+      updateCoaFn({ data: { id, payload } }),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: ({ id }: { id: number }) => deleteCoaFn({ data: { id } }),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+
+  const total = coaQuery.data ? coaQuery.data.total : 0;
+  const pageCount = coaQuery.data
+    ? Math.max(1, coaQuery.data.last_page)
+    : 1;
   const safePage = Math.min(Math.max(page, 1), pageCount);
   const pageIndex = safePage - 1;
-  const paginatedData = filteredData.slice(
-    pageIndex * perPage,
-    pageIndex * perPage + perPage,
-  );
+
   const pagination = {
     pageIndex,
-    pageSize: perPage,
+    pageSize: per_page,
     pageCount,
-    total: filteredData.length,
+    total,
   };
+
+  const [addOpen, setAddOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (safePage !== page) {
@@ -72,6 +109,63 @@ function RouteComponent() {
       });
     }
   }, [navigate, page, safePage]);
+
+  const handleSearchChange = (value: string) => {
+    navigate({
+      to: "/akuntansi/coa",
+      search: (prev: any) => ({
+        ...prev,
+        search: value === "" ? undefined : value,
+        page: 1,
+      }),
+      replace: true,
+    });
+  };
+
+  const handleAdd = async (payload: {
+    kategori_coa_id: number;
+    nama: string;
+    kode?: string;
+    keterangan?: string;
+  }) => {
+    try {
+      await createMutation.mutateAsync({ payload });
+      toast.success("COA berhasil ditambahkan");
+      setAddOpen(false);
+      return true;
+    } catch (err: any) {
+      toast.error(err?.message ?? "Gagal menambahkan COA");
+      return false;
+    }
+  };
+
+  const handleEdit = async (payload: {
+    id: number;
+    kategori_coa_id: number;
+    nama: string;
+    kode?: string;
+    keterangan?: string;
+  }) => {
+    try {
+      await updateMutation.mutateAsync({ id: payload.id, payload });
+      toast.success("COA berhasil diperbarui");
+      return true;
+    } catch (err: any) {
+      toast.error(err?.message ?? "Gagal memperbarui COA");
+      return false;
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteMutation.mutateAsync({ id });
+      toast.success("COA berhasil dihapus");
+      return true;
+    } catch (err: any) {
+      toast.error(err?.message ?? "Gagal menghapus COA");
+      return false;
+    }
+  };
 
   const handlePageChange = (newPageIndex: number) => {
     navigate({
@@ -89,74 +183,49 @@ function RouteComponent() {
     });
   };
 
-  const handleSearchChange = (value: string) => {
-    navigate({
-      to: "/akuntansi/coa",
-      search: (prev: any) => ({
-        ...prev,
-        search: value === "" ? undefined : value,
-        page: 1,
-      }),
-      replace: true,
-    });
-  };
-
-  const handleAdd = (payload: Omit<CoaRecord, "id">) => {
-    const id = Math.max(0, ...data.map((item) => item.id)) + 1;
-    setData((prev) => [{ id, ...payload }, ...prev]);
-  };
-
-  const handleEdit = (payload: CoaRecord) => {
-    setData((prev) =>
-      prev.map((item) => (item.id === payload.id ? payload : item)),
-    );
-  };
-
-  const handleDelete = (id: number) => {
-    setData((prev) => prev.filter((item) => item.id !== id));
-  };
-
   return (
     <>
-      <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Chart of Accounts</h1>
-          <p className="text-sm text-gray-500">Kelola Chart of Accounts</p>
+      {coaQuery.isLoading ? (
+        <div className="flex flex-col gap-6">
+          <div className="h-10 rounded-lg bg-slate-200 animate-pulse" />
+          <div className="h-10 rounded-lg bg-slate-100 animate-pulse" />
+          <div className="rounded-lg border-2 border-slate-200 bg-white overflow-hidden">
+            <TableSkeleton columns={5} rows={10} />
+          </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <Button variant="outline" className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Jurnal Umum
-          </Button>
-          <Button variant="orange" className="gap-2">
-            <HelpCircle className="h-4 w-4" />
-            Panduan
-          </Button>
-          <Button variant="green" onClick={() => setAddOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Tambah COA
-          </Button>
-        </div>
-      </div>
+      ) : (
+        <>
+          <HeaderComp
+            title="Chart of Accounts"
+            description="Kelola Chart of Accounts"
+            icon={<Plus />}
+            actionLabel={canManage ? "Tambah COA" : undefined}
+            onAction={canManage ? () => setAddOpen(true) : undefined}
+          />
 
-      <SearchBar
-        placeholder="Cari periode buku..."
-        className="mb-4 mt-4"
-        value={search.search ?? ""}
-        onChange={(event) => handleSearchChange(event.target.value)}
-      />
+          <SearchBar
+            placeholder="Cari COA..."
+            className="mb-4"
+            value={search.search ?? ""}
+            onChange={(event) => handleSearchChange(event.target.value)}
+          />
 
-      <CoaTable
-        data={paginatedData}
-        pagination={pagination}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        onAdd={handleAdd}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        addOpen={addOpen}
-        onAddOpenChange={setAddOpen}
-      />
+          <CoaTable
+            data={coaQuery.data?.data ?? []}
+            pagination={pagination}
+            canManage={canManage}
+            canDelete={canDelete}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            onAdd={handleAdd}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            addOpen={addOpen}
+            onAddOpenChange={setAddOpen}
+            kategoriOptions={kategoriQuery.data ?? []}
+          />
+        </>
+      )}
     </>
   );
 }

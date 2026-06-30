@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
 import type { CoaRecord } from "./types";
 
@@ -22,7 +21,13 @@ interface CoaEditDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   coa?: CoaRecord;
-  onEdit: (payload: CoaRecord) => void;
+  onEdit: (payload: {
+    id: number;
+    kategori_coa_id: number;
+    nama: string;
+    kode?: string;
+    keterangan?: string;
+  }) => Promise<boolean>;
   isEditing?: boolean;
 }
 
@@ -33,29 +38,23 @@ export function CoaEditDialog({
   onEdit,
   isEditing = false,
 }: CoaEditDialogProps) {
-  const [kode, setKode] = React.useState("");
   const [namaAkun, setNamaAkun] = React.useState("");
-  const [kategori, setKategori] = React.useState<string>("");
   const [keterangan, setKeterangan] = React.useState("");
 
   const isFormValid = React.useMemo(
-    () => namaAkun.trim() !== "" && kategori !== "" && Boolean(coa),
-    [namaAkun, kategori, coa],
+    () => namaAkun.trim() !== "" && Boolean(coa),
+    [namaAkun, coa],
   );
 
   React.useEffect(() => {
     if (coa && open) {
-      setKode(coa.kode);
       setNamaAkun(coa.namaAkun);
-      setKategori(coa.kategori);
       setKeterangan(coa.keterangan);
     }
   }, [coa, open]);
 
   const resetForm = React.useCallback(() => {
-    setKode("");
     setNamaAkun("");
-    setKategori("");
     setKeterangan("");
   }, []);
 
@@ -70,24 +69,22 @@ export function CoaEditDialog({
     if (!coa) return;
 
     if (!isFormValid) {
-      toast.error("Semua field wajib harus diisi");
       return;
     }
 
     try {
-      await Promise.resolve();
-      onEdit({
-        ...coa,
-        kode: kode.trim() || coa.kode,
-        namaAkun: namaAkun.trim(),
-        kategori: kategori as CoaRecord["kategori"],
-        keterangan: keterangan.trim(),
+      const success = await onEdit({
+        id: coa.id,
+        kategori_coa_id: coa.kategori_coa_id,
+        nama: namaAkun.trim(),
+        keterangan: keterangan.trim() || undefined,
       });
-      toast.success("COA berhasil diperbarui");
-      onOpenChange(false);
-      resetForm();
+      if (success) {
+        onOpenChange(false);
+        resetForm();
+      }
     } catch {
-      toast.error("Gagal memperbarui COA");
+      // error handled by parent
     }
   };
 
@@ -99,7 +96,7 @@ export function CoaEditDialog({
             <DialogTitle className="text-2xl font-bold">
               Edit Data COA
             </DialogTitle>
-            <DialogDescription>Silakan tambah data COA</DialogDescription>
+            <DialogDescription>Silakan ubah data COA</DialogDescription>
           </DialogHeader>
 
           <DialogBody className="grid gap-4 py-4">

@@ -6,7 +6,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown, Eye, Pencil, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 
 import { MOCK_COA_TRANSACTIONS } from "./types";
 import { CoaAddDialog } from "./coa-add-dialog";
@@ -37,13 +36,27 @@ interface CoaTableProps {
     pageCount: number;
     total: number;
   };
+  canManage?: boolean;
+  canDelete?: boolean;
   onPageChange: (newPageIndex: number) => void;
   onPageSizeChange: (pageSize: number) => void;
-  onAdd: (payload: Omit<CoaRecord, "id">) => void;
-  onEdit: (payload: CoaRecord) => void;
-  onDelete: (id: number) => void;
+  onAdd: (payload: {
+    kategori_coa_id: number;
+    nama: string;
+    kode?: string;
+    keterangan?: string;
+  }) => Promise<boolean>;
+  onEdit: (payload: {
+    id: number;
+    kategori_coa_id: number;
+    nama: string;
+    kode?: string;
+    keterangan?: string;
+  }) => Promise<boolean>;
+  onDelete: (id: number) => Promise<boolean>;
   addOpen: boolean;
   onAddOpenChange: (open: boolean) => void;
+  kategoriOptions?: Array<{ id: number; nama: string }>;
 }
 
 const formatRupiah = (value: number) => `${value.toLocaleString("id-ID")}`;
@@ -51,6 +64,8 @@ const formatRupiah = (value: number) => `${value.toLocaleString("id-ID")}`;
 export function CoaTable({
   data,
   pagination,
+  canManage,
+  canDelete,
   onPageChange,
   onPageSizeChange,
   onAdd,
@@ -58,6 +73,7 @@ export function CoaTable({
   onDelete,
   addOpen,
   onAddOpenChange,
+  kategoriOptions,
 }: CoaTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
@@ -68,8 +84,6 @@ export function CoaTable({
   const [editing, setEditing] = React.useState<CoaRecord | undefined>();
   const [deleting, setDeleting] = React.useState<CoaRecord | undefined>();
   const [selectedCoa, setSelectedCoa] = React.useState<CoaRecord | undefined>();
-
-  const [isDeletingLocal, setIsDeletingLocal] = React.useState(false);
 
   const selectedTransactions = React.useMemo<Array<CoaTransaction>>(
     () =>
@@ -99,18 +113,16 @@ export function CoaTable({
     return formatRupiah(last.saldo);
   }, [selectedTransactions]);
 
-  const handleDeleteConfirm = async (id: number) => {
-    setIsDeletingLocal(true);
+  const handleDeleteConfirm = async (id: number): Promise<boolean> => {
     try {
-      await Promise.resolve();
-      onDelete(id);
-      toast.success("COA berhasil dihapus");
-      setDeleteOpen(false);
-      setDeleting(undefined);
+      const success = await onDelete(id);
+      if (success) {
+        setDeleteOpen(false);
+        setDeleting(undefined);
+      }
+      return success;
     } catch {
-      toast.error("Gagal menghapus COA");
-    } finally {
-      setIsDeletingLocal(false);
+      return false;
     }
   };
 
@@ -196,29 +208,33 @@ export function CoaTable({
             <Eye className="h-4 w-4" />
           </Button>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
-            onClick={() => {
-              setEditing(row.original);
-              setEditOpen(true);
-            }}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
+          {canManage ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
+              onClick={() => {
+                setEditing(row.original);
+                setEditOpen(true);
+              }}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          ) : null}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
-            onClick={() => {
-              setDeleting(row.original);
-              setDeleteOpen(true);
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {canDelete ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+              onClick={() => {
+                setDeleting(row.original);
+                setDeleteOpen(true);
+              }}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          ) : null}
         </div>
       ),
     },
@@ -313,6 +329,7 @@ export function CoaTable({
         open={addOpen}
         onOpenChange={onAddOpenChange}
         onAdd={onAdd}
+        kategoriOptions={kategoriOptions}
       />
 
       <CoaEditDialog
@@ -327,7 +344,6 @@ export function CoaTable({
         onOpenChange={setDeleteOpen}
         coa={deleting}
         onConfirm={handleDeleteConfirm}
-        isDeleting={isDeletingLocal}
       />
 
       <CoaTransactionsDialog

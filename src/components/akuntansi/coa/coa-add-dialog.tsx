@@ -1,9 +1,5 @@
 import * as React from "react";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
-
-import { KATEGORI_OPTIONS } from "./types";
-import type { CoaRecord } from "./types";
 
 import {
   Dialog,
@@ -29,25 +25,36 @@ import {
 interface CoaAddDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAdd: (payload: Omit<CoaRecord, "id">) => void;
+  onAdd: (payload: {
+    kategori_coa_id: number;
+    nama: string;
+    kode?: string;
+    keterangan?: string;
+  }) => Promise<boolean>;
+  kategoriOptions?: Array<{ id: number; nama: string }>;
 }
 
-export function CoaAddDialog({ open, onOpenChange, onAdd }: CoaAddDialogProps) {
+export function CoaAddDialog({
+  open,
+  onOpenChange,
+  onAdd,
+  kategoriOptions,
+}: CoaAddDialogProps) {
   const [kode, setKode] = React.useState("");
   const [namaAkun, setNamaAkun] = React.useState("");
-  const [kategori, setKategori] = React.useState<string>("");
+  const [kategoriId, setKategoriId] = React.useState<number | "">("");
   const [keterangan, setKeterangan] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
 
   const isFormValid = React.useMemo(
-    () => namaAkun.trim() !== "" && kategori !== "",
-    [namaAkun, kategori],
+    () => namaAkun.trim() !== "" && kategoriId !== "",
+    [namaAkun, kategoriId],
   );
 
   const resetForm = React.useCallback(() => {
     setKode("");
     setNamaAkun("");
-    setKategori("");
+    setKategoriId("");
     setKeterangan("");
   }, []);
 
@@ -60,24 +67,21 @@ export function CoaAddDialog({ open, onOpenChange, onAdd }: CoaAddDialogProps) {
     e.preventDefault();
 
     if (!isFormValid) {
-      toast.error("Semua field wajib harus diisi");
       return;
     }
 
-    const generatedKode = kode.trim() || String(Date.now()).slice(-9);
-
     setIsLoading(true);
     try {
-      await Promise.resolve();
-      onAdd({
-        kode: generatedKode,
-        namaAkun: namaAkun.trim(),
-        kategori: kategori as CoaRecord["kategori"],
-        keterangan: keterangan.trim(),
+      const success = await onAdd({
+        kategori_coa_id: Number(kategoriId),
+        nama: namaAkun.trim(),
+        kode: kode.trim() || undefined,
+        keterangan: keterangan.trim() || undefined,
       });
-      toast.success("COA berhasil ditambahkan");
-      onOpenChange(false);
-      resetForm();
+      if (success) {
+        onOpenChange(false);
+        resetForm();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +132,10 @@ export function CoaAddDialog({ open, onOpenChange, onAdd }: CoaAddDialogProps) {
               <Label htmlFor="kategori" className="text-slate-600 font-medium">
                 Kategori <span className="text-red-500">*</span>
               </Label>
-              <Select value={kategori} onValueChange={setKategori}>
+              <Select
+                value={kategoriId !== "" ? String(kategoriId) : ""}
+                onValueChange={(v) => setKategoriId(Number(v))}
+              >
                 <SelectTrigger
                   id="kategori"
                   className="h-auto min-h-12 cursor-pointer w-full px-4 py-3"
@@ -136,9 +143,9 @@ export function CoaAddDialog({ open, onOpenChange, onAdd }: CoaAddDialogProps) {
                   <SelectValue placeholder="Pilih kategori" />
                 </SelectTrigger>
                 <SelectContent>
-                  {KATEGORI_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                  {kategoriOptions?.map((opt) => (
+                    <SelectItem key={opt.id} value={String(opt.id)}>
+                      {opt.nama}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import type { CoaRecord } from "./types";
 import {
@@ -15,8 +16,7 @@ interface CoaDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   coa?: CoaRecord;
-  onConfirm: (id: number) => void;
-  isDeleting?: boolean;
+  onConfirm: (id: number) => Promise<boolean>;
 }
 
 export function CoaDeleteDialog({
@@ -24,8 +24,21 @@ export function CoaDeleteDialog({
   onOpenChange,
   coa,
   onConfirm,
-  isDeleting = false,
 }: CoaDeleteDialogProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirm = async (id: number) => {
+    setIsDeleting(true);
+    try {
+      const success = await onConfirm(id);
+      if (success) {
+        onOpenChange(false);
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -53,7 +66,7 @@ export function CoaDeleteDialog({
             disabled={isDeleting}
             onClick={(e) => {
               e.preventDefault();
-              if (coa !== undefined) onConfirm(coa.id);
+              if (coa !== undefined) handleConfirm(coa.id);
             }}
             className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
           >

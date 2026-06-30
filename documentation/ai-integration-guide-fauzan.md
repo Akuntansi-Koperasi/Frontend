@@ -122,6 +122,7 @@ Target akhir:
 - semua serverside function sudah menggunakan createServerFn
 - semua serverside function dipanggil pakai useServerFn, tidak ada pemanggilan service langsung di komponen
 - semua query TanStack Query sudah di invalidate tanpa queryKey, sehingga semua query yang ada di cache akan di refresh
+- mock lama yang tidak dipakai lagi dihapus, jangan dibiarkan ada.
 
 ## Format Laporan Akhir
 
