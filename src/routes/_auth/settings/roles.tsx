@@ -72,18 +72,18 @@ function RouteComponent() {
   const createMutation = useMutation({
     mutationFn: ({ payload }: { payload: { name: string } }) =>
       createRoleFn({ data: { payload } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["roles"] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: { name: string } }) =>
       updateRoleFn({ data: { id, payload } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["roles"] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 
   const deleteMutation = useMutation({
     mutationFn: ({ id }: { id: number }) => deleteRoleFn({ data: { id } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["roles"] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 
   const normalizeApiErrors = (

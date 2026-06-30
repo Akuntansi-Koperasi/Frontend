@@ -155,10 +155,7 @@ function RouteComponent() {
         data: { roleId: mutationRoleId, permissions },
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["roles"] });
-      queryClient.invalidateQueries({
-        queryKey: ["roles", "permissions", roleId],
-      });
+      queryClient.invalidateQueries();
     },
   });
 

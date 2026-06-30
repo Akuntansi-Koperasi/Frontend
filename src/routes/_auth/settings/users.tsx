@@ -88,16 +88,16 @@ function RouteComponent() {
   const createMutation = useMutation({
     mutationFn: ({ payload }: { payload: any }) =>
       createUserFn({ data: { payload } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: any }) =>
       updateUserFn({ data: { id, payload } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
   const deleteMutation = useMutation({
     mutationFn: ({ id }: { id: number }) => deleteUserFn({ data: { id } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 
   const total = usersQuery.data ? usersQuery.data.total : 0;

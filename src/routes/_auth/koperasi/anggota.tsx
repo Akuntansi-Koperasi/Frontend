@@ -83,24 +83,24 @@ function RouteComponent() {
   const createMutation = useMutation({
     mutationFn: ({ payload }: { payload: any }) =>
       createAnggotaFn({ data: { payload } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["anggota"] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: any }) =>
       updateAnggotaFn({ data: { id, payload } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["anggota"] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 
   const deleteMutation = useMutation({
     mutationFn: ({ id }: { id: number }) => deleteAnggotaFn({ data: { id } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["anggota"] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 
   const activateMutation = useMutation({
     mutationFn: ({ id, roleId }: { id: number; roleId: number }) =>
       aktifkanAnggotaFn({ data: { id, roleId } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["anggota"] }),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 
   const normalizeApiErrors = (

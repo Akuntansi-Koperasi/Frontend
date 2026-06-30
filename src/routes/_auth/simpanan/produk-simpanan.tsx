@@ -79,7 +79,7 @@ function RouteComponent() {
     mutationFn: ({ payload }: { payload: Omit<ProdukSimpananRecord, "id"> }) =>
       createProdukSimpananFn({ data: { payload } }),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["produk-simpanan"] }),
+      queryClient.invalidateQueries(),
   });
 
   const updateMutation = useMutation({
@@ -91,14 +91,14 @@ function RouteComponent() {
       payload: Omit<ProdukSimpananRecord, "id">;
     }) => updateProdukSimpananFn({ data: { id, payload } }),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["produk-simpanan"] }),
+      queryClient.invalidateQueries(),
   });
 
   const deleteMutation = useMutation({
     mutationFn: ({ id }: { id: number }) =>
       deleteProdukSimpananFn({ data: { id } }),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["produk-simpanan"] }),
+      queryClient.invalidateQueries(),
   });
 
   const normalizeApiErrors = (

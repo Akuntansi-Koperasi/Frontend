@@ -34,6 +34,7 @@ Integrasikan halaman yang diberikan ke backend Laravel secara penuh, dengan meng
 - Jangan pakai `any` kalau bisa dihindari.
 - gunakan useServerFn untuk memanggil service yang sudah dibuat, jangan panggil service langsung di komponen.
 - ketika loading data atau permission maka pakai skeleton atau animate pulse untuk di tabel dan card, jangan pakai spinner di tengah halaman. seperti yang sudah di terapkan di route `src/routes/_auth/settings/roles` atau di route `src/routes/_auth/` lainnya.
+- ketika ada perubahan data seperti create, update, delete, maka panggil queryClient.invalidateQueries() untuk mengupdate data di tabel atau card. jangan tambahkan querykey, karena aku ingin semua query yang ada di invalidate tanpa terkecuali. seperti yang sudah diterapkan di route `src/routes/_auth/settings/roles` atau di route `src/routes/_auth/` lainnya.
 
 ## Permission Frontend
 
@@ -120,6 +121,7 @@ Target akhir:
 - kalau endpoint belum ada, laporkan sebagai API NOT FOUND
 - semua serverside function sudah menggunakan createServerFn
 - semua serverside function dipanggil pakai useServerFn, tidak ada pemanggilan service langsung di komponen
+- semua query TanStack Query sudah di invalidate tanpa queryKey, sehingga semua query yang ada di cache akan di refresh
 
 ## Format Laporan Akhir
 

@@ -95,13 +95,7 @@ function RouteComponent() {
 
   const invalidatePengurusQueries = React.useCallback(async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["pengurus"] }),
-      queryClient.invalidateQueries({
-        queryKey: ["pengurus-anggota-dropdown"],
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["pengurus-jabatan-dropdown"],
-      }),
+      queryClient.invalidateQueries(),
     ]);
   }, [queryClient]);
 

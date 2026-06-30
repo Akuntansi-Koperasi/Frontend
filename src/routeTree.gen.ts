@@ -8,577 +8,577 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as LoginRouteImport } from "./routes/login";
-import { Route as AuthRouteImport } from "./routes/_auth";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as AuthProfileRouteImport } from "./routes/_auth/profile";
-import { Route as AuthLaporanRetailRouteImport } from "./routes/_auth/laporan-retail";
-import { Route as AuthLaporanAkuntansiRouteImport } from "./routes/_auth/laporan-akuntansi";
-import { Route as AuthGeraiRetailRouteImport } from "./routes/_auth/gerai-retail";
-import { Route as AuthDashboardRouteImport } from "./routes/_auth/dashboard";
-import { Route as AuthSimpananTagihanRouteImport } from "./routes/_auth/simpanan/tagihan";
-import { Route as AuthSimpananRekeningSimpananRouteImport } from "./routes/_auth/simpanan/rekening-simpanan";
-import { Route as AuthSimpananProdukSimpananRouteImport } from "./routes/_auth/simpanan/produk-simpanan";
-import { Route as AuthSimpanPinjamTransaksiAnggotaRouteImport } from "./routes/_auth/simpan-pinjam/transaksi-anggota";
-import { Route as AuthSimpanPinjamLaporanTransaksiRouteImport } from "./routes/_auth/simpan-pinjam/laporan-transaksi";
-import { Route as AuthSettingsUsersRouteImport } from "./routes/_auth/settings/users";
-import { Route as AuthSettingsRolesRouteImport } from "./routes/_auth/settings/roles";
-import { Route as AuthSettingsMigrationRouteImport } from "./routes/_auth/settings/migration";
-import { Route as AuthPinjamanTagihanRouteImport } from "./routes/_auth/pinjaman/tagihan";
-import { Route as AuthPinjamanProdukPinjamanRouteImport } from "./routes/_auth/pinjaman/produk-pinjaman";
-import { Route as AuthPinjamanPengajuanPinjamanRouteImport } from "./routes/_auth/pinjaman/pengajuan-pinjaman";
-import { Route as AuthKoperasiPengurusRouteImport } from "./routes/_auth/koperasi/pengurus";
-import { Route as AuthKoperasiJabatanRouteImport } from "./routes/_auth/koperasi/jabatan";
-import { Route as AuthKoperasiAnggotaRouteImport } from "./routes/_auth/koperasi/anggota";
-import { Route as AuthAkuntansiTutupBukuRouteImport } from "./routes/_auth/akuntansi/tutup-buku";
-import { Route as AuthAkuntansiTransaksiUmumRouteImport } from "./routes/_auth/akuntansi/transaksi-umum";
-import { Route as AuthAkuntansiCoaRouteImport } from "./routes/_auth/akuntansi/coa";
-import { Route as AuthAkuntansiBukuBesarRouteImport } from "./routes/_auth/akuntansi/buku-besar";
-import { Route as AuthSettingsPermissionsRoleIdRouteImport } from "./routes/_auth/settings/permissions.$roleId";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
+import { Route as AuthLaporanRetailRouteImport } from './routes/_auth/laporan-retail'
+import { Route as AuthLaporanAkuntansiRouteImport } from './routes/_auth/laporan-akuntansi'
+import { Route as AuthGeraiRetailRouteImport } from './routes/_auth/gerai-retail'
+import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
+import { Route as AuthSimpananTagihanRouteImport } from './routes/_auth/simpanan/tagihan'
+import { Route as AuthSimpananRekeningSimpananRouteImport } from './routes/_auth/simpanan/rekening-simpanan'
+import { Route as AuthSimpananProdukSimpananRouteImport } from './routes/_auth/simpanan/produk-simpanan'
+import { Route as AuthSimpanPinjamTransaksiAnggotaRouteImport } from './routes/_auth/simpan-pinjam/transaksi-anggota'
+import { Route as AuthSimpanPinjamLaporanTransaksiRouteImport } from './routes/_auth/simpan-pinjam/laporan-transaksi'
+import { Route as AuthSettingsUsersRouteImport } from './routes/_auth/settings/users'
+import { Route as AuthSettingsRolesRouteImport } from './routes/_auth/settings/roles'
+import { Route as AuthSettingsMigrationRouteImport } from './routes/_auth/settings/migration'
+import { Route as AuthPinjamanTagihanRouteImport } from './routes/_auth/pinjaman/tagihan'
+import { Route as AuthPinjamanProdukPinjamanRouteImport } from './routes/_auth/pinjaman/produk-pinjaman'
+import { Route as AuthPinjamanPengajuanPinjamanRouteImport } from './routes/_auth/pinjaman/pengajuan-pinjaman'
+import { Route as AuthKoperasiPengurusRouteImport } from './routes/_auth/koperasi/pengurus'
+import { Route as AuthKoperasiJabatanRouteImport } from './routes/_auth/koperasi/jabatan'
+import { Route as AuthKoperasiAnggotaRouteImport } from './routes/_auth/koperasi/anggota'
+import { Route as AuthAkuntansiTutupBukuRouteImport } from './routes/_auth/akuntansi/tutup-buku'
+import { Route as AuthAkuntansiTransaksiUmumRouteImport } from './routes/_auth/akuntansi/transaksi-umum'
+import { Route as AuthAkuntansiCoaRouteImport } from './routes/_auth/akuntansi/coa'
+import { Route as AuthAkuntansiBukuBesarRouteImport } from './routes/_auth/akuntansi/buku-besar'
+import { Route as AuthSettingsPermissionsRoleIdRouteImport } from './routes/_auth/settings/permissions.$roleId'
 
 const LoginRoute = LoginRouteImport.update({
-  id: "/login",
-  path: "/login",
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AuthRoute = AuthRouteImport.update({
-  id: "/_auth",
+  id: '/_auth',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AuthProfileRoute = AuthProfileRouteImport.update({
-  id: "/profile",
-  path: "/profile",
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthLaporanRetailRoute = AuthLaporanRetailRouteImport.update({
-  id: "/laporan-retail",
-  path: "/laporan-retail",
+  id: '/laporan-retail',
+  path: '/laporan-retail',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthLaporanAkuntansiRoute = AuthLaporanAkuntansiRouteImport.update({
-  id: "/laporan-akuntansi",
-  path: "/laporan-akuntansi",
+  id: '/laporan-akuntansi',
+  path: '/laporan-akuntansi',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthGeraiRetailRoute = AuthGeraiRetailRouteImport.update({
-  id: "/gerai-retail",
-  path: "/gerai-retail",
+  id: '/gerai-retail',
+  path: '/gerai-retail',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthDashboardRoute = AuthDashboardRouteImport.update({
-  id: "/dashboard",
-  path: "/dashboard",
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthSimpananTagihanRoute = AuthSimpananTagihanRouteImport.update({
-  id: "/simpanan/tagihan",
-  path: "/simpanan/tagihan",
+  id: '/simpanan/tagihan',
+  path: '/simpanan/tagihan',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthSimpananRekeningSimpananRoute =
   AuthSimpananRekeningSimpananRouteImport.update({
-    id: "/simpanan/rekening-simpanan",
-    path: "/simpanan/rekening-simpanan",
+    id: '/simpanan/rekening-simpanan',
+    path: '/simpanan/rekening-simpanan',
     getParentRoute: () => AuthRoute,
-  } as any);
+  } as any)
 const AuthSimpananProdukSimpananRoute =
   AuthSimpananProdukSimpananRouteImport.update({
-    id: "/simpanan/produk-simpanan",
-    path: "/simpanan/produk-simpanan",
+    id: '/simpanan/produk-simpanan',
+    path: '/simpanan/produk-simpanan',
     getParentRoute: () => AuthRoute,
-  } as any);
+  } as any)
 const AuthSimpanPinjamTransaksiAnggotaRoute =
   AuthSimpanPinjamTransaksiAnggotaRouteImport.update({
-    id: "/simpan-pinjam/transaksi-anggota",
-    path: "/simpan-pinjam/transaksi-anggota",
+    id: '/simpan-pinjam/transaksi-anggota',
+    path: '/simpan-pinjam/transaksi-anggota',
     getParentRoute: () => AuthRoute,
-  } as any);
+  } as any)
 const AuthSimpanPinjamLaporanTransaksiRoute =
   AuthSimpanPinjamLaporanTransaksiRouteImport.update({
-    id: "/simpan-pinjam/laporan-transaksi",
-    path: "/simpan-pinjam/laporan-transaksi",
+    id: '/simpan-pinjam/laporan-transaksi',
+    path: '/simpan-pinjam/laporan-transaksi',
     getParentRoute: () => AuthRoute,
-  } as any);
+  } as any)
 const AuthSettingsUsersRoute = AuthSettingsUsersRouteImport.update({
-  id: "/settings/users",
-  path: "/settings/users",
+  id: '/settings/users',
+  path: '/settings/users',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthSettingsRolesRoute = AuthSettingsRolesRouteImport.update({
-  id: "/settings/roles",
-  path: "/settings/roles",
+  id: '/settings/roles',
+  path: '/settings/roles',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthSettingsMigrationRoute = AuthSettingsMigrationRouteImport.update({
-  id: "/settings/migration",
-  path: "/settings/migration",
+  id: '/settings/migration',
+  path: '/settings/migration',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthPinjamanTagihanRoute = AuthPinjamanTagihanRouteImport.update({
-  id: "/pinjaman/tagihan",
-  path: "/pinjaman/tagihan",
+  id: '/pinjaman/tagihan',
+  path: '/pinjaman/tagihan',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthPinjamanProdukPinjamanRoute =
   AuthPinjamanProdukPinjamanRouteImport.update({
-    id: "/pinjaman/produk-pinjaman",
-    path: "/pinjaman/produk-pinjaman",
+    id: '/pinjaman/produk-pinjaman',
+    path: '/pinjaman/produk-pinjaman',
     getParentRoute: () => AuthRoute,
-  } as any);
+  } as any)
 const AuthPinjamanPengajuanPinjamanRoute =
   AuthPinjamanPengajuanPinjamanRouteImport.update({
-    id: "/pinjaman/pengajuan-pinjaman",
-    path: "/pinjaman/pengajuan-pinjaman",
+    id: '/pinjaman/pengajuan-pinjaman',
+    path: '/pinjaman/pengajuan-pinjaman',
     getParentRoute: () => AuthRoute,
-  } as any);
+  } as any)
 const AuthKoperasiPengurusRoute = AuthKoperasiPengurusRouteImport.update({
-  id: "/koperasi/pengurus",
-  path: "/koperasi/pengurus",
+  id: '/koperasi/pengurus',
+  path: '/koperasi/pengurus',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthKoperasiJabatanRoute = AuthKoperasiJabatanRouteImport.update({
-  id: "/koperasi/jabatan",
-  path: "/koperasi/jabatan",
+  id: '/koperasi/jabatan',
+  path: '/koperasi/jabatan',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthKoperasiAnggotaRoute = AuthKoperasiAnggotaRouteImport.update({
-  id: "/koperasi/anggota",
-  path: "/koperasi/anggota",
+  id: '/koperasi/anggota',
+  path: '/koperasi/anggota',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthAkuntansiTutupBukuRoute = AuthAkuntansiTutupBukuRouteImport.update({
-  id: "/akuntansi/tutup-buku",
-  path: "/akuntansi/tutup-buku",
+  id: '/akuntansi/tutup-buku',
+  path: '/akuntansi/tutup-buku',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthAkuntansiTransaksiUmumRoute =
   AuthAkuntansiTransaksiUmumRouteImport.update({
-    id: "/akuntansi/transaksi-umum",
-    path: "/akuntansi/transaksi-umum",
+    id: '/akuntansi/transaksi-umum',
+    path: '/akuntansi/transaksi-umum',
     getParentRoute: () => AuthRoute,
-  } as any);
+  } as any)
 const AuthAkuntansiCoaRoute = AuthAkuntansiCoaRouteImport.update({
-  id: "/akuntansi/coa",
-  path: "/akuntansi/coa",
+  id: '/akuntansi/coa',
+  path: '/akuntansi/coa',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthAkuntansiBukuBesarRoute = AuthAkuntansiBukuBesarRouteImport.update({
-  id: "/akuntansi/buku-besar",
-  path: "/akuntansi/buku-besar",
+  id: '/akuntansi/buku-besar',
+  path: '/akuntansi/buku-besar',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 const AuthSettingsPermissionsRoleIdRoute =
   AuthSettingsPermissionsRoleIdRouteImport.update({
-    id: "/settings/permissions/$roleId",
-    path: "/settings/permissions/$roleId",
+    id: '/settings/permissions/$roleId',
+    path: '/settings/permissions/$roleId',
     getParentRoute: () => AuthRoute,
-  } as any);
+  } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/login": typeof LoginRoute;
-  "/dashboard": typeof AuthDashboardRoute;
-  "/gerai-retail": typeof AuthGeraiRetailRoute;
-  "/laporan-akuntansi": typeof AuthLaporanAkuntansiRoute;
-  "/laporan-retail": typeof AuthLaporanRetailRoute;
-  "/profile": typeof AuthProfileRoute;
-  "/akuntansi/buku-besar": typeof AuthAkuntansiBukuBesarRoute;
-  "/akuntansi/coa": typeof AuthAkuntansiCoaRoute;
-  "/akuntansi/transaksi-umum": typeof AuthAkuntansiTransaksiUmumRoute;
-  "/akuntansi/tutup-buku": typeof AuthAkuntansiTutupBukuRoute;
-  "/koperasi/anggota": typeof AuthKoperasiAnggotaRoute;
-  "/koperasi/jabatan": typeof AuthKoperasiJabatanRoute;
-  "/koperasi/pengurus": typeof AuthKoperasiPengurusRoute;
-  "/pinjaman/pengajuan-pinjaman": typeof AuthPinjamanPengajuanPinjamanRoute;
-  "/pinjaman/produk-pinjaman": typeof AuthPinjamanProdukPinjamanRoute;
-  "/pinjaman/tagihan": typeof AuthPinjamanTagihanRoute;
-  "/settings/migration": typeof AuthSettingsMigrationRoute;
-  "/settings/roles": typeof AuthSettingsRolesRoute;
-  "/settings/users": typeof AuthSettingsUsersRoute;
-  "/simpan-pinjam/laporan-transaksi": typeof AuthSimpanPinjamLaporanTransaksiRoute;
-  "/simpan-pinjam/transaksi-anggota": typeof AuthSimpanPinjamTransaksiAnggotaRoute;
-  "/simpanan/produk-simpanan": typeof AuthSimpananProdukSimpananRoute;
-  "/simpanan/rekening-simpanan": typeof AuthSimpananRekeningSimpananRoute;
-  "/simpanan/tagihan": typeof AuthSimpananTagihanRoute;
-  "/settings/permissions/$roleId": typeof AuthSettingsPermissionsRoleIdRoute;
+  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/dashboard': typeof AuthDashboardRoute
+  '/gerai-retail': typeof AuthGeraiRetailRoute
+  '/laporan-akuntansi': typeof AuthLaporanAkuntansiRoute
+  '/laporan-retail': typeof AuthLaporanRetailRoute
+  '/profile': typeof AuthProfileRoute
+  '/akuntansi/buku-besar': typeof AuthAkuntansiBukuBesarRoute
+  '/akuntansi/coa': typeof AuthAkuntansiCoaRoute
+  '/akuntansi/transaksi-umum': typeof AuthAkuntansiTransaksiUmumRoute
+  '/akuntansi/tutup-buku': typeof AuthAkuntansiTutupBukuRoute
+  '/koperasi/anggota': typeof AuthKoperasiAnggotaRoute
+  '/koperasi/jabatan': typeof AuthKoperasiJabatanRoute
+  '/koperasi/pengurus': typeof AuthKoperasiPengurusRoute
+  '/pinjaman/pengajuan-pinjaman': typeof AuthPinjamanPengajuanPinjamanRoute
+  '/pinjaman/produk-pinjaman': typeof AuthPinjamanProdukPinjamanRoute
+  '/pinjaman/tagihan': typeof AuthPinjamanTagihanRoute
+  '/settings/migration': typeof AuthSettingsMigrationRoute
+  '/settings/roles': typeof AuthSettingsRolesRoute
+  '/settings/users': typeof AuthSettingsUsersRoute
+  '/simpan-pinjam/laporan-transaksi': typeof AuthSimpanPinjamLaporanTransaksiRoute
+  '/simpan-pinjam/transaksi-anggota': typeof AuthSimpanPinjamTransaksiAnggotaRoute
+  '/simpanan/produk-simpanan': typeof AuthSimpananProdukSimpananRoute
+  '/simpanan/rekening-simpanan': typeof AuthSimpananRekeningSimpananRoute
+  '/simpanan/tagihan': typeof AuthSimpananTagihanRoute
+  '/settings/permissions/$roleId': typeof AuthSettingsPermissionsRoleIdRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/login": typeof LoginRoute;
-  "/dashboard": typeof AuthDashboardRoute;
-  "/gerai-retail": typeof AuthGeraiRetailRoute;
-  "/laporan-akuntansi": typeof AuthLaporanAkuntansiRoute;
-  "/laporan-retail": typeof AuthLaporanRetailRoute;
-  "/profile": typeof AuthProfileRoute;
-  "/akuntansi/buku-besar": typeof AuthAkuntansiBukuBesarRoute;
-  "/akuntansi/coa": typeof AuthAkuntansiCoaRoute;
-  "/akuntansi/transaksi-umum": typeof AuthAkuntansiTransaksiUmumRoute;
-  "/akuntansi/tutup-buku": typeof AuthAkuntansiTutupBukuRoute;
-  "/koperasi/anggota": typeof AuthKoperasiAnggotaRoute;
-  "/koperasi/jabatan": typeof AuthKoperasiJabatanRoute;
-  "/koperasi/pengurus": typeof AuthKoperasiPengurusRoute;
-  "/pinjaman/pengajuan-pinjaman": typeof AuthPinjamanPengajuanPinjamanRoute;
-  "/pinjaman/produk-pinjaman": typeof AuthPinjamanProdukPinjamanRoute;
-  "/pinjaman/tagihan": typeof AuthPinjamanTagihanRoute;
-  "/settings/migration": typeof AuthSettingsMigrationRoute;
-  "/settings/roles": typeof AuthSettingsRolesRoute;
-  "/settings/users": typeof AuthSettingsUsersRoute;
-  "/simpan-pinjam/laporan-transaksi": typeof AuthSimpanPinjamLaporanTransaksiRoute;
-  "/simpan-pinjam/transaksi-anggota": typeof AuthSimpanPinjamTransaksiAnggotaRoute;
-  "/simpanan/produk-simpanan": typeof AuthSimpananProdukSimpananRoute;
-  "/simpanan/rekening-simpanan": typeof AuthSimpananRekeningSimpananRoute;
-  "/simpanan/tagihan": typeof AuthSimpananTagihanRoute;
-  "/settings/permissions/$roleId": typeof AuthSettingsPermissionsRoleIdRoute;
+  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/dashboard': typeof AuthDashboardRoute
+  '/gerai-retail': typeof AuthGeraiRetailRoute
+  '/laporan-akuntansi': typeof AuthLaporanAkuntansiRoute
+  '/laporan-retail': typeof AuthLaporanRetailRoute
+  '/profile': typeof AuthProfileRoute
+  '/akuntansi/buku-besar': typeof AuthAkuntansiBukuBesarRoute
+  '/akuntansi/coa': typeof AuthAkuntansiCoaRoute
+  '/akuntansi/transaksi-umum': typeof AuthAkuntansiTransaksiUmumRoute
+  '/akuntansi/tutup-buku': typeof AuthAkuntansiTutupBukuRoute
+  '/koperasi/anggota': typeof AuthKoperasiAnggotaRoute
+  '/koperasi/jabatan': typeof AuthKoperasiJabatanRoute
+  '/koperasi/pengurus': typeof AuthKoperasiPengurusRoute
+  '/pinjaman/pengajuan-pinjaman': typeof AuthPinjamanPengajuanPinjamanRoute
+  '/pinjaman/produk-pinjaman': typeof AuthPinjamanProdukPinjamanRoute
+  '/pinjaman/tagihan': typeof AuthPinjamanTagihanRoute
+  '/settings/migration': typeof AuthSettingsMigrationRoute
+  '/settings/roles': typeof AuthSettingsRolesRoute
+  '/settings/users': typeof AuthSettingsUsersRoute
+  '/simpan-pinjam/laporan-transaksi': typeof AuthSimpanPinjamLaporanTransaksiRoute
+  '/simpan-pinjam/transaksi-anggota': typeof AuthSimpanPinjamTransaksiAnggotaRoute
+  '/simpanan/produk-simpanan': typeof AuthSimpananProdukSimpananRoute
+  '/simpanan/rekening-simpanan': typeof AuthSimpananRekeningSimpananRoute
+  '/simpanan/tagihan': typeof AuthSimpananTagihanRoute
+  '/settings/permissions/$roleId': typeof AuthSettingsPermissionsRoleIdRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/_auth": typeof AuthRouteWithChildren;
-  "/login": typeof LoginRoute;
-  "/_auth/dashboard": typeof AuthDashboardRoute;
-  "/_auth/gerai-retail": typeof AuthGeraiRetailRoute;
-  "/_auth/laporan-akuntansi": typeof AuthLaporanAkuntansiRoute;
-  "/_auth/laporan-retail": typeof AuthLaporanRetailRoute;
-  "/_auth/profile": typeof AuthProfileRoute;
-  "/_auth/akuntansi/buku-besar": typeof AuthAkuntansiBukuBesarRoute;
-  "/_auth/akuntansi/coa": typeof AuthAkuntansiCoaRoute;
-  "/_auth/akuntansi/transaksi-umum": typeof AuthAkuntansiTransaksiUmumRoute;
-  "/_auth/akuntansi/tutup-buku": typeof AuthAkuntansiTutupBukuRoute;
-  "/_auth/koperasi/anggota": typeof AuthKoperasiAnggotaRoute;
-  "/_auth/koperasi/jabatan": typeof AuthKoperasiJabatanRoute;
-  "/_auth/koperasi/pengurus": typeof AuthKoperasiPengurusRoute;
-  "/_auth/pinjaman/pengajuan-pinjaman": typeof AuthPinjamanPengajuanPinjamanRoute;
-  "/_auth/pinjaman/produk-pinjaman": typeof AuthPinjamanProdukPinjamanRoute;
-  "/_auth/pinjaman/tagihan": typeof AuthPinjamanTagihanRoute;
-  "/_auth/settings/migration": typeof AuthSettingsMigrationRoute;
-  "/_auth/settings/roles": typeof AuthSettingsRolesRoute;
-  "/_auth/settings/users": typeof AuthSettingsUsersRoute;
-  "/_auth/simpan-pinjam/laporan-transaksi": typeof AuthSimpanPinjamLaporanTransaksiRoute;
-  "/_auth/simpan-pinjam/transaksi-anggota": typeof AuthSimpanPinjamTransaksiAnggotaRoute;
-  "/_auth/simpanan/produk-simpanan": typeof AuthSimpananProdukSimpananRoute;
-  "/_auth/simpanan/rekening-simpanan": typeof AuthSimpananRekeningSimpananRoute;
-  "/_auth/simpanan/tagihan": typeof AuthSimpananTagihanRoute;
-  "/_auth/settings/permissions/$roleId": typeof AuthSettingsPermissionsRoleIdRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_auth': typeof AuthRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_auth/dashboard': typeof AuthDashboardRoute
+  '/_auth/gerai-retail': typeof AuthGeraiRetailRoute
+  '/_auth/laporan-akuntansi': typeof AuthLaporanAkuntansiRoute
+  '/_auth/laporan-retail': typeof AuthLaporanRetailRoute
+  '/_auth/profile': typeof AuthProfileRoute
+  '/_auth/akuntansi/buku-besar': typeof AuthAkuntansiBukuBesarRoute
+  '/_auth/akuntansi/coa': typeof AuthAkuntansiCoaRoute
+  '/_auth/akuntansi/transaksi-umum': typeof AuthAkuntansiTransaksiUmumRoute
+  '/_auth/akuntansi/tutup-buku': typeof AuthAkuntansiTutupBukuRoute
+  '/_auth/koperasi/anggota': typeof AuthKoperasiAnggotaRoute
+  '/_auth/koperasi/jabatan': typeof AuthKoperasiJabatanRoute
+  '/_auth/koperasi/pengurus': typeof AuthKoperasiPengurusRoute
+  '/_auth/pinjaman/pengajuan-pinjaman': typeof AuthPinjamanPengajuanPinjamanRoute
+  '/_auth/pinjaman/produk-pinjaman': typeof AuthPinjamanProdukPinjamanRoute
+  '/_auth/pinjaman/tagihan': typeof AuthPinjamanTagihanRoute
+  '/_auth/settings/migration': typeof AuthSettingsMigrationRoute
+  '/_auth/settings/roles': typeof AuthSettingsRolesRoute
+  '/_auth/settings/users': typeof AuthSettingsUsersRoute
+  '/_auth/simpan-pinjam/laporan-transaksi': typeof AuthSimpanPinjamLaporanTransaksiRoute
+  '/_auth/simpan-pinjam/transaksi-anggota': typeof AuthSimpanPinjamTransaksiAnggotaRoute
+  '/_auth/simpanan/produk-simpanan': typeof AuthSimpananProdukSimpananRoute
+  '/_auth/simpanan/rekening-simpanan': typeof AuthSimpananRekeningSimpananRoute
+  '/_auth/simpanan/tagihan': typeof AuthSimpananTagihanRoute
+  '/_auth/settings/permissions/$roleId': typeof AuthSettingsPermissionsRoleIdRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/login"
-    | "/dashboard"
-    | "/gerai-retail"
-    | "/laporan-akuntansi"
-    | "/laporan-retail"
-    | "/profile"
-    | "/akuntansi/buku-besar"
-    | "/akuntansi/coa"
-    | "/akuntansi/transaksi-umum"
-    | "/akuntansi/tutup-buku"
-    | "/koperasi/anggota"
-    | "/koperasi/jabatan"
-    | "/koperasi/pengurus"
-    | "/pinjaman/pengajuan-pinjaman"
-    | "/pinjaman/produk-pinjaman"
-    | "/pinjaman/tagihan"
-    | "/settings/migration"
-    | "/settings/roles"
-    | "/settings/users"
-    | "/simpan-pinjam/laporan-transaksi"
-    | "/simpan-pinjam/transaksi-anggota"
-    | "/simpanan/produk-simpanan"
-    | "/simpanan/rekening-simpanan"
-    | "/simpanan/tagihan"
-    | "/settings/permissions/$roleId";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/gerai-retail'
+    | '/laporan-akuntansi'
+    | '/laporan-retail'
+    | '/profile'
+    | '/akuntansi/buku-besar'
+    | '/akuntansi/coa'
+    | '/akuntansi/transaksi-umum'
+    | '/akuntansi/tutup-buku'
+    | '/koperasi/anggota'
+    | '/koperasi/jabatan'
+    | '/koperasi/pengurus'
+    | '/pinjaman/pengajuan-pinjaman'
+    | '/pinjaman/produk-pinjaman'
+    | '/pinjaman/tagihan'
+    | '/settings/migration'
+    | '/settings/roles'
+    | '/settings/users'
+    | '/simpan-pinjam/laporan-transaksi'
+    | '/simpan-pinjam/transaksi-anggota'
+    | '/simpanan/produk-simpanan'
+    | '/simpanan/rekening-simpanan'
+    | '/simpanan/tagihan'
+    | '/settings/permissions/$roleId'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/login"
-    | "/dashboard"
-    | "/gerai-retail"
-    | "/laporan-akuntansi"
-    | "/laporan-retail"
-    | "/profile"
-    | "/akuntansi/buku-besar"
-    | "/akuntansi/coa"
-    | "/akuntansi/transaksi-umum"
-    | "/akuntansi/tutup-buku"
-    | "/koperasi/anggota"
-    | "/koperasi/jabatan"
-    | "/koperasi/pengurus"
-    | "/pinjaman/pengajuan-pinjaman"
-    | "/pinjaman/produk-pinjaman"
-    | "/pinjaman/tagihan"
-    | "/settings/migration"
-    | "/settings/roles"
-    | "/settings/users"
-    | "/simpan-pinjam/laporan-transaksi"
-    | "/simpan-pinjam/transaksi-anggota"
-    | "/simpanan/produk-simpanan"
-    | "/simpanan/rekening-simpanan"
-    | "/simpanan/tagihan"
-    | "/settings/permissions/$roleId";
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/gerai-retail'
+    | '/laporan-akuntansi'
+    | '/laporan-retail'
+    | '/profile'
+    | '/akuntansi/buku-besar'
+    | '/akuntansi/coa'
+    | '/akuntansi/transaksi-umum'
+    | '/akuntansi/tutup-buku'
+    | '/koperasi/anggota'
+    | '/koperasi/jabatan'
+    | '/koperasi/pengurus'
+    | '/pinjaman/pengajuan-pinjaman'
+    | '/pinjaman/produk-pinjaman'
+    | '/pinjaman/tagihan'
+    | '/settings/migration'
+    | '/settings/roles'
+    | '/settings/users'
+    | '/simpan-pinjam/laporan-transaksi'
+    | '/simpan-pinjam/transaksi-anggota'
+    | '/simpanan/produk-simpanan'
+    | '/simpanan/rekening-simpanan'
+    | '/simpanan/tagihan'
+    | '/settings/permissions/$roleId'
   id:
-    | "__root__"
-    | "/"
-    | "/_auth"
-    | "/login"
-    | "/_auth/dashboard"
-    | "/_auth/gerai-retail"
-    | "/_auth/laporan-akuntansi"
-    | "/_auth/laporan-retail"
-    | "/_auth/profile"
-    | "/_auth/akuntansi/buku-besar"
-    | "/_auth/akuntansi/coa"
-    | "/_auth/akuntansi/transaksi-umum"
-    | "/_auth/akuntansi/tutup-buku"
-    | "/_auth/koperasi/anggota"
-    | "/_auth/koperasi/jabatan"
-    | "/_auth/koperasi/pengurus"
-    | "/_auth/pinjaman/pengajuan-pinjaman"
-    | "/_auth/pinjaman/produk-pinjaman"
-    | "/_auth/pinjaman/tagihan"
-    | "/_auth/settings/migration"
-    | "/_auth/settings/roles"
-    | "/_auth/settings/users"
-    | "/_auth/simpan-pinjam/laporan-transaksi"
-    | "/_auth/simpan-pinjam/transaksi-anggota"
-    | "/_auth/simpanan/produk-simpanan"
-    | "/_auth/simpanan/rekening-simpanan"
-    | "/_auth/simpanan/tagihan"
-    | "/_auth/settings/permissions/$roleId";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/_auth'
+    | '/login'
+    | '/_auth/dashboard'
+    | '/_auth/gerai-retail'
+    | '/_auth/laporan-akuntansi'
+    | '/_auth/laporan-retail'
+    | '/_auth/profile'
+    | '/_auth/akuntansi/buku-besar'
+    | '/_auth/akuntansi/coa'
+    | '/_auth/akuntansi/transaksi-umum'
+    | '/_auth/akuntansi/tutup-buku'
+    | '/_auth/koperasi/anggota'
+    | '/_auth/koperasi/jabatan'
+    | '/_auth/koperasi/pengurus'
+    | '/_auth/pinjaman/pengajuan-pinjaman'
+    | '/_auth/pinjaman/produk-pinjaman'
+    | '/_auth/pinjaman/tagihan'
+    | '/_auth/settings/migration'
+    | '/_auth/settings/roles'
+    | '/_auth/settings/users'
+    | '/_auth/simpan-pinjam/laporan-transaksi'
+    | '/_auth/simpan-pinjam/transaksi-anggota'
+    | '/_auth/simpanan/produk-simpanan'
+    | '/_auth/simpanan/rekening-simpanan'
+    | '/_auth/simpanan/tagihan'
+    | '/_auth/settings/permissions/$roleId'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  AuthRoute: typeof AuthRouteWithChildren;
-  LoginRoute: typeof LoginRoute;
+  IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/login": {
-      id: "/login";
-      path: "/login";
-      fullPath: "/login";
-      preLoaderRoute: typeof LoginRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_auth": {
-      id: "/_auth";
-      path: "";
-      fullPath: "/";
-      preLoaderRoute: typeof AuthRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_auth/profile": {
-      id: "/_auth/profile";
-      path: "/profile";
-      fullPath: "/profile";
-      preLoaderRoute: typeof AuthProfileRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/laporan-retail": {
-      id: "/_auth/laporan-retail";
-      path: "/laporan-retail";
-      fullPath: "/laporan-retail";
-      preLoaderRoute: typeof AuthLaporanRetailRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/laporan-akuntansi": {
-      id: "/_auth/laporan-akuntansi";
-      path: "/laporan-akuntansi";
-      fullPath: "/laporan-akuntansi";
-      preLoaderRoute: typeof AuthLaporanAkuntansiRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/gerai-retail": {
-      id: "/_auth/gerai-retail";
-      path: "/gerai-retail";
-      fullPath: "/gerai-retail";
-      preLoaderRoute: typeof AuthGeraiRetailRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/dashboard": {
-      id: "/_auth/dashboard";
-      path: "/dashboard";
-      fullPath: "/dashboard";
-      preLoaderRoute: typeof AuthDashboardRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/simpanan/tagihan": {
-      id: "/_auth/simpanan/tagihan";
-      path: "/simpanan/tagihan";
-      fullPath: "/simpanan/tagihan";
-      preLoaderRoute: typeof AuthSimpananTagihanRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/simpanan/rekening-simpanan": {
-      id: "/_auth/simpanan/rekening-simpanan";
-      path: "/simpanan/rekening-simpanan";
-      fullPath: "/simpanan/rekening-simpanan";
-      preLoaderRoute: typeof AuthSimpananRekeningSimpananRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/simpanan/produk-simpanan": {
-      id: "/_auth/simpanan/produk-simpanan";
-      path: "/simpanan/produk-simpanan";
-      fullPath: "/simpanan/produk-simpanan";
-      preLoaderRoute: typeof AuthSimpananProdukSimpananRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/simpan-pinjam/transaksi-anggota": {
-      id: "/_auth/simpan-pinjam/transaksi-anggota";
-      path: "/simpan-pinjam/transaksi-anggota";
-      fullPath: "/simpan-pinjam/transaksi-anggota";
-      preLoaderRoute: typeof AuthSimpanPinjamTransaksiAnggotaRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/simpan-pinjam/laporan-transaksi": {
-      id: "/_auth/simpan-pinjam/laporan-transaksi";
-      path: "/simpan-pinjam/laporan-transaksi";
-      fullPath: "/simpan-pinjam/laporan-transaksi";
-      preLoaderRoute: typeof AuthSimpanPinjamLaporanTransaksiRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/settings/users": {
-      id: "/_auth/settings/users";
-      path: "/settings/users";
-      fullPath: "/settings/users";
-      preLoaderRoute: typeof AuthSettingsUsersRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/settings/roles": {
-      id: "/_auth/settings/roles";
-      path: "/settings/roles";
-      fullPath: "/settings/roles";
-      preLoaderRoute: typeof AuthSettingsRolesRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/settings/migration": {
-      id: "/_auth/settings/migration";
-      path: "/settings/migration";
-      fullPath: "/settings/migration";
-      preLoaderRoute: typeof AuthSettingsMigrationRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/pinjaman/tagihan": {
-      id: "/_auth/pinjaman/tagihan";
-      path: "/pinjaman/tagihan";
-      fullPath: "/pinjaman/tagihan";
-      preLoaderRoute: typeof AuthPinjamanTagihanRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/pinjaman/produk-pinjaman": {
-      id: "/_auth/pinjaman/produk-pinjaman";
-      path: "/pinjaman/produk-pinjaman";
-      fullPath: "/pinjaman/produk-pinjaman";
-      preLoaderRoute: typeof AuthPinjamanProdukPinjamanRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/pinjaman/pengajuan-pinjaman": {
-      id: "/_auth/pinjaman/pengajuan-pinjaman";
-      path: "/pinjaman/pengajuan-pinjaman";
-      fullPath: "/pinjaman/pengajuan-pinjaman";
-      preLoaderRoute: typeof AuthPinjamanPengajuanPinjamanRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/koperasi/pengurus": {
-      id: "/_auth/koperasi/pengurus";
-      path: "/koperasi/pengurus";
-      fullPath: "/koperasi/pengurus";
-      preLoaderRoute: typeof AuthKoperasiPengurusRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/koperasi/jabatan": {
-      id: "/_auth/koperasi/jabatan";
-      path: "/koperasi/jabatan";
-      fullPath: "/koperasi/jabatan";
-      preLoaderRoute: typeof AuthKoperasiJabatanRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/koperasi/anggota": {
-      id: "/_auth/koperasi/anggota";
-      path: "/koperasi/anggota";
-      fullPath: "/koperasi/anggota";
-      preLoaderRoute: typeof AuthKoperasiAnggotaRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/akuntansi/tutup-buku": {
-      id: "/_auth/akuntansi/tutup-buku";
-      path: "/akuntansi/tutup-buku";
-      fullPath: "/akuntansi/tutup-buku";
-      preLoaderRoute: typeof AuthAkuntansiTutupBukuRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/akuntansi/transaksi-umum": {
-      id: "/_auth/akuntansi/transaksi-umum";
-      path: "/akuntansi/transaksi-umum";
-      fullPath: "/akuntansi/transaksi-umum";
-      preLoaderRoute: typeof AuthAkuntansiTransaksiUmumRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/akuntansi/coa": {
-      id: "/_auth/akuntansi/coa";
-      path: "/akuntansi/coa";
-      fullPath: "/akuntansi/coa";
-      preLoaderRoute: typeof AuthAkuntansiCoaRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/akuntansi/buku-besar": {
-      id: "/_auth/akuntansi/buku-besar";
-      path: "/akuntansi/buku-besar";
-      fullPath: "/akuntansi/buku-besar";
-      preLoaderRoute: typeof AuthAkuntansiBukuBesarRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
-    "/_auth/settings/permissions/$roleId": {
-      id: "/_auth/settings/permissions/$roleId";
-      path: "/settings/permissions/$roleId";
-      fullPath: "/settings/permissions/$roleId";
-      preLoaderRoute: typeof AuthSettingsPermissionsRoleIdRouteImport;
-      parentRoute: typeof AuthRoute;
-    };
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/profile': {
+      id: '/_auth/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthProfileRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/laporan-retail': {
+      id: '/_auth/laporan-retail'
+      path: '/laporan-retail'
+      fullPath: '/laporan-retail'
+      preLoaderRoute: typeof AuthLaporanRetailRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/laporan-akuntansi': {
+      id: '/_auth/laporan-akuntansi'
+      path: '/laporan-akuntansi'
+      fullPath: '/laporan-akuntansi'
+      preLoaderRoute: typeof AuthLaporanAkuntansiRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/gerai-retail': {
+      id: '/_auth/gerai-retail'
+      path: '/gerai-retail'
+      fullPath: '/gerai-retail'
+      preLoaderRoute: typeof AuthGeraiRetailRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/dashboard': {
+      id: '/_auth/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthDashboardRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/simpanan/tagihan': {
+      id: '/_auth/simpanan/tagihan'
+      path: '/simpanan/tagihan'
+      fullPath: '/simpanan/tagihan'
+      preLoaderRoute: typeof AuthSimpananTagihanRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/simpanan/rekening-simpanan': {
+      id: '/_auth/simpanan/rekening-simpanan'
+      path: '/simpanan/rekening-simpanan'
+      fullPath: '/simpanan/rekening-simpanan'
+      preLoaderRoute: typeof AuthSimpananRekeningSimpananRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/simpanan/produk-simpanan': {
+      id: '/_auth/simpanan/produk-simpanan'
+      path: '/simpanan/produk-simpanan'
+      fullPath: '/simpanan/produk-simpanan'
+      preLoaderRoute: typeof AuthSimpananProdukSimpananRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/simpan-pinjam/transaksi-anggota': {
+      id: '/_auth/simpan-pinjam/transaksi-anggota'
+      path: '/simpan-pinjam/transaksi-anggota'
+      fullPath: '/simpan-pinjam/transaksi-anggota'
+      preLoaderRoute: typeof AuthSimpanPinjamTransaksiAnggotaRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/simpan-pinjam/laporan-transaksi': {
+      id: '/_auth/simpan-pinjam/laporan-transaksi'
+      path: '/simpan-pinjam/laporan-transaksi'
+      fullPath: '/simpan-pinjam/laporan-transaksi'
+      preLoaderRoute: typeof AuthSimpanPinjamLaporanTransaksiRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/users': {
+      id: '/_auth/settings/users'
+      path: '/settings/users'
+      fullPath: '/settings/users'
+      preLoaderRoute: typeof AuthSettingsUsersRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/roles': {
+      id: '/_auth/settings/roles'
+      path: '/settings/roles'
+      fullPath: '/settings/roles'
+      preLoaderRoute: typeof AuthSettingsRolesRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/migration': {
+      id: '/_auth/settings/migration'
+      path: '/settings/migration'
+      fullPath: '/settings/migration'
+      preLoaderRoute: typeof AuthSettingsMigrationRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/pinjaman/tagihan': {
+      id: '/_auth/pinjaman/tagihan'
+      path: '/pinjaman/tagihan'
+      fullPath: '/pinjaman/tagihan'
+      preLoaderRoute: typeof AuthPinjamanTagihanRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/pinjaman/produk-pinjaman': {
+      id: '/_auth/pinjaman/produk-pinjaman'
+      path: '/pinjaman/produk-pinjaman'
+      fullPath: '/pinjaman/produk-pinjaman'
+      preLoaderRoute: typeof AuthPinjamanProdukPinjamanRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/pinjaman/pengajuan-pinjaman': {
+      id: '/_auth/pinjaman/pengajuan-pinjaman'
+      path: '/pinjaman/pengajuan-pinjaman'
+      fullPath: '/pinjaman/pengajuan-pinjaman'
+      preLoaderRoute: typeof AuthPinjamanPengajuanPinjamanRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/koperasi/pengurus': {
+      id: '/_auth/koperasi/pengurus'
+      path: '/koperasi/pengurus'
+      fullPath: '/koperasi/pengurus'
+      preLoaderRoute: typeof AuthKoperasiPengurusRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/koperasi/jabatan': {
+      id: '/_auth/koperasi/jabatan'
+      path: '/koperasi/jabatan'
+      fullPath: '/koperasi/jabatan'
+      preLoaderRoute: typeof AuthKoperasiJabatanRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/koperasi/anggota': {
+      id: '/_auth/koperasi/anggota'
+      path: '/koperasi/anggota'
+      fullPath: '/koperasi/anggota'
+      preLoaderRoute: typeof AuthKoperasiAnggotaRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/akuntansi/tutup-buku': {
+      id: '/_auth/akuntansi/tutup-buku'
+      path: '/akuntansi/tutup-buku'
+      fullPath: '/akuntansi/tutup-buku'
+      preLoaderRoute: typeof AuthAkuntansiTutupBukuRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/akuntansi/transaksi-umum': {
+      id: '/_auth/akuntansi/transaksi-umum'
+      path: '/akuntansi/transaksi-umum'
+      fullPath: '/akuntansi/transaksi-umum'
+      preLoaderRoute: typeof AuthAkuntansiTransaksiUmumRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/akuntansi/coa': {
+      id: '/_auth/akuntansi/coa'
+      path: '/akuntansi/coa'
+      fullPath: '/akuntansi/coa'
+      preLoaderRoute: typeof AuthAkuntansiCoaRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/akuntansi/buku-besar': {
+      id: '/_auth/akuntansi/buku-besar'
+      path: '/akuntansi/buku-besar'
+      fullPath: '/akuntansi/buku-besar'
+      preLoaderRoute: typeof AuthAkuntansiBukuBesarRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/permissions/$roleId': {
+      id: '/_auth/settings/permissions/$roleId'
+      path: '/settings/permissions/$roleId'
+      fullPath: '/settings/permissions/$roleId'
+      preLoaderRoute: typeof AuthSettingsPermissionsRoleIdRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
 interface AuthRouteChildren {
-  AuthDashboardRoute: typeof AuthDashboardRoute;
-  AuthGeraiRetailRoute: typeof AuthGeraiRetailRoute;
-  AuthLaporanAkuntansiRoute: typeof AuthLaporanAkuntansiRoute;
-  AuthLaporanRetailRoute: typeof AuthLaporanRetailRoute;
-  AuthProfileRoute: typeof AuthProfileRoute;
-  AuthAkuntansiBukuBesarRoute: typeof AuthAkuntansiBukuBesarRoute;
-  AuthAkuntansiCoaRoute: typeof AuthAkuntansiCoaRoute;
-  AuthAkuntansiTransaksiUmumRoute: typeof AuthAkuntansiTransaksiUmumRoute;
-  AuthAkuntansiTutupBukuRoute: typeof AuthAkuntansiTutupBukuRoute;
-  AuthKoperasiAnggotaRoute: typeof AuthKoperasiAnggotaRoute;
-  AuthKoperasiJabatanRoute: typeof AuthKoperasiJabatanRoute;
-  AuthKoperasiPengurusRoute: typeof AuthKoperasiPengurusRoute;
-  AuthPinjamanPengajuanPinjamanRoute: typeof AuthPinjamanPengajuanPinjamanRoute;
-  AuthPinjamanProdukPinjamanRoute: typeof AuthPinjamanProdukPinjamanRoute;
-  AuthPinjamanTagihanRoute: typeof AuthPinjamanTagihanRoute;
-  AuthSettingsMigrationRoute: typeof AuthSettingsMigrationRoute;
-  AuthSettingsRolesRoute: typeof AuthSettingsRolesRoute;
-  AuthSettingsUsersRoute: typeof AuthSettingsUsersRoute;
-  AuthSimpanPinjamLaporanTransaksiRoute: typeof AuthSimpanPinjamLaporanTransaksiRoute;
-  AuthSimpanPinjamTransaksiAnggotaRoute: typeof AuthSimpanPinjamTransaksiAnggotaRoute;
-  AuthSimpananProdukSimpananRoute: typeof AuthSimpananProdukSimpananRoute;
-  AuthSimpananRekeningSimpananRoute: typeof AuthSimpananRekeningSimpananRoute;
-  AuthSimpananTagihanRoute: typeof AuthSimpananTagihanRoute;
-  AuthSettingsPermissionsRoleIdRoute: typeof AuthSettingsPermissionsRoleIdRoute;
+  AuthDashboardRoute: typeof AuthDashboardRoute
+  AuthGeraiRetailRoute: typeof AuthGeraiRetailRoute
+  AuthLaporanAkuntansiRoute: typeof AuthLaporanAkuntansiRoute
+  AuthLaporanRetailRoute: typeof AuthLaporanRetailRoute
+  AuthProfileRoute: typeof AuthProfileRoute
+  AuthAkuntansiBukuBesarRoute: typeof AuthAkuntansiBukuBesarRoute
+  AuthAkuntansiCoaRoute: typeof AuthAkuntansiCoaRoute
+  AuthAkuntansiTransaksiUmumRoute: typeof AuthAkuntansiTransaksiUmumRoute
+  AuthAkuntansiTutupBukuRoute: typeof AuthAkuntansiTutupBukuRoute
+  AuthKoperasiAnggotaRoute: typeof AuthKoperasiAnggotaRoute
+  AuthKoperasiJabatanRoute: typeof AuthKoperasiJabatanRoute
+  AuthKoperasiPengurusRoute: typeof AuthKoperasiPengurusRoute
+  AuthPinjamanPengajuanPinjamanRoute: typeof AuthPinjamanPengajuanPinjamanRoute
+  AuthPinjamanProdukPinjamanRoute: typeof AuthPinjamanProdukPinjamanRoute
+  AuthPinjamanTagihanRoute: typeof AuthPinjamanTagihanRoute
+  AuthSettingsMigrationRoute: typeof AuthSettingsMigrationRoute
+  AuthSettingsRolesRoute: typeof AuthSettingsRolesRoute
+  AuthSettingsUsersRoute: typeof AuthSettingsUsersRoute
+  AuthSimpanPinjamLaporanTransaksiRoute: typeof AuthSimpanPinjamLaporanTransaksiRoute
+  AuthSimpanPinjamTransaksiAnggotaRoute: typeof AuthSimpanPinjamTransaksiAnggotaRoute
+  AuthSimpananProdukSimpananRoute: typeof AuthSimpananProdukSimpananRoute
+  AuthSimpananRekeningSimpananRoute: typeof AuthSimpananRekeningSimpananRoute
+  AuthSimpananTagihanRoute: typeof AuthSimpananTagihanRoute
+  AuthSettingsPermissionsRoleIdRoute: typeof AuthSettingsPermissionsRoleIdRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
@@ -606,24 +606,24 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthSimpananRekeningSimpananRoute: AuthSimpananRekeningSimpananRoute,
   AuthSimpananTagihanRoute: AuthSimpananTagihanRoute,
   AuthSettingsPermissionsRoleIdRoute: AuthSettingsPermissionsRoleIdRoute,
-};
+}
 
-const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren);
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx";
-import type { createStart } from "@tanstack/react-start";
-declare module "@tanstack/react-start" {
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
   interface Register {
-    ssr: true;
-    router: Awaited<ReturnType<typeof getRouter>>;
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
   }
 }
